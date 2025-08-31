@@ -31,7 +31,7 @@ Project-MedSync/
 ### Prerequisites
 - Node.js (v16+)
 - PostgreSQL
-- npm or yarn
+- npm
 
 ### Setup Instructions
 
@@ -144,9 +144,9 @@ Refer to the ERD document for detailed database design.
 
 ## 👥 Team Members
 
-- **230365D** - LAKSHAN H.M.K. - [GitHub]()
+- **230365D** - LAKSHAN H.M.K. - [GitHub](https://github.com/Kalana-Lakshan)
 - **230425M** - NAWAGAMUWA N.A.K. - [GitHub](https://github.com/ashiniKavindya)
-- **230453V** - PADMASIRI G.R.H.D. - [GitHub]()
+- **230453V** - PADMASIRI G.R.H.D. - [GitHub](https://github.com/hasarangadinuj)
 - **230518C** - RAKESHAN K.R.K. - [GitHub](https://github.com/KRakeesh04)
 - **230611F** - SHAZAN M.S.M. - [GitHub](https://github.com/shazzann)
 
