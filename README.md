@@ -6,7 +6,7 @@ A comprehensive medical clinic appointment and treatment management system built
 
 MedSync is a full-stack web application designed to streamline clinic operations, manage patient appointments, and handle treatment records efficiently. The system provides a seamless experience for both healthcare providers and patients.
 
-## Security Access Levels 
+## 🔐 Security Access Levels 
 
 ```text
 SUPER_ADMIN
