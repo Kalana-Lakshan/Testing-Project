@@ -8,6 +8,9 @@ export interface AuthRequest extends Request {
 
 function authorizeRoles(allowedRoles: string[]) {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (allowedRoles.includes("PUBLIC")) {
+      return next();
+    }
     if (!req.user) {
       return res.status(401).json({ message: 'Unauthorized: No user info' });
     }
