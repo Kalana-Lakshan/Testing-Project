@@ -6,6 +6,23 @@ A comprehensive medical clinic appointment and treatment management system built
 
 MedSync is a full-stack web application designed to streamline clinic operations, manage patient appointments, and handle treatment records efficiently. The system provides a seamless experience for both healthcare providers and patients.
 
+## Security Access Levels 
+
+```text
+SUPER_ADMIN
+│
+├── BRANCH_MANAGER
+│   ├── ADMIN_STAFF
+│   ├── DOCTOR
+│   │    ├── NURSE
+│   ├── BILLING_STAFF
+│   ├── INSURANCE_AGENT
+│   └── RECEPTIONIST
+│
+└── PATIENT
+    └── PUBLIC
+```
+
 ## 📁 Project Structure
 
 ```
@@ -155,3 +172,45 @@ Refer to the ERD document for detailed database design.
 For technical issues or questions:
 - Backend-related: Refer to [backend/README.md](backend/README.md) troubleshooting section
 - Frontend-related: Refer to [frontend/README.md](frontend/README.md) development guide
+
+
+### Functionalities and access levels
+
+| Module/Function              | SUPER_ADMIN | BRANCH_MANAGER | ADMIN_STAFF       | DOCTOR       | NURSE         | BILLING_STAFF | INSURANCE_AGENT | RECEPTIONIST | PATIENT       | PUBLIC   |
+|-----------------------------|-------------|----------------|-------------------|--------------|---------------|---------------|-----------------|--------------|---------------|----------|
+| Patient Registration        | Full        | Full           | Read/Write        | None         | None          | None          | None            | Read/Write   | Read/Write    | None     |
+| Appointment Scheduling      | Full        | Full           | Read              | Read         | Read          | None          | None            | Full         | Read/Write    | None     |
+| Appointment Management      | Full        | Full           | Limited Read      | Full         | Limited Read  | None          | None            | Full         | Read/Write    | None     |
+| Patient Medical Records     | Full        | Full           | No Access         | Full         | Limited Read  | No Access     | No Access       | No Access    | Read          | No Access|
+| Treatment Records           | Full        | Full           | No Access         | Full         | Limited Read  | No Access     | No Access       | No Access    | Read          | No Access|
+| Billing and Invoices        | Full        | Full           | Read (Summary)    | No Access    | No Access     | Full          | Limited Read    | No Access    | Read          | No Access|
+| Insurance Claims            | Full        | Full           | No Access         | No Access    | No Access     | No Access     | Full            | No Access    | Read          | No Access|
+| Staff Scheduling & Directory| Full        | Full           | Full              | No Access    | No Access     | No Access     | No Access       | No Access    | No Access     | No Access|
+| Reports (Operational/Admin) | Full        | Full           | Full              | Limited      | Limited       | Limited       | Limited         | Limited      | No Access     | No Access|
+| User Management            | Full        | Limited        | No Access or Limited | No Access  | No Access     | No Access     | No Access       | No Access    | No Access     | No Access|
+| System Configuration        | Full        | No Access      | No Access         | No Access    | No Access     | No Access     | No Access       | No Access    | No Access     | No Access|
+
+
+### Access Type Key:
+
+   - **Full**: Create, Read, Update, Delete (CRUD) access
+
+   - **Read/Write**: Can view and modify relevant data for this module
+
+   - **Read**: View-only access
+
+   - **Limited Read**: View limited or summary info only
+
+   - **No Access**: No permission for the module/function
+
+### Notes:
+
+   - Doctors and Nurses focus on clinical data only, no billing or insurance access.
+   - Billing Staff fully access billing, invoices, payment processes but not medical records.
+   - Insurance Agents manage insurance claims and related data but not treatment notes or billing directly.
+   - Admin Staff support patient and appointment operations, have summary billing report access, and manage internal staff scheduling.
+   - Receptionists control patient registration and appointment booking fully but do not access billing or clinical records.
+   - Patients can view and manage their own records and appointments, including payments.
+   - Public has access only to general clinic info, no confidential or personal data.
+
+
