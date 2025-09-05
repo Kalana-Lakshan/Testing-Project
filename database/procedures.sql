@@ -39,8 +39,8 @@ CREATE OR REPLACE PROCEDURE create_user(
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  INSERT INTO "User" (username, password_hash, role, branch_id, is_approved)
-  VALUES (p_username, p_password_hash, p_role, p_branch_id, p_is_approved);
+  INSERT INTO "User" (username, password_hash, role, branch_id, is_approved, created_at)
+  VALUES (p_username, p_password_hash, p_role, p_branch_id, p_is_approved, NOW());
 END;
 $$;
 
@@ -74,7 +74,8 @@ RETURNS TABLE(
   password_hash VARCHAR,
   role         VARCHAR,
   branch_id    BIGINT,
-  is_approved  BOOLEAN
+  is_approved  BOOLEAN,
+	created_at	TIMESTAMP
 ) LANGUAGE plpgsql
 AS $$
 BEGIN
