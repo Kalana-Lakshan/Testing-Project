@@ -129,12 +129,12 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
   UPDATE "Patient"
-  SET name  = p_name 
-      gender = p_gender 
-      emergency_contact_no = p_emergency_contact_no 
-      nic = p_nic 
-      address = p_address 
-      date_of_birth = p_date_of_birth 
+  SET name  = p_name,
+      gender = p_gender,
+      emergency_contact_no = p_emergency_contact_no,
+      nic = p_nic,
+      address = p_address, 
+      date_of_birth = p_date_of_birth, 
       blood_type = p_blood_type 
   WHERE patient_id = p_patient_id;
 END;
@@ -221,10 +221,10 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
   UPDATE "Staff"
-  SET name p_name
-			type p_type
-			gender p_gender
-			monthly_salary p_monthly_salary
+  SET name = p_name,
+			type = p_type,
+			gender = p_gender,
+			monthly_salary = p_monthly_salary
   WHERE staff_id = p_staff_id;
 END;
 $$;
@@ -302,8 +302,8 @@ LANGUAGE plpgsql
 AS $$
 BEGIN
   UPDATE "Branch_Manager"
-  SET name = p_name
-			monthly_salary = p_monthly_salary
+  SET name = p_name,
+			monthly_salary = p_monthly_salary,
 			gender = p_gender
   WHERE manager_id = p_manager_id;
 END;
