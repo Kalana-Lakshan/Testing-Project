@@ -113,8 +113,8 @@ CREATE TABLE public.Log (
   time_Stamp timestamp without time zone NOT NULL,
   details character varying,
   CONSTRAINT Log_pkey PRIMARY KEY (log_id),
-  CONSTRAINT Log_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.User(user_id),
-  CONSTRAINT Log_action_id_fkey FOREIGN KEY (action_id) REFERENCES public.Action(id)
+  CONSTRAINT Log_action_id_fkey FOREIGN KEY (action_id) REFERENCES public.Action(id),
+  CONSTRAINT Log_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.User(user_id)
 );
 CREATE TABLE public.Medical_History (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
@@ -199,7 +199,7 @@ CREATE TABLE public.User (
   role character varying NOT NULL,
   branch_id bigint NOT NULL,
   is_approved boolean NOT NULL DEFAULT false,
-  username character varying NOT NULL,
+  username character varying NOT NULL UNIQUE,
   created_at timestamp without time zone NOT NULL,
   CONSTRAINT User_pkey PRIMARY KEY (user_id),
   CONSTRAINT User_branch_id_fkey FOREIGN KEY (branch_id) REFERENCES public.Branch(id)
