@@ -1,5 +1,6 @@
 import type { Express, Request, Response } from "express";
 import authorizeRoles from "../auth/auth.js";
+import { getUsers } from "../handlers/user.handler.ts";
 
 
 export const HttpMethod = {
@@ -35,7 +36,8 @@ interface Route {
 
 var routes: Route[] = [
 	// example for adding a new route
-	{ path: "/users", AccessibleBy: availableForRoles([]), method: HttpMethod.GET, handler: () => {} },
+	{ path: "/users", AccessibleBy: availableForRoles([Role.USER]), method: HttpMethod.GET, handler: getUsers },
+
 
 ];
 
