@@ -23,30 +23,36 @@ DROP TABLE IF EXISTS `billing_invoice`;
 DROP TABLE IF EXISTS `billing_payment`;
 
 
-CREATE Table `branch` (
-    `branch_id` : BIGINT UNIQUE AUTO_INCREMENT PRIMARY KEY,
-    `name` : VARCHAR(15),
-    `location` : VARCHAR(100),
-    `landline_no` : VARCHAR(10),
-    `created_at` : TIMESTAMP DEFAULT NOW()
+CREATE TABLE `branch` (
+    `branch_id` BIGINT AUTO_INCREMENT,
+    `name` VARCHAR(15),
+    `location` VARCHAR(100),
+    `landline_no` VARCHAR(10),
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`branch_id`)
 );
 
-CREATE Table `user` (
-    `user_id` BIGINT UNIQUE AUTO_INCREMENT PRIMARY KEY,
+
+CREATE TABLE `user` (
+    `user_id` BIGINT AUTO_INCREMENT,
     `username` VARCHAR(20) UNIQUE,
     `password_hash` VARCHAR(50),
-    `role` VARCHAR(15) ENUM(
-        "SUPER_ADMIN", 
-        "BRANCH_MANAGER", 
-        "DOCTOR", 
-        "ADMIN_STAFF", 
-        "NURSE", 
-        "RECEPTIONIST", 
-        "BILLING_STAFF", 
-        "INSURANCE_AGENT", 
-        "PATIENT"
-        ),
-    `branch_id` BIGINT, 
+    `role` ENUM(
+        'SUPER_ADMIN', 
+        'BRANCH_MANAGER', 
+        'DOCTOR', 
+        'ADMIN_STAFF', 
+        'NURSE', 
+        'RECEPTIONIST', 
+        'BILLING_STAFF', 
+        'INSURANCE_AGENT', 
+        'PATIENT'
+    ),
+    `branch_id` BIGINT,
+    PRIMARY KEY (`user_id`),
+    FOREIGN KEY (`branch_id`) REFERENCES `branch`(`branch_id`)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
 
