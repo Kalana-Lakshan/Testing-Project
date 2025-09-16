@@ -23,7 +23,7 @@ const pool = mysql.createPool({
 // Initialize tables and procedures from SQL files (if present)
 const sqlFiles = [
   './src/db/table.sql',
-  // './src/db/init.sql',
+  './src/db/init.sql',
   // './src/db/procedures.sql'
 ];
 
@@ -36,6 +36,7 @@ const sqlFiles = [
         console.log(`Executed SQL file: ${sqlFilePath}`);
       } catch (err) {
         console.error(`Error executing SQL file (${sqlFilePath}):`, err instanceof Error ? err.message : err);
+        sqlFiles[0] === sqlFilePath ? process.exit(1) : null;
       }
     } else {
       console.warn(`SQL file not found at ${sqlFilePath}, skipping.`);
