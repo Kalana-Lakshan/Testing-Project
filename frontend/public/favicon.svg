@@ -1,0 +1,26 @@
+<!-- MedSync favicon SVG -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="32" height="32" role="img" aria-labelledby="title desc">
+  <title id="title">MedSync favicon</title>
+  <desc id="desc">Circular sync arrows enclosing a heartbeat line.</desc>
+
+  <defs>
+    <linearGradient id="g-teal" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0ea5a4"/>
+      <stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="g-green" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#06d6a0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer sync arcs -->
+  <path d="M96 24A56 56 0 0 0 24 96" fill="none" stroke="url(#g-teal)" stroke-width="10" stroke-linecap="round"/>
+  <path d="M96 24 L84 34 L104 36 Z" fill="url(#g-teal)"/>
+  <path d="M24 96A56 56 0 0 0 96 104" fill="none" stroke="url(#g-green)" stroke-width="10" stroke-linecap="round"/>
+  <path d="M24 96 L12 104 L28 112 Z" fill="url(#g-green)"/>
+
+  <!-- Heartbeat line -->
+  <path d="M20 64 L40 64 L50 48 L60 80 L74 36 L86 64 L108 64"
+        stroke="#0f172a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

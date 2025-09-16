@@ -1,0 +1,85 @@
+<!-- MedSync logo SVG
+     - Icon: circular sync arrows + heartbeat/EKG
+     - Wordmark: "Med" (teal/blue) + "Sync" (green)
+     - Accessible title/desc included
+     - ViewBox scalable; designed to remain legible at favicon sizes
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" width="600" height="200" role="img" aria-labelledby="medsyncTitle medsyncDesc">
+  <title id="medsyncTitle">MedSync logo — medical sync dashboard</title>
+  <desc id="medsyncDesc">A circular sync icon enclosing a heartbeat/EKG line to the left of the "MedSync" wordmark. "Med" colored teal-blue, "Sync" colored green.</desc>
+
+  <defs>
+    <!-- gradients -->
+    <linearGradient id="g-teal" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0ea5a4"/>
+      <stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="g-green" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#10b981"/>
+      <stop offset="1" stop-color="#06d6a0"/>
+    </linearGradient>
+
+    <!-- rounded line style for small sizes -->
+    <style type="text/css"><![CDATA[
+      .icon-stroke { stroke-linecap: round; stroke-linejoin: round; }
+      .word { font-family: "Inter", "Poppins", "Segoe UI", Roboto, Arial, sans-serif; font-weight: 700; letter-spacing: -0.02em; }
+    ]]></style>
+  </defs>
+
+  <!-- LEFT: Icon group (placed at x=28,y=24) -->
+  <g transform="translate(28,24)">
+    <!-- Outer sync circle formed by two arrowed arcs -->
+    <g transform="translate(0,0)">
+      <!-- first arc -->
+      <path d="M 96 8
+               A 80 80 0 0 0 16 88"
+            fill="none" stroke="url(#g-teal)" stroke-width="10" class="icon-stroke"/>
+      <!-- arrowhead at start of second arc (top-right) -->
+      <path d="M 96 8 L 86 22 L 106 20 Z" fill="url(#g-teal)" opacity="0.95"/>
+
+      <!-- second arc -->
+      <path d="M 16 88
+               A 80 80 0 0 0 96 168"
+            fill="none" stroke="url(#g-green)" stroke-width="10" class="icon-stroke"/>
+      <!-- arrowhead at bottom-left of second arc -->
+      <path d="M 16 88 L 2 98 L 18 106 Z" fill="url(#g-green)" opacity="0.95"/>
+    </g>
+
+    <!-- Inner circle background to improve contrast at small sizes -->
+    <circle cx="56" cy="88" r="44" fill="#ffffff00"/>
+
+    <!-- Heartbeat / EKG line centered in the circle -->
+    <g transform="translate(6,46)" stroke="#0f172a" stroke-width="6" fill="none" class="icon-stroke">
+      <!-- subtle shadow line for depth (very low opacity) -->
+      <path d="M2 40 L 18 40 L 26 28 L 36 64 L 54 8 L 66 40 L 110 40" stroke="#000000" stroke-opacity="0.06" />
+      <!-- main EKG -->
+      <path d="M2 40 L 18 40 L 26 28 L 36 64 L 54 8 L 66 40 L 110 40" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- overlay colored stroke to integrate with gradients -->
+      <path d="M2 40 L 18 40 L 26 28 L 36 64 L 54 8 L 66 40 L 110 40"
+            stroke="url(#g-teal)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- subtle circle ring (thin) to define icon area -->
+    <circle cx="56" cy="88" r="52" fill="none" stroke="#0f172a" stroke-opacity="0.06" stroke-width="1.5"/>
+  </g>
+
+  <!-- RIGHT: Wordmark -->
+  <g transform="translate(192,118)" aria-hidden="false">
+    <!-- "Med" -->
+    <text x="0" y="0" class="word" font-size="56" fill="url(#g-teal)" dominant-baseline="middle" alignment-baseline="middle">
+      <tspan x="0" dy="0">Med</tspan>
+    </text>
+
+    <!-- "Sync" -->
+    <text x="132" y="0" class="word" font-size="56" fill="url(#g-green)" dominant-baseline="middle" alignment-baseline="middle">
+      <tspan x="132" dy="0">Sync</tspan>
+    </text>
+
+    <!-- Optional tagline (small, disabled by default). Uncomment if you want a small tagline. -->
+    <!--
+    <text x="0" y="36" font-family="Inter, Arial, sans-serif" font-size="14" fill="#6b7280">
+      Appointment · Payments · Billing
+    </text>
+    -->
+  </g>
+</svg>
