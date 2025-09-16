@@ -26,7 +26,7 @@ import {
     ClipboardPenLine,
     ChevronRight,
     LogOut,
-    PanelLeftIcon
+    PanelRightOpen
  } from "lucide-react"
 // billing and paments - Receipt
 // patient - Users
@@ -41,9 +41,11 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSkeleton,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
@@ -55,6 +57,15 @@ import {
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 
 export const ROLE_SUPER_ADMIN		= "SUPER_ADMIN";
@@ -69,9 +80,10 @@ export const ROLE_PATIENT			= "PATIENT";
 export const ROLE_USER			    = "USER";
 
 import { NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 interface SidebarItemLink {
-	type: "link";
+	type: "child";
 	title: string;
 	url: string;
 	icon: LucideIcon;
@@ -79,29 +91,29 @@ interface SidebarItemLink {
 }
 
 interface SidebarItemGroup {
-	type: "group";
+	type: "parent";
 	title: string;
 	icon: LucideIcon;
-	links: Array<SidebarItemLink>;
+	children: Array<SidebarItemLink>;
 	hideIf?: (role: string) => boolean;
 }
 
 const items: Array<SidebarItemLink | SidebarItemGroup> = [
     {
-        type: "link",
+        type: "child",
         title: "Dashboard",
         url: "/",
         icon: Hospital,
         hideIf:(role) => typeof role !== "string" || role == ROLE_PATIENT,
     },
     {
-        type: "group",
+        type: "parent",
         title: "Patient Dashboard",
         icon: HeartPulse,
         hideIf:(role) => typeof role !== "string" || role != ROLE_PATIENT,
-        links: [
+        children: [
             {
-                type: "link",
+                type: "child",
                 title: "Medical History",
                 url: "",
                 icon: BookOpen,
@@ -109,7 +121,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_PATIENT, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Outstanding bills",
                 url: "",
                 icon: FileStack,
@@ -117,7 +129,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_PATIENT, ROLE_BILLING_STAFF, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Insurances info",
                 url: "",
                 icon: IdCardLanyard,
@@ -125,7 +137,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Payment history",
                 url: "",
                 icon: FileClock,
@@ -135,13 +147,13 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         ],
     },
     {
-        type: "group",
+        type: "parent",
         title: "Doctors' Dashboard",
         icon: Stethoscope,
         // hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
-        links: [
+        children: [
             {
-                type: "link",
+                type: "child",
                 title: "Doctors' details",
                 url: "",
                 icon: HeartPulse,
@@ -149,7 +161,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Appointment details",
                 url: "",
                 icon: FileUser,
@@ -157,7 +169,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Patients history",
                 url: "",
                 icon: BookUser,
@@ -167,13 +179,13 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         ],
     },
     {
-        type: "group",
+        type: "parent",
         title: "Staff Dashboard",
         icon: Users,
         // hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
-        links: [
+        children: [
             {
-                type: "link",
+                type: "child",
                 title: "Staffs details",
                 url: "",
                 icon: UserSearch,
@@ -181,7 +193,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Reports",
                 url: "",
                 icon: ClipboardPenLine,
@@ -191,13 +203,13 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         ],
     },
     {
-        type: "group",
+        type: "parent",
         title: "Appointments",
         icon: ClipboardClock,
         // hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
-        links: [
+        children: [
             {
-                type: "link",
+                type: "child",
                 title: "All Appointments",
                 url: "",
                 icon: ClipboardList,
@@ -205,7 +217,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Doctors' avilable time",
                 url: "",
                 icon: ClockPlus,
@@ -213,7 +225,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Add Appointment",
                 url: "",
                 icon: ClipboardPlus,
@@ -221,7 +233,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Schedule/Reschedule",
                 url: "",
                 icon: CalendarSync,
@@ -229,7 +241,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Cancelled",
                 url: "",
                 icon: CalendarX2,
@@ -239,13 +251,13 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         ],
     },
     {
-        type: "group",
+        type: "parent",
         title: "Billing & Payment",
         icon: Receipt,
         // hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
-        links: [
+        children: [
             {
-                type: "link",
+                type: "child",
                 title: "Invoice details",
                 url: "",
                 icon: ReceiptText,
@@ -253,7 +265,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Outstanding balances",
                 url: "",
                 icon: BanknoteX,
@@ -261,7 +273,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "Make payment",
                 url: "",
                 icon: CreditCard,
@@ -271,13 +283,13 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         ],
     },
     {
-        type: "group",
+        type: "parent",
         title: "Insurance info",
         icon: HandCoins,
         // hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
-        links: [
+        children: [
             {
-                type: "link",
+                type: "child",
                 title: "",
                 url: "",
                 icon: HandCoins,
@@ -285,7 +297,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
                 ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
             },
             {
-                type: "link",
+                type: "child",
                 title: "",
                 url: "",
                 icon: HandCoins,
@@ -297,39 +309,54 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
 ]
 
 export function AppSidebar() {
-    const { toggleSidebar } = useSidebar();
+    const [loading, setLoading] = useState<boolean>(false);
+    const { toggleSidebar, open } = useSidebar();
     const navigate = useNavigate();
     const user = {
-        role: "",
-        username: "",
+        role: "User",
+        username: "K Rakeshan",
     };
     const role = "";
     const logout = () => {
-		navigate("/.....");
+		navigate("/sign-in");
 	};
 
-  return (
-    <Sidebar collapsible="icon">
+  return loading? (
+    <SidebarMenu>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <SidebarMenuItem key={index}>
+          <SidebarMenuSkeleton />
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  ):(
+    <Sidebar 
+    collapsible="icon"
+    onClick={!open? toggleSidebar: undefined}
+    >
+        <SidebarHeader>
+            <SidebarMenu>
+                {open? 
+                    <SidebarMenuItem className="flex flex-row">
+                        <div>
+                        <img src="/logo.svg" />
+                        </div>
+                        <div>
+                        <PanelRightOpen size={20} className="cursor-pointer" onClick={toggleSidebar}/>
+                        </div>
+                    </SidebarMenuItem>
+                :
+                    <SidebarMenuItem>
+                        <img src="/favicon.svg"/>
+                    </SidebarMenuItem>
+                }
+            </SidebarMenu>
+        </SidebarHeader>
       <SidebarContent className="gap-0">
         <SidebarGroup>
             <SidebarMenu>
-                <SidebarMenuItem>
-                    <SidebarMenuButton>
-                        {user ? (
-                            <>
-                                <User />
-                                <div className="flex flex-col">
-                                    <span className="font-medium">{user.username}</span>
-                                    <span className="text-xs">
-                                        {user.role}
-                                    </span>
-                                </div>
-                            </>
-                        ) : null}
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
                 {items.map((item) => 
-                    item.type !== "link" || item.hideIf?.(role) ? null : (
+                    item.type !== "child" || item.hideIf?.(role) ? null : (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton asChild>
                                 <NavLink to={item.url}>
@@ -343,7 +370,7 @@ export function AppSidebar() {
             </SidebarMenu>
         </SidebarGroup>
         {items.map((item) => 
-            item.type !== "group" || item.hideIf?.(role) ? null : (
+            item.type !== "parent" || item.hideIf?.(role) ? null : (
                 <SidebarGroup>
                     <SidebarMenu>
                         <Collapsible className="group/collapsible">
@@ -357,12 +384,12 @@ export function AppSidebar() {
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
                                     <SidebarMenuSub>
-                                        {item.links.map((link) => (
-                                            <SidebarMenuSubItem key={link.title}>
+                                        {item.children.map((child) => (
+                                            <SidebarMenuSubItem key={child.title}>
                                                 <SidebarMenuSubButton asChild>
-                                                    <NavLink to={link.url}>
-                                                        <link.icon size={25} className="size-40" />
-                                                        <span>{link.title}</span>
+                                                    <NavLink to={child.url}>
+                                                        <child.icon size={25} className="size-40" />
+                                                        <span>{child.title}</span>
                                                     </NavLink>
                                                 </SidebarMenuSubButton>
                                             </SidebarMenuSubItem>
@@ -379,22 +406,40 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton
+                <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton className="h-15">
+                        {user ? (
+                            <>
+                                <User/>
+                                <div className="flex flex-col pl-1">
+                                    <span className="font-medium">{user.username}</span>
+                                    <span className="text-xs">
+                                        {user.role}
+                                    </span>
+                                </div>
+                            </>
+                        ) : null}
+                    </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                side="top"
+                // className="w-[--radix-popper-anchor-width]"
+                className="w-full w-(--sidebar-width)"
+                >
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                    <DropdownMenuItem>Billing</DropdownMenuItem>
+                    <DropdownMenuItem>Team</DropdownMenuItem>
+                    <DropdownMenuItem 
                     className="text-destructive hover:text-destructive"
-                    onClick={logout}
-                >
-                    <LogOut />
-                    <span>Log Out</span>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-                <SidebarMenuButton
-                    className="cursor-pointer"
-                    onClick={toggleSidebar}
-                >
-                    <PanelLeftIcon />
-                    <span>Hide</span>
-                </SidebarMenuButton>
+                    onClick={logout}>
+                        <LogOut />
+                        <span>Log Out</span>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+                </DropdownMenu>
             </SidebarMenuItem>
         </SidebarMenu>
     </SidebarFooter>
