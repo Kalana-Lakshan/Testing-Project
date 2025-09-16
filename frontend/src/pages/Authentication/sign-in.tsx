@@ -10,28 +10,73 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { login } from "@/services/authServices"
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
-export function CardDemo() {
+const SignIn: React.FC = () => {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const [username, setUsername] = useState("");
+	const [password, setPassword] = useState("");
+	const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+	const handleSignIn = async (e: { preventDefault: () => void }) => {
+		e.preventDefault();
+		setLoading(true);
+		if (username !== "" && password !== "") {
+			await login(username, password)
+				.then(() => {
+					navigate("/");
+				})
+				.catch((error) => {
+					setError(error);
+					setLoading(false);
+				});
+		} else if (username === "" || password === "") {
+			setError("Please enter your username and password");
+			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		if (token) {
+			navigate("/");
+		}
+	}, [token, navigate]);
+
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
         <CardTitle>Login to your account</CardTitle>
         <CardDescription>
-          Enter your email below to login to your account
+          Enter your username below to login to your account
         </CardDescription>
         <CardAction>
-          <Button variant="link">Sign Up</Button>
+          <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          >
+            <Link to="/auth/signup" >
+								Sign Up
+							</Link>
+            </Button>
         </CardAction>
       </CardHeader>
       <CardContent>
         <form>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Username</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
+                id="username"
+                value={username}
+								onChange={(e) => setUsername(e.target.value)}
+								type="text"
+								placeholder="Enter your username"
                 required
               />
             </div>
@@ -45,19 +90,34 @@ export function CardDemo() {
                   Forgot your password?
                 </a>
               </div>
-              <Input id="password" type="password" required />
+              <Input 
+                id="password" 
+                value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								type="password"
+								placeholder="Enter your password"
+                required 
+              />
             </div>
           </div>
         </form>
       </CardContent>
       <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full">
-          Login
+        <Button
+          type="button"
+          onClick={handleSignIn}
+          variant="outline"
+          className="w-full"
+          disabled={loading}
+        >
+          {loading ? "Signing In..." : "Sign In"}
         </Button>
-        <Button variant="outline" className="w-full">
+        {/* <Button variant="outline" className="w-full">
           Login with Google
-        </Button>
+        </Button> */}
       </CardFooter>
     </Card>
   )
 }
+
+export default SignIn;
