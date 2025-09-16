@@ -1,4 +1,4 @@
-import sql from "../db.ts";
+import sql from "../db/db.ts";
 
 export interface User {
   user_id       : number;
