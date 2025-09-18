@@ -37,7 +37,7 @@ CREATE TABLE `Insurance` (
 CREATE TABLE `Staff` (
   `staff_id` int,
   `name` varchar(50),
-  `type (receptionist, nurse, admin staff)` varchar(15),
+  `type` varchar(15),
   `monthly_salary` numeric(8,2),
   `gender` varchar(6),
   PRIMARY KEY (`staff_id`)
@@ -182,9 +182,9 @@ CREATE TABLE `User` (
   `user_id` int,
   `username` varchar(20),
   `password_hash` varchar(50),
-  `role (patient / doctor / staff / branch_manager)` varchar(15),
+  `role` varchar(15),
   `branch_id` int,
-  `is_approved (to allow a user to login to the dashboard)` bool,
+  `is_approved` bool,
   `created_at` timestamp,
   PRIMARY KEY (`user_id`),
   FOREIGN KEY (`branch_id`)
@@ -193,7 +193,7 @@ CREATE TABLE `User` (
 
 CREATE TABLE `User_Contact` (
   `contact ` varchar(50),
-  `contact_type (email or phone_no)` varchar(8),
+  `contact_type` varchar(8),
   `is_default` bool,
   `user_id` int,
   PRIMARY KEY (`contact `),
@@ -215,7 +215,7 @@ CREATE TABLE `Log` (
   `user_role` varchar(15),
   `action_id` int,
   `table_name` varchar(15),
-  `record_id (PK in updated table)` int,
+  `record_id` int,
   `time_Stamp` timestamp,
   `details` varchar(255),
   PRIMARY KEY (`log_id`),
