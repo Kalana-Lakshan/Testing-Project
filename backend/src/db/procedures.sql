@@ -58,8 +58,8 @@ CREATE PROCEDURE create_user(
     IN p_is_approved TINYINT(1)
 )
 BEGIN
-    INSERT INTO `user` (username, password_hash, role, branch_id)
-    VALUES (p_username, p_password_hash, p_role, p_branch_id);
+    INSERT INTO `user` (username, password_hash, role, branch_id, is_approved)
+    VALUES (p_username, p_password_hash, p_role, p_branch_id, p_is_approved);
 END$$
 
 -- Update a user
@@ -76,14 +76,15 @@ BEGIN
     SET username = p_username,
         password_hash = p_password_hash,
         role = p_role,
-        branch_id = p_branch_id
+        branch_id = p_branch_id,
+        is_approved = p_is_approved
     WHERE user_id = p_id;
 END$$
 
 -- Get a user by ID 
 CREATE PROCEDURE get_user_by_id(IN p_id BIGINT)
 BEGIN
-    SELECT user_id, username, password_hash, role, branch_id
+    SELECT user_id, username, password_hash, role, branch_id, is_approved, created_at
     FROM `user`
     WHERE user_id = p_id;
 END$$
@@ -91,7 +92,7 @@ END$$
 -- Get a user by username 
 CREATE PROCEDURE get_user_by_username(IN p_username VARCHAR(20))
 BEGIN
-    SELECT user_id, username, password_hash, role, branch_id
+    SELECT user_id, username, password_hash, role, branch_id, is_approved, created_at
     FROM `user`
     WHERE username = p_username;
 END$$
@@ -99,7 +100,7 @@ END$$
 -- Get all user 
 CREATE PROCEDURE get_all_users(IN user_count INT, IN start_count INT)
 BEGIN
-    SELECT user_id, username, password_hash, role, branch_id
+    SELECT user_id, username, password_hash, role, branch_id, is_approved, created_at
     FROM `user`
     ORDER BY user_id
     LIMIT user_count OFFSET start_count;
