@@ -55,11 +55,11 @@ Project-MedSync/
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/KRakeesh04/Project-MedSync.git
-   cd Project-MedSync
    ```
 
 2. **Backend Setup:**
-   ```bash
+   ```bash  //take a new terminal
+   cd Project-MedSync
    cd backend
    npm install
    cp .env.example .env
@@ -70,7 +70,8 @@ Project-MedSync/
    📖 **Detailed backend setup**: See [backend/README.md](backend/README.md)
 
 3. **Frontend Setup:**
-   ```bash
+   ```bash  //take a new terminal
+   cd Project-MedSync
    cd frontend
    npm install
    npm run dev
