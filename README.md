@@ -57,8 +57,8 @@ Project-MedSync/
    git clone https://github.com/KRakeesh04/Project-MedSync.git
    ```
 
-2. **Backend Setup:**
-   ```bash  //take a new terminal
+2. **Backend Setup:  //take a new terminal**
+   ```bash
    cd Project-MedSync
    cd backend
    npm install
@@ -69,8 +69,8 @@ Project-MedSync/
 
    📖 **Detailed backend setup**: See [backend/README.md](backend/README.md)
 
-3. **Frontend Setup:**
-   ```bash  //take a new terminal
+3. **Frontend Setup:  //take a new terminal**
+   ```bash  
    cd Project-MedSync
    cd frontend
    npm install
