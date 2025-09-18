@@ -54,7 +54,7 @@ Project-MedSync/
 
 1. **Clone the repository:**
    ```bash
-   git clone [<repository-url>](https://github.com/KRakeesh04/Project-MedSync.git)
+   git clone https://github.com/KRakeesh04/Project-MedSync.git
    cd Project-MedSync
    ```
 
