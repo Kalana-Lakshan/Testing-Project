@@ -5,13 +5,29 @@ CREATE TABLE `Speciality` (
   PRIMARY KEY (`speciality_id`)
 );
 
-CREATE TABLE `Doctor` (
-  `doctor_id` int,
-  `name` varchar(50),
-  `fee_per_patient` numeric(8,2),
-  `basic_monthly_salary` numeric(8,2),
-  `gender` varchar(6),
-  PRIMARY KEY (`doctor_id`)
+
+CREATE TABLE `user` (
+    `user_id` BIGINT AUTO_INCREMENT,
+    `username` VARCHAR(20) NOT NULL UNIQUE,
+    `password_hash` VARCHAR(50) NOT  NULL,
+    `role` ENUM(
+        'Super_Admin', 
+        'Branch_Manager', 
+        'Doctor', 
+        'Admin_Staff', 
+        'Nurse', 
+        'Receptionist', 
+        'Billing_Staff', 
+        'Insurance_Agent', 
+        'Patient'
+    ) NOT NULL,
+    `branch_id` BIGINT NULL,
+    `is_approved` BOOLEAN DEFAULT FALSE,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`user_id`),
+    FOREIGN KEY (`branch_id`) REFERENCES `branch`(`branch_id`)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
 CREATE TABLE `Doctor_Speciality` (
