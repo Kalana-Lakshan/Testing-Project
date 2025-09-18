@@ -1,12 +1,12 @@
-// import './App.css'
+import './App.css'
 import { useEffect, useState } from "react";
 import { Route, Routes, useLocation } from 'react-router-dom';
 import PageTitle from './components/PageTitle';
 import DefaultLayout from './DefaultLayout';
 import Dashboard from './pages/Dashboard';
 import { Skeleton } from "./components/ui/skeleton";
-import SignIn from "./pages/Authentication/sign-in";
-import SignUp from "./pages/Authentication/sign-up";
+import SignIn from "./pages/Authentication/sign-in";  
+    
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);

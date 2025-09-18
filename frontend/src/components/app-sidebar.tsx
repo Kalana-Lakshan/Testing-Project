@@ -150,7 +150,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         type: "parent",
         title: "Doctors' Dashboard",
         icon: Stethoscope,
-        // hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
+        //hideIf:(role) => typeof role !== "string" || ![ROLE_DOCTOR].includes(role),
         children: [
             {
                 type: "child",
