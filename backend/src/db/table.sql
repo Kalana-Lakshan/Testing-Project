@@ -124,7 +124,7 @@ CREATE TABLE `Billing_Payment` (
 CREATE TABLE `Prescription` (
   `appointment_id` int,
   `consultation_note` varchar(255),
-  `prescription_items_details` Type,
+  `prescription_items_details` varchar(255),
   `prescribed_at` timestamp,
   `is_active` bool,
   PRIMARY KEY (`appointment_id`)
@@ -143,8 +143,8 @@ CREATE TABLE `Appointment` (
   `patient_note` varchar(255),
   `date` date,
   `time_slot` varchar(13),
-  `status (Scheduled / Completed / Cancelled)` varchar(10),
-  `time_stamp (for emergency walk-in)` timestamp,
+  `status` varchar(10),
+  `time_stamp` timestamp,
   PRIMARY KEY (`appointment_id`),
   FOREIGN KEY (`patient_id`)
       REFERENCES `Patient`(`patient_id`),
@@ -192,11 +192,11 @@ CREATE TABLE `User` (
 );
 
 CREATE TABLE `User_Contact` (
-  `contact ` varchar(50),
-  `contact_type` varchar(8),
+  `contact` varchar(50),
+  `contact_type (email or phone_no)` varchar(8),
   `is_default` bool,
   `user_id` int,
-  PRIMARY KEY (`contact `),
+  PRIMARY KEY (`contact`),
   FOREIGN KEY (`user_id`)
       REFERENCES `User`(`user_id`)
 );
@@ -214,7 +214,7 @@ CREATE TABLE `Log` (
   `user_id` int,
   `user_role` varchar(15),
   `action_id` int,
-  `table_name` varchar(15),
+  `table_name` varchar(255),
   `record_id` int,
   `time_Stamp` timestamp,
   `details` varchar(255),
