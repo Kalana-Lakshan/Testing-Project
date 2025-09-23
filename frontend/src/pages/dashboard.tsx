@@ -1,9 +1,8 @@
-
 const Dashboard: React.FC = () => {
-  return(
+  return (
     <>
       <h1>
-        hiii this is Dashboard 
+        hiii this is Dashboard
       </h1>
     </>
   );
