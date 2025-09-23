@@ -1,3 +1,4 @@
+use `Project-MedSync`;
 -- User model functions
 DROP PROCEDURE IF EXISTS create_user;
 DROP PROCEDURE IF EXISTS update_user;
@@ -100,8 +101,9 @@ END$$
 -- Get all user 
 CREATE PROCEDURE get_all_users(IN user_count INT, IN start_count INT)
 BEGIN
-    SELECT user_id, username, password_hash, role, branch_id, is_approved, created_at
-    FROM `user`
+    SELECT u.user_id, u.username, u.role, b.name as branch_name, u.is_approved, u.created_at
+    FROM `user` u
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
     ORDER BY user_id
     LIMIT user_count OFFSET start_count;
 END$$
