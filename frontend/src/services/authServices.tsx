@@ -1,4 +1,4 @@
-import AxiosError from "axios";
+import { AxiosError } from "axios";
 import axiosInstance from "../axiosConfig";
 
 export const LOCAL_STORAGE__TOKEN = "token";
@@ -7,9 +7,9 @@ export const LOCAL_STORAGE__USERNAME = "username";
 export const LOCAL_STORAGE__ROLE = "role";
 export const LOCAL_STORAGE__USER_ID = "user_id";
 
-export const login = async (username: string, password: string) => {
+export const signin = async (username: string, password: string) => {
   try {
-    const response = await axiosInstance.post("/auth/login", {
+    const response = await axiosInstance.post("/auth/sign-in", {
       username,
       password,
     });
@@ -27,7 +27,6 @@ export const login = async (username: string, password: string) => {
       if (error.response?.data?.error) {
         throw error.response.data.error;
       }
-
       throw error.message;
     }
     throw "Unknown error occurred";

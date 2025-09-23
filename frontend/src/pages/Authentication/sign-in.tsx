@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { login } from "@/services/authServices"
+import { signin } from "@/services/authServices"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
@@ -27,7 +27,7 @@ const SignIn: React.FC = () => {
 		e.preventDefault();
 		setLoading(true);
 		if (username !== "" && password !== "") {
-			await login(username, password)
+			await signin(username, password)
 				.then(() => {
 					navigate("/");
 				})
@@ -60,7 +60,7 @@ const SignIn: React.FC = () => {
           variant="outline"
           className="w-full"
           >
-            <Link to="/auth/signup" >
+            <Link to="/sign-up" >
 								Sign Up
 							</Link>
             </Button>
@@ -75,7 +75,7 @@ const SignIn: React.FC = () => {
                 id="username"
                 value={username}
 								onChange={(e) => setUsername(e.target.value)}
-								type="text"
+								type="text" 
 								placeholder="Enter your username"
                 required
               />
@@ -112,9 +112,6 @@ const SignIn: React.FC = () => {
         >
           {loading ? "Signing In..." : "Sign In"}
         </Button>
-        {/* <Button variant="outline" className="w-full">
-          Login with Google
-        </Button> */}
       </CardFooter>
     </Card>
   )
