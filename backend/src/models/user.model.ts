@@ -1,38 +1,67 @@
 import sql from "../db/db.ts";
 
 export interface User {
-  user_id       : number;
-  username      : string;
-  password_hash : string;
-  role          : string;
-  branch_id     : number;
-  is_approved   : boolean;
-  created_at    : string;
+  user_id: number;
+  username: string;
+  password_hash: string;
+  role: string;
+  branch_id: number;
+  branch_name: string;
+  is_approved: boolean;
+  created_at: string;
 }
 
-export const createUser = async (username: string, password_hash: string, role: string, branch_id: number, is_approved: boolean) => {
+// Create User
+export const createUser = async (
+  username: string,
+  password_hash: string,
+  role: string,
+  branch_id: number,
+  is_approved: boolean
+): Promise<User> => {
   try {
-    const [user] = await sql<User[]>`SELECT * FROM create_user(${username}, ${password_hash}, ${role}, ${branch_id}, ${is_approved});`;
-    return user;
+    const [rows] = await sql.query(
+      "CALL create_user(?, ?, ?, ?, ?)",
+      [username, password_hash, role, branch_id, is_approved]
+    );
+    // stored procs return nested arrays: [[rows], ...]
+    return (rows as any)[0][0] as User;
   } catch (error) {
     console.error("Error creating user:", error);
     throw error;
   }
 };
 
-export const updateUser = async (user_id: number, username: string, password_hash: string, role: string, branch_id: number, is_approved: boolean) => {
+// Update User
+export const updateUser = async (
+  user_id: number,
+  username: string,
+  password_hash: string,
+  role: string,
+  branch_id: number,
+  is_approved: boolean
+): Promise<void> => {
   try {
-    await sql`SELECT update_user(${user_id}, ${username}, ${password_hash}, ${role}, ${branch_id}, ${is_approved});`;
+    await sql.query("CALL update_user(?, ?, ?, ?, ?, ?)", [
+      user_id,
+      username,
+      password_hash,
+      role,
+      branch_id,
+      is_approved,
+    ]);
   } catch (error) {
     console.error("Error updating user:", error);
     throw error;
   }
 };
 
-export const getUserById = async (id: number) => {
+// Get User By ID
+export const getUserById = async (id: number): Promise<User> => {
   try {
-    const [user] = await sql<User[]>`SELECT * FROM get_user_by_id(${id});`;
-    if (!user) throw new Error('User not found');
+    const [rows] = await sql.query("CALL get_user_by_id(?)", [id]);
+    const user = (rows as any)[0][0] as User;
+    if (!user) throw new Error("User not found");
     return user;
   } catch (error) {
     console.error("Error fetching user by ID:", error);
@@ -40,10 +69,17 @@ export const getUserById = async (id: number) => {
   }
 };
 
-export const getAllUser = async (count: number, offset: number) => {
+// Get All Users (pagination)
+export const getAllUser = async (
+  count: number,
+  offset: number
+): Promise<User[]> => {
   try {
-    const users = await sql<User[]>`SELECT * FROM get_all_users(${count}, ${offset});`;
-    return users;
+    const [rows] = await sql.query("CALL get_all_users(?, ?)", [
+      count,
+      offset,
+    ]);
+    return (rows as any)[0] as User[];
   } catch (error) {
     console.error("Error fetching all users:", error);
     throw error;
