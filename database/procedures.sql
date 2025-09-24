@@ -45,17 +45,27 @@ DROP PROCEDURE IF EXISTS get_default_contacts_by_userID;
 DROP PROCEDURE IF EXISTS get_all_contacts;
 
 -- speciality model functions
-
 DROP PROCEDURE IF EXISTS create_speciality;
 DROP PROCEDURE IF EXISTS update_speciality;
 DROP PROCEDURE IF EXISTS delete_speciality;
 DROP PROCEDURE IF EXISTS get_speciality_by_id;
-DROP PROCEDURE IF EXISTS get_all_speciality;
+DROP PROCEDURE IF EXISTS get_all_specialities;
 
--- billing_invoice functions
+-- billing_invoice model functions
+DROP PROCEDURE IF EXISTS create_billing_invoice;
+DROP PROCEDURE IF EXISTS update_billing_invoice;
+DROP PROCEDURE IF EXISTS delete_billing_invoice;
+DROP PROCEDURE IF EXISTS get_billing_invoice_by_id;
+DROP PROCEDURE IF EXISTS get_all_billing_invoices;
 
--- billing_payment functions
 
+-- billing_payment model functions
+DROP PROCEDURE IF EXISTS create_billing_payment;
+DROP PROCEDURE IF EXISTS update_billing_payment;
+DROP PROCEDURE IF EXISTS delete_billing_payment;
+DROP PROCEDURE IF EXISTS get_billing_payment_by_id;
+DROP PROCEDURE IF EXISTS get_billing_payments_by_invoice_id;
+DROP PROCEDURE IF EXISTS get_all_billing_payments;
 
 
 
@@ -466,10 +476,177 @@ BEGIN
 END$$
 
 
+-- billing_invoice model functions
+-- CREATE PROCEDURE to insert a new billing invoice
+
+CREATE PROCEDURE create_billing_invoice(
+    IN p_appointment_id INT,
+    IN p_additional_fee DECIMAL(10,2),
+    IN p_total_fee DECIMAL(10,2),
+    IN p_claim_id INT,
+    IN p_net_amount DECIMAL(10,2),
+    IN p_remaining_payment_amount DECIMAL(10,2)
+)
+BEGIN
+    INSERT INTO `billing_invoice` 
+    (appointment_id, additional_fee, total_fee, claim_id, net_amount, remaining_payment_amount, time_stamp)
+    VALUES
+    (p_appointment_id, p_additional_fee, p_total_fee, p_claim_id, p_net_amount, p_remaining_payment_amount, NOW());
+END$$
 
 
+-- CREATE PROCEDURE to update an existing billing invoice
+
+CREATE PROCEDURE update_billing_invoice(
+    IN p_invoice_id INT,
+    IN p_additional_fee DECIMAL(10,2),
+    IN p_total_fee DECIMAL(10,2),
+    IN p_net_amount DECIMAL(10,2),
+    IN p_remaining_payment_amount DECIMAL(10,2)
+)
+BEGIN
+    UPDATE `billing_invoice`
+    SET additional_fee = p_additional_fee,
+        total_fee = p_total_fee,
+        net_amount = p_net_amount,
+        remaining_payment_amount = p_remaining_payment_amount,
+        time_stamp = NOW()
+    WHERE id = p_invoice_id;
+END$$
 
 
+-- CREATE PROCEDURE to delete a billing invoice
+
+CREATE PROCEDURE delete_billing_invoice(IN p_invoice_id INT)
+BEGIN
+    DELETE FROM `billing_invoice` WHERE id = p_invoice_id;
+END$$
 
 
+-- CREATE PROCEDURE to get a billing invoice by ID
+
+CREATE PROCEDURE get_billing_invoice_by_id(IN p_invoice_id INT)
+BEGIN
+    SELECT * FROM `billing_invoice` WHERE id = p_invoice_id;
+END$$
+
+-- CREATE PROCEDURE to get all billing invoices
+
+CREATE PROCEDURE get_all_billing_invoices()
+BEGIN
+    SELECT * FROM `billing_invoice`;
+END$$
+
+-- billing_payment model functions
+
+-- CREATE PROCEDURE to insert a new billing payment
+
+CREATE PROCEDURE create_billing_payment(
+    IN p_payment_id INT,
+    IN p_invoice_id INT,
+    IN p_branch_id INT,
+    IN p_paid_amount NUMERIC(8,2),
+    IN p_cashier_id INT
+)
+BEGIN
+    INSERT INTO `billing_payment`
+    (payment_id, invoice_id, branch_id, paid_amount, cashier_id, time_stamp)
+    VALUES
+    (p_payment_id, p_invoice_id, p_branch_id, p_paid_amount, p_cashier_id, NOW());
+END$$
+
+-- CREATE PROCEDURE to update an existing billing payment
+CREATE PROCEDURE update_billing_payment(
+    IN p_payment_id INT,
+    IN p_paid_amount NUMERIC(8,2)
+)
+BEGIN
+    UPDATE `billing_payment`
+    SET paid_amount = p_paid_amount,
+        time_stamp = NOW()
+    WHERE payment_id = p_payment_id;
+END$$
+
+
+-- CREATE PROCEDURE to delete a billing payment
+
+CREATE PROCEDURE delete_billing_payment(IN p_payment_id INT)
+BEGIN
+    DELETE FROM `billing_payment` WHERE payment_id = p_payment_id;
+END$$
+
+
+-- CREATE PROCEDURE to get a billing payment by payment_id
+
+CREATE PROCEDURE get_billing_payment_by_id(IN p_payment_id INT)
+BEGIN
+    SELECT * FROM `billing_payment` WHERE payment_id = p_payment_id;
+END$$
+
+
+-- CREATE PROCEDURE to get payments by invoice_id
+
+CREATE PROCEDURE get_billing_payments_by_invoice_id(IN p_invoice_id INT)
+BEGIN
+    SELECT * FROM `billing_payment` WHERE invoice_id = p_invoice_id;
+END$$
+
+
+-- CREATE PROCEDURE to get all billing payments
+CREATE PROCEDURE get_all_billing_payments()
+BEGIN
+    SELECT * FROM `billing_payment`;
+END$$
+
+-- speciality model functions
+-- CREATE PROCEDURE to insert a new speciality
+
+CREATE PROCEDURE create_speciality(
+    IN p_speciality_id INT,
+    IN p_speciality_name VARCHAR(20),
+    IN p_description VARCHAR(255)
+)
+BEGIN
+    INSERT INTO `speciality` (speciality_id, speciality_name, description)
+    VALUES (p_speciality_id, p_speciality_name, p_description);
+END$$
+
+
+-- CREATE PROCEDURE to update an existing speciality
+
+CREATE PROCEDURE update_speciality(
+    IN p_speciality_id INT,
+    IN p_speciality_name VARCHAR(20),
+    IN p_description VARCHAR(255)
+)
+BEGIN
+    UPDATE `speciality`
+    SET speciality_name = p_speciality_name,
+        description = p_description
+    WHERE speciality_id = p_speciality_id;
+END$$
+
+
+-- CREATE PROCEDURE to delete a speciality
+
+CREATE PROCEDURE delete_speciality(IN p_speciality_id INT)
+BEGIN
+    DELETE FROM `speciality` WHERE speciality_id = p_speciality_id;
+END$$
+
+
+-- CREATE PROCEDURE to get a speciality by ID
+
+CREATE PROCEDURE get_speciality_by_id(IN p_speciality_id INT)
+BEGIN
+    SELECT * FROM `speciality` WHERE speciality_id = p_speciality_id;
+END$$
+
+
+-- CREATE PROCEDURE to get all specialities
+
+CREATE PROCEDURE get_all_specialities()
+BEGIN
+    SELECT * FROM `speciality`;
+END$$
 DELIMITER ;
