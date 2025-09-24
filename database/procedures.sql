@@ -44,6 +44,19 @@ DROP PROCEDURE IF EXISTS get_contact_details_by_contact;
 DROP PROCEDURE IF EXISTS get_default_contacts_by_userID;
 DROP PROCEDURE IF EXISTS get_all_contacts;
 
+-- speciality model functions
+
+DROP PROCEDURE IF EXISTS create_speciality;
+DROP PROCEDURE IF EXISTS update_speciality;
+DROP PROCEDURE IF EXISTS delete_speciality;
+DROP PROCEDURE IF EXISTS get_speciality_by_id;
+DROP PROCEDURE IF EXISTS get_all_speciality;
+
+-- billing_invoice functions
+
+-- billing_payment functions
+
+
 
 
 DELIMITER $$
