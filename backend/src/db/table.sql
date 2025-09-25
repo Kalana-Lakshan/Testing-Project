@@ -53,6 +53,7 @@ CREATE TABLE `user` (
     `branch_id` INT NULL,
     `is_approved` BOOLEAN DEFAULT FALSE,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `is_deleted` BOOLEAN DEFAULT False,
     PRIMARY KEY (`user_id`),
     FOREIGN KEY (`branch_id`) 
       REFERENCES `branch`(`branch_id`)

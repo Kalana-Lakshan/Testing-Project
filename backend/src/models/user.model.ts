@@ -11,6 +11,19 @@ export interface User {
   created_at: string;
 }
 
+// for the login
+export const getUserByUsername = async (username: string): Promise<User | null> => {
+  try {
+    const [rows] = await sql.query("CALL get_user_by_username(?)", [username]);
+    const user = (rows as any)[0][0] as User;
+    if (!user) throw new Error("User not found");
+    return user;
+  } catch (error) {
+    console.error("Error fetching user by ID:", error);
+    throw error;
+  }
+};
+
 // Create User
 export const createUser = async (
   username: string,
@@ -69,7 +82,7 @@ export const getUserById = async (id: number): Promise<User> => {
   }
 };
 
-// Get All Users (pagination)
+// Get All active Users (pagination)
 export const getAllUser = async (
   count: number,
   offset: number
@@ -82,6 +95,46 @@ export const getAllUser = async (
     return (rows as any)[0] as User[];
   } catch (error) {
     console.error("Error fetching all users:", error);
+    throw error;
+  }
+};
+
+
+export const getActiveUserCount = async (): Promise<Number> => {
+  try {
+    const [rows] = await sql.query("CALL get_all_active_users_count()");
+    return (rows as any)[0];
+  } catch (error) {
+    console.error("Error fetching count of active users:", error);
+    throw error;
+  }
+};
+
+
+// Get All Deleted Users (pagination)
+export const getAllDeletedUser = async (
+  count: number,
+  offset: number
+): Promise<User[]> => {
+  try {
+    const [rows] = await sql.query("CALL get_all_deleted_users(?, ?)", [
+      count,
+      offset,
+    ]);
+    return (rows as any)[0] as User[];
+  } catch (error) {
+    console.error("Error fetching all deleted users:", error);
+    throw error;
+  }
+};
+
+
+export const getInActiveUserCount = async (): Promise<Number> => {
+  try {
+    const [rows] = await sql.query("CALL get_all_deleted_users_count()");
+    return (rows as any)[0];
+  } catch (error) {
+    console.error("Error fetching count of deleted users:", error);
     throw error;
   }
 };

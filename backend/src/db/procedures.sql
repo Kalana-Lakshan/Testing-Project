@@ -1,3 +1,4 @@
+-- Active: 1755111596628@@127.0.0.1@3306@Project-MedSync
 use `Project-MedSync`;
 -- User model functions
 DROP PROCEDURE IF EXISTS create_user;
@@ -6,6 +7,9 @@ DROP PROCEDURE IF EXISTS delete_user;
 DROP PROCEDURE IF EXISTS get_user_by_id;
 DROP PROCEDURE IF EXISTS get_user_by_username;
 DROP PROCEDURE IF EXISTS get_all_users;
+DROP PROCEDURE IF EXISTS get_all_active_users_count;
+DROP PROCEDURE IF EXISTS get_all_deleted_users;
+DROP PROCEDURE IF EXISTS get_all_deleted_users_count;
 
 -- Patient model functions
 DROP PROCEDURE IF EXISTS create_patient;
@@ -85,33 +89,63 @@ END$$
 -- Get a user by ID 
 CREATE PROCEDURE get_user_by_id(IN p_id BIGINT)
 BEGIN
-    SELECT user_id, username, password_hash, role, branch_id, is_approved, created_at
-    FROM `user`
-    WHERE user_id = p_id;
+    SELECT u.user_id, u.username, u.password_hash, u.role, b.branch_id, b.name as branch_name, u.is_approved, u.created_at
+    FROM `user` u
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE u.user_id = p_id AND u.is_deleted = 0;
 END$$
 
 -- Get a user by username 
 CREATE PROCEDURE get_user_by_username(IN p_username VARCHAR(20))
 BEGIN
-    SELECT user_id, username, password_hash, role, branch_id, is_approved, created_at
-    FROM `user`
-    WHERE username = p_username;
+    SELECT u.user_id, u.username, u.password_hash, u.role, b.branch_id, b.name as branch_name, u.is_approved, u.created_at
+    FROM `user` u
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE u.username = p_username AND u.is_deleted = 0;
 END$$
 
 -- Get all user 
 CREATE PROCEDURE get_all_users(IN user_count INT, IN start_count INT)
 BEGIN
-    SELECT u.user_id, u.username, u.role, b.name as branch_name, u.is_approved, u.created_at
+    SELECT u.user_id, u.username, u.password_hash, u.role, b.branch_id, b.name as branch_name, u.is_approved, u.created_at
     FROM `user` u
     LEFT JOIN `branch` b ON u.branch_id = b.branch_id
-    ORDER BY user_id
+    WHERE u.is_deleted = 0
+    ORDER BY u.user_id
     LIMIT user_count OFFSET start_count;
+END$$
+
+CREATE PROCEDURE get_all_active_users_count()
+BEGIN
+    SELECT COUNT(user_id)
+    FROM `user`
+    WHERE is_deleted = 0;
+END$$
+
+-- get all deleted users
+CREATE PROCEDURE get_all_deleted_users(IN user_count INT, IN start_count INT)
+BEGIN
+    SELECT u.user_id, u.username, u.password_hash, u.role, b.branch_id, b.name as branch_name, u.is_approved, u.created_at
+    FROM `user` u
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE u.is_deleted = 1
+    ORDER BY u.user_id
+    LIMIT user_count OFFSET start_count;
+END$$
+
+CREATE PROCEDURE get_all_deleted_users_count()
+BEGIN
+    SELECT COUNT(user_id)
+    FROM `user`
+    WHERE is_deleted = 1;
 END$$
 
 -- Delete a user 
 CREATE PROCEDURE delete_user(IN p_id BIGINT)
 BEGIN
-    DELETE FROM `user` WHERE user_id = p_id;
+    UPDATE `user` 
+    set is_deleted = 1 
+    WHERE user_id = p_id; 
 END$$
 
 -- Patient model functions
