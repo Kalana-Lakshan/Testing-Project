@@ -7,7 +7,7 @@ import Dashboard from './pages/dashboard';
 import { Skeleton } from "./components/ui/skeleton";
 import SignIn from "./pages/Authentication/sign-in";
 import SignUp from './pages/Authentication/sign-up';
-import Users from './pages/users/users';
+import Users from './pages/users/activeUsers';
 import { ThemeProvider } from './components/theme-provider';
 
 
