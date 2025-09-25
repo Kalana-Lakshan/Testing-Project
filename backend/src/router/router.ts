@@ -1,6 +1,7 @@
 import type { Express, Request, Response } from "express";
 import authorizeRoles from "../auth/auth.js";
 import { getUsers } from "../handlers/user.handler.ts";
+import { patientSignup, userLogin, userSignup, validateUser } from "../handlers/auth.handler.ts";
 
 
 export const HttpMethod = {
@@ -35,8 +36,14 @@ interface Route {
 }
 
 var routes: Route[] = [
-	// example for adding a new route
-	{ path: "/users", AccessibleBy: availableForRoles([Role.USER]), method: HttpMethod.GET, handler: getUsers },
+	// authentication router
+	{ path: "/auth/sign-in", AccessibleBy: availableForRoles([Role.USER]), method: HttpMethod.POST, handler: userLogin },
+	{ path: "/auth/sign-up/user", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: userSignup },
+	{ path: "/auth/sign-up/patient", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: patientSignup },
+	{ path: "/auth/validate", AccessibleBy: availableForRoles([Role.USER]), method: HttpMethod.POST, handler: validateUser },
+
+	// users router
+	{ path: "/users/active", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getUsers },
 
 
 ];
@@ -70,52 +77,52 @@ export const MapRouters = (app: Express) => {
 
 
 function availableForRoles(roles: string[]): string[] {
-    const allRoles = Object.values(Role);
-    let result: Set<string> = new Set();
+	const allRoles = Object.values(Role);
+	let result: Set<string> = new Set();
 
-    for (const role of roles) {
-        if (role === Role.USER) {
+	for (const role of roles) {
+		if (role === Role.USER) {
 			for (const r of allRoles) {
 				if (r !== Role.USER || r !== Role.PUBLIC || r !== Role.MEDICAL_STAFF) {
 					result.add(r);
 				}
 			}
-            break;
-        } else if (role === Role.MEDICAL_STAFF) {
-            [
-                Role.RECEPTIONIST,
-                Role.NURSE,
-                Role.DOCTOR,
-                Role.ADMIN_STAFF,
-                Role.BRANCH_MANAGER,
-                Role.SUPER_ADMIN
-            ].forEach(r => result.add(r));
-        } else if (role === Role.RECEPTIONIST) {
-            [
-                Role.RECEPTIONIST,
-                Role.ADMIN_STAFF,
-                Role.BRANCH_MANAGER,
-                Role.SUPER_ADMIN
-            ].forEach(r => result.add(r));
-        } else if (
-            role === Role.ADMIN_STAFF || 
-			role === Role.DOCTOR || 
-			role === Role.NURSE || 
-			role === Role.BILLING_STAFF || 
-			role === Role.INSURANCE_AGENT
-        ) {
-            [
-				role, 
-				Role.BRANCH_MANAGER, 
+			break;
+		} else if (role === Role.MEDICAL_STAFF) {
+			[
+				Role.RECEPTIONIST,
+				Role.NURSE,
+				Role.DOCTOR,
+				Role.ADMIN_STAFF,
+				Role.BRANCH_MANAGER,
 				Role.SUPER_ADMIN
 			].forEach(r => result.add(r));
-        } else {
-            result.add(role);
-        }
-    }
+		} else if (role === Role.RECEPTIONIST) {
+			[
+				Role.RECEPTIONIST,
+				Role.ADMIN_STAFF,
+				Role.BRANCH_MANAGER,
+				Role.SUPER_ADMIN
+			].forEach(r => result.add(r));
+		} else if (
+			role === Role.ADMIN_STAFF ||
+			role === Role.DOCTOR ||
+			role === Role.NURSE ||
+			role === Role.BILLING_STAFF ||
+			role === Role.INSURANCE_AGENT
+		) {
+			[
+				role,
+				Role.BRANCH_MANAGER,
+				Role.SUPER_ADMIN
+			].forEach(r => result.add(r));
+		} else {
+			result.add(role);
+		}
+	}
 
-    result.add(Role.SUPER_ADMIN);
+	result.add(Role.SUPER_ADMIN);
 
-    return Array.from(result);
+	return Array.from(result);
 }
 
