@@ -4,6 +4,24 @@ import { comparePasswords } from "../auth/hash.ts";
 import { generateToken } from "../auth/token.ts";
 
 
+export const Role = {
+	SUPER_ADMIN		: "SUPER_ADMIN",
+	BRANCH_MANAGER	: "BRANCH_MANAGER",
+	DOCTOR			: "DOCTOR",
+	ADMIN_STAFF		: "ADMIN_STAFF",
+	NURSE			: "NURSE",
+	RECEPTIONIST	: "RECEPTIONIST",
+	BILLING_STAFF	: "BILLING_STAFF",
+	INSURANCE_AGENT	: "INSURANCE_AGENT",
+	PATIENT			: "PATIENT",
+	// PUBLIC			: "PUBLIC",		// open access 
+	// // to group the user related roles those who have access to login to the system
+	// USER			: "USER",
+	// // to group the medical related staff
+	// MEDICAL_STAFF	: "MEDICAL_STAFF",
+};
+
+
 export const userLogin = async (req: Request, res: Response) => {
     let { username, password } = req.query;
     try {
