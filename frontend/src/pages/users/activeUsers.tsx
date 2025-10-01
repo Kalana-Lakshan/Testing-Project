@@ -106,7 +106,7 @@ const Users: React.FC = () => {
     toast.loading("Loading...");
 
     return Promise.allSettled([
-      getAllUsers(page, itemsPerPage),
+      getAllUsers(itemsPerPage, page),
       createTimer(500),
     ])
       .then((hu) => {
