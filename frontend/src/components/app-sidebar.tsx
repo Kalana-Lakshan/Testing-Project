@@ -384,23 +384,25 @@ export function AppSidebar() {
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <SidebarMenuSub>
-                        {item.children.map((child) => (
-                          <SidebarMenuSubItem key={child.title}>
-                            <SidebarMenuSubButton asChild>
-                              <NavLink to={child.url}>
-                                <child.icon size={25} className="size-40" />
-                                <span>{child.title}</span>
-                              </NavLink>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
+                        {item.children.map((child) =>
+                          item.hideIf?.(role) ? null : (
+                            <SidebarMenuSubItem key={child.title}>
+                              <SidebarMenuSubButton asChild>
+                                <NavLink to={child.url}>
+                                  <child.icon size={25} className="size-40" />
+                                  <span>{child.title}</span>
+                                </NavLink>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ),
+                        )}
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </SidebarMenuItem>
                 </Collapsible>
               </SidebarMenu>
             </SidebarGroup>
-          )
+          ),
         )}
       </SidebarContent>
       <SidebarFooter>
