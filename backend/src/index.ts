@@ -1,10 +1,11 @@
 import express from "express";
 import type { Express, Request, Response } from "express";
 import { MapRouters } from "./router/router.js";
-
+import cors from "cors";
 
 const port = process.env.PORT || 8000;
 const app: Express = express();
+app.use(cors());
 
 MapRouters(app);
 
