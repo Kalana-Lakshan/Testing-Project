@@ -28,7 +28,7 @@ export const userLogin = async (req: Request, res: Response) => {
 }
 
 
-export const userSignup = async (req: Request, res: Response) => {
+export const staffSignup = async (req: Request, res: Response) => {
     let { username, password } = req.query;
 }
 
@@ -37,5 +37,5 @@ export const patientSignup = async (req: Request, res: Response) => {
 }
 
 export const validateUser = async (req: Request, res: Response) => {
-    let { username, password } = req.query;
+    return res.status(200).json({message: "Success"})
 }
