@@ -102,8 +102,8 @@ export const getAllUser = async (
 
 export const getActiveUserCount = async (): Promise<Number> => {
   try {
-    const [rows] = await sql.query("CALL get_all_active_users_count()");
-    return (rows as any)[0];
+    const [rows]: any = await sql.query("CALL get_all_active_users_count()");
+    return rows[0][0].user_count;
   } catch (error) {
     console.error("Error fetching count of active users:", error);
     throw error;
@@ -132,7 +132,7 @@ export const getAllDeletedUser = async (
 export const getInActiveUserCount = async (): Promise<Number> => {
   try {
     const [rows] = await sql.query("CALL get_all_deleted_users_count()");
-    return (rows as any)[0];
+    return (rows as any)[0][`COUNT(user_id)`];;
   } catch (error) {
     console.error("Error fetching count of deleted users:", error);
     throw error;

@@ -117,7 +117,7 @@ END$$
 
 CREATE PROCEDURE get_all_active_users_count()
 BEGIN
-    SELECT COUNT(user_id)
+    SELECT COUNT(user_id) AS user_count
     FROM `user`
     WHERE is_deleted = 0;
 END$$
@@ -135,7 +135,7 @@ END$$
 
 CREATE PROCEDURE get_all_deleted_users_count()
 BEGIN
-    SELECT COUNT(user_id)
+    SELECT COUNT(user_id) AS user_count
     FROM `user`
     WHERE is_deleted = 1;
 END$$
