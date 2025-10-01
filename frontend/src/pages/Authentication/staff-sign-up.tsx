@@ -1,0 +1,265 @@
+import { SelectComboBox } from "@/components/select-combo-box"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { staffSignup, type StaffData } from "@/services/authServices"
+import { useState } from "react"
+import toast from "react-hot-toast"
+import { Link, useNavigate } from "react-router-dom"
+
+const Roles = [
+  {
+    value: "NURSE",
+    label: "Nurse",
+  },
+  {
+    value: "BILLING_STAFF",
+    label: "Billing Staff",
+  },
+  {
+    value: "RECEPTIONIST",
+    label: "Receptionist",
+  },
+  {
+    value: "ADMIN_STAFF",
+    label: "Admin Staff",
+  },
+  {
+    value: "DOCTOR",
+    label: "Doctor",
+  },
+  {
+    value: "INSURANCE_AGENT",
+    label: "Insurance Agent",
+  },
+  {
+    value: "BRANCH_MANAGER",
+    label: "Branch Manager",
+  },
+  {
+    value: "SUPER_ADMIN",
+    label: "Super Admin",
+  },
+]
+
+const branches = [
+  { value: "BR1", label: "Colombo Branch" },
+  { value: "BR2", label: "Kandy Branch" },
+  { value: "BR3", label: "Galle Branch" },
+]
+
+const StaffSignUp: React.FC = () => {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+  const [phoneNo, setPhoneNo] = useState("")
+  const [gender, setGender] = useState("")
+  const [selectedRole, setSelectedRole] = useState("")
+  const [selectedBranch, setSelectedBranch] = useState("")
+  const [loading, setLoading] = useState<boolean>(false);
+
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault()
+    setLoading(true);
+
+    const staffData: StaffData = {
+      username,
+      email,
+      password,
+      phoneNo,
+      gender,
+      role: selectedRole,
+      branch: Number(selectedBranch),
+    }
+
+    if (
+      username === "" ||
+      password === "" ||
+      confirmPassword === "" ||
+      email === "" ||
+      phoneNo === "" ||
+      gender === "" ||
+      selectedRole === "" ||
+      selectedBranch === ""
+    ) {
+      toast.error("Please fill all the required details");
+      setLoading(false);
+    } else if (password !== confirmPassword) {
+      toast.error("Passwords do not match")
+      setLoading(false);
+    } else {
+      console.log("Submitting staff account:", staffData)
+      await staffSignup(staffData)
+        .then(() => {
+          toast.success("Staff account created successfully")
+          navigate("/staff/sign-in");
+        })
+        .catch((error) => {
+          toast.error(error)
+        });
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-dvh">
+      <Card className="w-full max-w-[96vw] md:max-w-[80vw] md:max-w-2xl">
+        <CardHeader>
+          <CardTitle>Create a staff account</CardTitle>
+          <CardDescription>
+            Provide the required information to create a new staff account.<br />
+            The account will be used to access the system based on their role.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form>
+            <div className="grid md:grid-cols-2 gap-3 w-full sm:grid-cols-1">
+
+              <div className="grid gap-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  required
+                  value={username}
+                  onChange={
+                    (e) => setUsername(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={
+                    (e) => setEmail(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="password">Password</Label>
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={
+                    (e) => setPassword(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="confirm_password">Confirm Password</Label>
+                </div>
+                <Input
+                  id="confirm_password"
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={
+                    (e) => setConfirmPassword(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="email">Phone Number</Label>
+                <Input
+                  id="phone_no"
+                  type="tel"
+                  placeholder="+94 (XX) XXX XXXX"
+                  required
+                  value={phoneNo}
+                  onChange={
+                    (e) => setPhoneNo(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="gender">Gender</Label>
+                <Select onValueChange={(value) => setGender(value)}>
+                  <SelectTrigger id="gender" className="w-full">
+                    <SelectValue placeholder="gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="role">Role</Label>
+                <SelectComboBox
+                  options={Roles}
+                  value={selectedRole}
+                  onChange={setSelectedRole}
+                  placeholder="Select role..."
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="branch">Branch</Label>
+                <SelectComboBox
+                  options={branches}
+                  value={selectedBranch}
+                  onChange={setSelectedBranch}
+                  placeholder="Select branch..."
+                />
+              </div>
+
+            </div>
+          </form>
+        </CardContent>
+        <CardFooter className="self-center flex md:flex-row flex-col-reverse gap-5 pt-[20px]">
+
+          <Button
+            type="submit"
+            className="md:w-[50%]"
+            variant={"outline"}
+            disabled={loading}
+          >
+            <Link to="/staff/sign-in" >
+              Sign in
+            </Link>
+          </Button>
+
+          <Button
+            type="submit"
+            className="md:w-[50%]"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? "Creating..." : "Create Account"}
+          </Button>
+
+        </CardFooter>
+      </Card>
+    </div>
+  )
+}
+
+export default StaffSignUp;
