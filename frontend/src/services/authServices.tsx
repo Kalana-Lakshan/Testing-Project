@@ -76,11 +76,11 @@ export const staffSignup = async (data: StaffData) => {
 };
 
 export const validateToken = async () => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token")
   const response = await axiosInstance.get("/auth/validate", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-  });
-  return response.data.success;
-};
+  })
+  return response.data.success
+}
