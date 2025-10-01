@@ -73,7 +73,24 @@ export const staffSignup = async (data: StaffData) => {
     }
     throw "Unknown error occurred";
   }
-};
+}
+
+export const patientSignup = async (data: PatientData) => {
+  try {
+    const response = await axiosInstance.post("/auth/sign-up/patient", data)
+    const message = response.data.message
+    return message
+  } catch (error: unknown) {
+    console.error("Error in creating account:", error)
+    if (error instanceof AxiosError) {
+      if (error.response?.data?.error) {
+        throw error.response.data.error
+      }
+      throw error.message
+    }
+    throw "Unknown error occurred"
+  }
+}
 
 export const validateToken = async () => {
   const token = localStorage.getItem("token")
