@@ -64,7 +64,7 @@ export const staffSignup = async (data: StaffData) => {
     const message = response.data.message
     return message
   } catch (error: unknown) {
-    console.error("Error logging in:", error);
+    console.error("Error in creating account:", error);
     if (error instanceof AxiosError) {
       if (error.response?.data?.error) {
         throw error.response.data.error;
