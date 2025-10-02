@@ -16,37 +16,37 @@ import { useState } from "react"
 import toast from "react-hot-toast"
 import { Link, useNavigate } from "react-router-dom"
 
-const Roles = [
+export const Roles = [
   {
-    value: "NURSE",
+    value: "Nurse",
     label: "Nurse",
   },
   {
-    value: "BILLING_STAFF",
+    value: "Billing_Staff",
     label: "Billing Staff",
   },
   {
-    value: "RECEPTIONIST",
+    value: "Receptionist",
     label: "Receptionist",
   },
   {
-    value: "ADMIN_STAFF",
+    value: "Admin_Staff",
     label: "Admin Staff",
   },
   {
-    value: "DOCTOR",
+    value: "Doctor",
     label: "Doctor",
   },
   {
-    value: "INSURANCE_AGENT",
+    value: "Insurance_Agent",
     label: "Insurance Agent",
   },
   {
-    value: "BRANCH_MANAGER",
+    value: "Branch_Manager",
     label: "Branch Manager",
   },
   {
-    value: "SUPER_ADMIN",
+    value: "Super_Admin",
     label: "Super Admin",
   },
 ]
