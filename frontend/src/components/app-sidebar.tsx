@@ -155,7 +155,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "Doctors' details",
-        url: "",
+        url: "/doctors",
         icon: HeartPulse,
         hideIf: (role) => typeof role !== "string" ||
           ![ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),

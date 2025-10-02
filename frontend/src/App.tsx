@@ -8,6 +8,7 @@ import { Skeleton } from "./components/ui/skeleton";
 import SignIn from "./pages/Authentication/sign-in";
 import SignUp from './pages/Authentication/sign-up';
 import Users from './pages/users/activeUsers';
+import DoctorsDetails from './pages/doctors/doctorsDetails';
 import { ThemeProvider } from './components/theme-provider';
 
 
@@ -71,6 +72,16 @@ function App() {
                 <>
                   <PageTitle title="Users | MedSync" />
                   <Users />
+                </>
+              }
+            />
+
+            <Route
+              path="/doctors"
+              element={
+                <>
+                  <PageTitle title="Doctors | MedSync" />
+                  <DoctorsDetails />
                 </>
               }
             />
