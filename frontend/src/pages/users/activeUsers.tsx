@@ -1,15 +1,21 @@
-import { getAllUsers, type UserDTO } from "@/services/userService";
+import { getAllUsers, type User } from "@/services/userService";
 import { DataTable } from "../../components/data-table"
 import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import { createTimer } from "@/services/utils";
+import { Eye, Trash } from "lucide-react";
+import { Role } from "@/utils";
+import DeleteUser from "./user.delete";
+import ViewUser from "./user-view";
 
 
 const Users: React.FC = () => {
-  const [Users, setUsers] = useState<Array<UserDTO>>([]);
-  const columns: ColumnDef<UserDTO>[] = [
+  const [Users, setUsers] = useState<Array<User>>([]);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [action, setAction] = useState<"edit" | "delete" | null>(null);
+  const columns: ColumnDef<User>[] = [
     {
       accessorKey: "user_id",
       header: ({ column }) => (
@@ -72,7 +78,42 @@ const Users: React.FC = () => {
     },
     {
       accessorKey: "is_approved",
-      header: "Is_Approved",
+      header: "Approved",
+    },
+    {
+      header: "Actions",
+      cell: ({ row }) => {
+        if (row.original.role === Role.SUPER_ADMIN) {
+          return <div className="text-muted-foreground mt-3 h-6">N/A</div>;
+        }
+        return (
+          <div className="flex gap-2">
+
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                setSelectedUser(row.original);
+                setAction("edit");
+              }}
+            >
+              <Eye />
+            </Button>
+
+            <Button
+              size="icon"
+              variant="destructive"
+              onClick={() => {
+                setSelectedUser(row.original);
+                setAction("delete");
+              }}
+            >
+              <Trash />
+            </Button>
+
+          </div>
+        );
+      },
     },
   ]
 
@@ -113,17 +154,16 @@ const Users: React.FC = () => {
         if (hu[0].status === "rejected") {
           throw hu[0].reason;
         }
-        const mappedUsers: UserDTO[] = hu[0].value.users.map((u: any) => ({
-          user_id: u.user_id,
-          username: u.username,
-          role: u.role,
-          branch_name: u.branch_name,
-          created_at: u.created_at,
-          is_approved: Boolean(u.is_approved),
-        }));
-
-        setUsers(mappedUsers);
-        // setUsers(hu[0].value.users);
+        // const mappedUsers: UserDTO[] = hu[0].value.users.map((u: any) => ({
+        //   user_id: u.user_id,
+        //   username: u.username,
+        //   role: u.role,
+        //   branch_name: u.branch_name,
+        //   created_at: u.created_at,
+        //   is_approved: Boolean(u.is_approved),
+        // }));
+        // setUsers(mappedUsers);
+        setUsers(hu[0].value.users);
         console.log("set", hu[0].value, itemsPerPage);
         setPageCount(Math.ceil(hu[0].value.user_count / itemsPerPage));
       })
@@ -131,7 +171,7 @@ const Users: React.FC = () => {
         if (typeof error === "string") {
           toast.error(error);
         } else {
-          toast.error("Failed to fetch unverified students");
+          toast.error("Failed to fetch users");
         }
       })
       .finally(() => {
@@ -143,7 +183,28 @@ const Users: React.FC = () => {
     fetchUsers();
   }, [fetchUsers, pagination]);
   return (
-    <DataTable table={table} />
+    <>
+      <ViewUser
+        isOpen={action === "edit" && selectedUser !== null}
+        selectedUser={selectedUser}
+        onFinished={fetchUsers}
+        onClose={() => {
+          setAction(null);
+          setSelectedUser(null);
+        }}
+      />
+
+      <DeleteUser
+        isOpen={action === "delete" && selectedUser !== null}
+        selectedUser={selectedUser}
+        onFinished={fetchUsers}
+        onClose={() => {
+          setAction(null);
+          setSelectedUser(null);
+        }}
+      />
+      <DataTable table={table} />
+    </>
   );
 };
 
