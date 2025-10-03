@@ -32,8 +32,8 @@ const UndoDeleteUser: React.FC<UndoDeleteUserProps> = ({
     toast.loading("Restoring user...");
 
     try {
-      await restoreDeletedUser(selectedUser.user_id)
-      toast.success(`User "${selectedUser.username}" restored successfully.`);
+      const response = await restoreDeletedUser(selectedUser.user_id)
+      toast.success(`${response} : "${selectedUser.username}"` || `User "${selectedUser.username}" restored successfully.`);
       onFinished();
       onClose();
     } catch (error) {

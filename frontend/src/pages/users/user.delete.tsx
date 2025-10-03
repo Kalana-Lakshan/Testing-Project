@@ -20,8 +20,8 @@ const DeleteUser: React.FC<DeleteUserProps> = ({ isOpen, selectedUser, onFinishe
     toast.loading("Deleting user...");
 
     try {
-      await deleteUser(selectedUser.user_id)
-      toast.success(`User "${selectedUser.username}" deleted successfully.`);
+      const response = await deleteUser(selectedUser.user_id)
+      toast.success(`${response} : "${selectedUser.username}"` || `User "${selectedUser.username}" deleted successfully.`);
       onFinished();
       onClose();
     } catch (error) {
