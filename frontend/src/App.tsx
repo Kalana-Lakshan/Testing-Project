@@ -85,7 +85,7 @@ function App() {
               path="/users/active"
               element={
                 <>
-                  <PageTitle title="Users | MedSync" />
+                  <PageTitle title="Active Users | MedSync" />
                   <Users />
                 </>
               }
