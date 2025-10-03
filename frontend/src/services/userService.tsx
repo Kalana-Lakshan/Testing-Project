@@ -1,14 +1,6 @@
 import { AxiosError } from "axios";
 import axiosInstance from "../axiosConfig";
 
-export interface UserDTO {
-  user_id: number;
-  username: string;
-  role: string;
-  branch_name: string;
-  created_at: string;
-  is_approved: number | boolean;
-}
 
 export interface User {
   user_id: number;
@@ -61,8 +53,12 @@ export const getAllInactiveUsers = async (count: number, offset: number) => {
 
 export const editUser = async (data: any) => {
   try {
-    const response = await axiosInstance.put(`/user/edit/${data.user_id}`,
-      data
+    const response = await axiosInstance.put(`/user/update/${data.user_id}`,
+      {
+        role: data.role,
+        branch_id: data.branch_id,
+        is_approved: data.is_approved,
+      }
     )
     return response.data
   } catch (error: unknown) {
