@@ -8,6 +8,7 @@ export const LOCAL_STORAGE__ROLE = "role";
 export const LOCAL_STORAGE__USER_ID = "user_id";
 
 export interface StaffData {
+  fullname: string
   username: string
   email: string
   password: string
@@ -25,7 +26,7 @@ export interface PatientData {
   password: string
   phoneNo: string
   emergencyContactNo: string
-  DOB: string
+  date_of_birth: string
   gender: string
   bloodType: string
   branch: number
@@ -44,7 +45,7 @@ export const signin = async (username: string, password: string) => {
     localStorage.setItem(LOCAL_STORAGE__USER, JSON.stringify(user))
     localStorage.setItem(LOCAL_STORAGE__USERNAME, user.username)
     localStorage.setItem(LOCAL_STORAGE__ROLE, user.role)
-    localStorage.setItem(LOCAL_STORAGE__USER_ID, user.id)
+    localStorage.setItem(LOCAL_STORAGE__USER_ID, user.user_id)
     return true
   } catch (error: unknown) {
     console.error("Error logging in:", error)
