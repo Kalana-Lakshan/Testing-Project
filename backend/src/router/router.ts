@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import authorizeRoles from "../auth/auth.js";
-import { getUsers } from "../handlers/user.handler.ts";
+import { deleteUser, getDeletedUsers, getUsers, restoreUser, updateUser } from "../handlers/user.handler.ts";
 import { patientSignup, staffSignup, userLogin, validateUser } from "../handlers/auth.handler.ts";
+import { getBranches } from "../handlers/branch.handler.ts";
 
 
 export const HttpMethod = {
@@ -37,14 +38,20 @@ interface Route {
 
 var routes: Route[] = [
 	// authentication router
-	{ path: "/auth/sign-in", AccessibleBy: availableForRoles([Role.USER]), method: HttpMethod.POST, handler: userLogin },
+	{ path: "/auth/sign-in", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: userLogin },
 	{ path: "/auth/sign-up/staff", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: staffSignup },
 	{ path: "/auth/sign-up/patient", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: patientSignup },
-	{ path: "/auth/validate", AccessibleBy: availableForRoles([Role.USER]), method: HttpMethod.GET, handler: validateUser },
+	{ path: "/auth/validate", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: validateUser },
 
 	// users router
 	{ path: "/users/active", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getUsers },
+	{ path: "/users/inactive", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDeletedUsers },
+	{ path: "/user/update/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateUser },
+	{ path: "/user/delete/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteUser },
+	{ path: "/user/restore/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: restoreUser },
 
+	// branches router
+	{ path: "/branches", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranches },
 
 ];
 
