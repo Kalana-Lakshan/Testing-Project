@@ -1,4 +1,4 @@
-USE `Project-MedSync`;
+-- USE `Project-MedSync`;
 
 -- child → parent drop order
 DROP TABLE IF EXISTS `billing_payment`;

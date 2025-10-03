@@ -6,7 +6,7 @@ export default function DoctorsDetails() {
       <PageTitle title="Doctors' Details" />
   
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-       rfvgrgvrfvfd
+        Hello here is doctor
       </div>
     </div>
   );
