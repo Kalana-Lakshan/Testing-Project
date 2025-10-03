@@ -46,7 +46,7 @@ export const createUser = async (
 };
 
 // Update User
-export const updateUser = async (
+export const updateUserById = async (
   user_id: number,
   username: string,
   password_hash: string,
@@ -69,12 +69,29 @@ export const updateUser = async (
   }
 };
 
+export const deleteUserById = async (user_id: number): Promise<void> => {
+  try {
+    await sql.query("CALL delete_user(?)", [user_id]);
+  } catch (error) {
+    console.error("Error deleting user by ID:", error);
+    throw error;
+  }
+};
+
+export const restoreUserById = async (user_id: number): Promise<void> => {
+  try {
+    await sql.query("CALL restore_user(?)", [user_id]);
+  } catch (error) {
+    console.error("Error restoring user by ID:", error);
+    throw error;
+  }
+};
+
 // Get User By ID
 export const getUserById = async (id: number): Promise<User> => {
   try {
     const [rows] = await sql.query("CALL get_user_by_id(?)", [id]);
     const user = (rows as any)[0][0] as User;
-    if (!user) throw new Error("User not found");
     return user;
   } catch (error) {
     console.error("Error fetching user by ID:", error);
