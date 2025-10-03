@@ -33,12 +33,17 @@ export const createUser = async (
   is_approved: boolean
 ): Promise<User> => {
   try {
-    const [rows] = await sql.query(
+    const [resultSets] = await sql.query(
       "CALL create_user(?, ?, ?, ?, ?)",
       [username, password_hash, role, branch_id, is_approved]
     );
-    // stored procs return nested arrays: [[rows], ...]
-    return (rows as any)[0][0] as User;
+    console.log("create_user result:", JSON.stringify(resultSets, null, 2));
+    // CALL returns [ [rows], [extraMeta] ]
+    const userRows = (resultSets as any)[0]; // first array = rows
+    if (!userRows || userRows.length === 0) {
+      throw new Error("User not created");
+    }
+    return userRows[0] as User;
   } catch (error) {
     console.error("Error creating user:", error);
     throw error;
@@ -148,8 +153,8 @@ export const getAllDeletedUser = async (
 
 export const getInActiveUserCount = async (): Promise<Number> => {
   try {
-    const [rows] = await sql.query("CALL get_all_deleted_users_count()");
-    return (rows as any)[0][`COUNT(user_id)`];;
+    const [rows]: any = await sql.query("CALL get_all_deleted_users_count()");
+    return rows[0][0].user_count;
   } catch (error) {
     console.error("Error fetching count of deleted users:", error);
     throw error;
