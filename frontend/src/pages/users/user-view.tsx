@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Roles } from "../Authentication/staff-sign-up";
 import { Switch } from "@/components/ui/switch";
+import { getAllBranches, type Branch } from "@/services/branchServices";
 
 interface ViewUserProps {
   isOpen: boolean;
@@ -37,17 +38,26 @@ const ViewUser: React.FC<ViewUserProps> = ({
 }) => {
   const [username, setUsername] = useState("");
   const [role, setRole] = useState("");
-  const [branch, setBranch] = useState("");
+  const [branch, setBranch] = useState<number | "">("");
+  const [branches, setBranches] = useState<Branch[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
 
+  // fetch branches
+  useEffect(() => {
+    getAllBranches()
+      .then((res) => setBranches(res.branches))
+      .catch(() => toast.error("Failed to load branches"));
+  }, []);
+
+  // populate user details
   useEffect(() => {
     if (selectedUser) {
       setUsername(selectedUser.username);
       setRole(selectedUser.role);
-      setBranch(selectedUser.branch_name || "");
+      setBranch(selectedUser.branch_id ?? ""); // map to branch_id 
       setIsApproved(selectedUser.is_approved);
-      setIsEditing(false); // reset to view mode
+      setIsEditing(false);
     }
   }, [selectedUser]);
 
@@ -59,11 +69,11 @@ const ViewUser: React.FC<ViewUserProps> = ({
       const data = {
         user_id: selectedUser.user_id,
         role: role,
-        // branch_id: branch,
+        branch_id: branch,
         is_approved: isApproved,
-      }
-      await editUser(data)
-      toast.success("User updated successfully.");
+      };
+      const response = await editUser(data);
+      toast.success(response.message || "User updated successfully.");
       onFinished();
       onClose();
     } catch (error) {
@@ -89,47 +99,72 @@ const ViewUser: React.FC<ViewUserProps> = ({
           {/* Username */}
           <div className="grid gap-2">
             <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              value={username}
-              disabled={true}
-            />
+            <Input id="username" value={username} disabled className="md:w-[50%]" />
           </div>
 
-          {/* Role */}
-          <div className="grid gap-2">
-            <Label htmlFor="role">Role</Label>
-            {isEditing ? (
-              <Select value={role} onValueChange={setRole}>
-                <SelectTrigger id="role">
-                  <SelectValue>
-                    {Roles.find((r) => r.value === role)?.label || "Unknown role"}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {Roles.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>
-                      {r.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <Input id="role" value={role} disabled />
-            )}
+          <div className="grid md:grid-cols-2 gap-2">
+            {/* Role */}
+            <div className="grid gap-2">
+              <Label htmlFor="role">Role</Label>
+              {isEditing ? (
+                <Select value={role} onValueChange={setRole} >
+                  <SelectTrigger id="role" className="w-full">
+                    <SelectValue
+                      placeholder="Select role"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Roles.map((r) => (
+                      <SelectItem key={r.value} value={r.value}>
+                        {r.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="role"
+                  value={Roles.find((r) => r.value === role)?.label || role}
+                  disabled
+                />
+              )}
+            </div>
+
+            {/* Branch */}
+            <div className="grid gap-2">
+              <Label htmlFor="branch">Branch</Label>
+              {isEditing ? (
+                <Select
+                  value={branch?.toString() || ""}
+                  onValueChange={(val) => setBranch(Number(val))}
+                >
+                  <SelectTrigger id="branch" className="w-full">
+                    <SelectValue placeholder="Select branch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {branches.map((b) => (
+                      <SelectItem key={b.branch_id} value={b.branch_id.toString()}>
+                        {b.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="branch"
+                  value={
+                    branches.find((b) => b.branch_id === branch)?.name ||
+                    selectedUser?.branch_name ||
+                    ""
+                  }
+                  disabled
+                />
+              )}
+            </div>
           </div>
 
-          {/* Branch */}
-          <div className="grid gap-2">
-            <Label htmlFor="branch">Branch</Label>
-            <Input
-              id="branch"
-              value={branch}
-              disabled={!isEditing}
-              onChange={(e) => setBranch(e.target.value)}
-            />
-          </div>
 
+          {/* Approved */}
           <div className="flex items-center space-x-2">
             <Label htmlFor="is_approved">Approved</Label>
             <Switch
