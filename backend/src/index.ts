@@ -5,6 +5,7 @@ import cors from "cors";
 
 const port = process.env.PORT || 8000;
 const app: Express = express();
+app.use(express.json());
 app.use(cors());
 
 MapRouters(app);
