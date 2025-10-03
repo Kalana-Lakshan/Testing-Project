@@ -12,15 +12,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { patientSignup, type PatientData } from "@/services/authServices"
-import { useState } from "react"
+import { getAllBranches } from "@/services/branchServices"
+import { toMySQLDate } from "@/services/utils"
+import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { Link, useNavigate } from "react-router-dom"
 
-const branches = [
-  { value: "BR1", label: "Colombo Branch" },
-  { value: "BR2", label: "Kandy Branch" },
-  { value: "BR3", label: "Galle Branch" },
-]
+
+
 
 const bloodTypes = [
   { value: "A+", label: "A+" },
@@ -47,15 +46,35 @@ const PatientSignUp: React.FC = () => {
   const [gender, setGender] = useState("")
   const [address, setAddress] = useState("")
   const [bloodType, setBloodType] = useState("")
-  const [DOB, setDOB] = useState("")
+  const [DOB, setDOB] = useState<string>("")
   const [selectedBranch, setSelectedBranch] = useState("")
-  const [loading, setLoading] = useState<boolean>(false);
+  const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
+  const [loading, setLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const data = await getAllBranches();
+        const mappedBranches = data.branches.map((b) => ({
+          value: String(b.branch_id),
+          label: b.name,
+        }));
+        setBranches(mappedBranches);
+      } catch (err) {
+        toast.error("Failed to load branches");
+      }
+    };
+
+    fetchBranches();
+  }, []);
+
 
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
     setLoading(true);
 
+    const date_of_birth = toMySQLDate(DOB);
     const patientData: PatientData = {
       fullname,
       nic,
@@ -64,7 +83,7 @@ const PatientSignUp: React.FC = () => {
       password,
       phoneNo,
       emergencyContactNo,
-      DOB,
+      date_of_birth,
       gender,
       bloodType,
       branch: Number(selectedBranch),

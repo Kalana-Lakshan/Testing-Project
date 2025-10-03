@@ -12,7 +12,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { staffSignup, type StaffData } from "@/services/authServices"
-import { useState } from "react"
+import { getAllBranches } from "@/services/branchServices"
+import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { Link, useNavigate } from "react-router-dom"
 
@@ -49,16 +50,51 @@ export const Roles = [
     value: "Super_Admin",
     label: "Super Admin",
   },
+  {
+    value: "Patient",
+    label: "Patient",
+  },
 ]
 
-const branches = [
-  { value: "BR1", label: "Colombo Branch" },
-  { value: "BR2", label: "Kandy Branch" },
-  { value: "BR3", label: "Galle Branch" },
+const StaffRoles = [
+  {
+    value: "Nurse",
+    label: "Nurse",
+  },
+  {
+    value: "Billing_Staff",
+    label: "Billing Staff",
+  },
+  {
+    value: "Receptionist",
+    label: "Receptionist",
+  },
+  {
+    value: "Admin_Staff",
+    label: "Admin Staff",
+  },
+  {
+    value: "Doctor",
+    label: "Doctor",
+  },
+  {
+    value: "Insurance_Agent",
+    label: "Insurance Agent",
+  },
+  {
+    value: "Branch_Manager",
+    label: "Branch Manager",
+  },
+  {
+    value: "Super_Admin",
+    label: "Super Admin",
+  },
 ]
+
 
 const StaffSignUp: React.FC = () => {
   const navigate = useNavigate();
+  const [fullname, setFullname] = useState("")
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -67,7 +103,25 @@ const StaffSignUp: React.FC = () => {
   const [gender, setGender] = useState("")
   const [selectedRole, setSelectedRole] = useState("")
   const [selectedBranch, setSelectedBranch] = useState("")
-  const [loading, setLoading] = useState<boolean>(false);
+  const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
+  const [loading, setLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const data = await getAllBranches();
+        const mappedBranches = data.branches.map((b) => ({
+          value: String(b.branch_id),   // backend ID → value
+          label: b.name,         // backend name → label
+        }));
+        setBranches(mappedBranches);
+      } catch (err) {
+        toast.error("Failed to load branches");
+      }
+    };
+
+    fetchBranches();
+  }, []);
 
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
@@ -75,6 +129,7 @@ const StaffSignUp: React.FC = () => {
     setLoading(true);
 
     const staffData: StaffData = {
+      fullname,
       username,
       email,
       password,
@@ -85,6 +140,7 @@ const StaffSignUp: React.FC = () => {
     }
 
     if (
+      fullname === "" ||
       username === "" ||
       password === "" ||
       confirmPassword === "" ||
@@ -101,17 +157,19 @@ const StaffSignUp: React.FC = () => {
       setLoading(false);
     } else {
       console.log("Submitting staff account:", staffData)
-      await staffSignup(staffData)
-        .then(() => {
-          toast.success("Staff account created successfully")
-          navigate("/staff/sign-in");
-        })
-        .catch((error) => {
-          toast.error(error)
-        });
-      setLoading(false);
+      try {
+        const message = await staffSignup(staffData);
+        toast.success(message);
+        navigate("/staff/sign-in");
+      } catch (error: any) {
+        toast.error(error.message || "Failed to create staff account");
+      } finally {
+        setLoading(false);
+      }
     }
   }
+
+
 
   return (
     <div className="flex items-center justify-center min-h-dvh">
@@ -128,6 +186,19 @@ const StaffSignUp: React.FC = () => {
             <div className="grid md:grid-cols-2 gap-3 w-full sm:grid-cols-1">
 
               <div className="grid gap-2">
+                <Label htmlFor="fullname">Full Name</Label>
+                <Input
+                  id="fullname"
+                  type="text"
+                  required
+                  value={fullname}
+                  onChange={
+                    (e) => setFullname(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="grid gap-2">
                 <Label htmlFor="username">Username</Label>
                 <Input
                   id="username"
@@ -136,20 +207,6 @@ const StaffSignUp: React.FC = () => {
                   value={username}
                   onChange={
                     (e) => setUsername(e.target.value)
-                  }
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  value={email}
-                  onChange={
-                    (e) => setEmail(e.target.value)
                   }
                 />
               </div>
@@ -199,6 +256,20 @@ const StaffSignUp: React.FC = () => {
               </div>
 
               <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={email}
+                  onChange={
+                    (e) => setEmail(e.target.value)
+                  }
+                />
+              </div>
+
+              <div className="grid gap-2">
                 <Label htmlFor="gender">Gender</Label>
                 <Select onValueChange={(value) => setGender(value)}>
                   <SelectTrigger id="gender" className="w-full">
@@ -214,7 +285,7 @@ const StaffSignUp: React.FC = () => {
               <div className="grid gap-2">
                 <Label htmlFor="role">Role</Label>
                 <SelectComboBox
-                  options={Roles}
+                  options={StaffRoles}
                   value={selectedRole}
                   onChange={setSelectedRole}
                   placeholder="Select role..."

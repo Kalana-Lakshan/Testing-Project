@@ -26,3 +26,13 @@ export function formatRole(role: string): string {
 		.replace(/_/g, " ")
 		.replace(/\b\w/g, (c) => c.toUpperCase());
 }
+
+export function toMySQLDate(dateStr: string): string {
+	if (!dateStr) return "";
+
+	const [day, month, year] = dateStr.split("/");
+	const d = day.padStart(2, "0");
+	const m = month.padStart(2, "0");
+
+	return `${year}-${m}-${d}`; // YYYY-MM-DD
+}
