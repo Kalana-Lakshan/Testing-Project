@@ -38,7 +38,7 @@ CREATE TABLE `branch` (
 CREATE TABLE `user` (
     `user_id` INT AUTO_INCREMENT,
     `username` VARCHAR(20) NOT NULL UNIQUE,
-    `password_hash` VARCHAR(50) NOT  NULL,
+    `password_hash` VARCHAR(255) NOT  NULL,
     `role` ENUM(
         'Super_Admin', 
         'Branch_Manager', 
