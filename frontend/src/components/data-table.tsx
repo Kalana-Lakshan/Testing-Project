@@ -25,7 +25,7 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
 									return (
 										<TableHead
 											key={header.id}
-											className="cursor-pointer select-none"
+											className="cursor-pointer select-none text-center bg-muted"
 											onClick={(event) =>
 												header.column.getToggleSortingHandler()?.(event)
 											}
