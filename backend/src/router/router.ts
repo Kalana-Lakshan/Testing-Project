@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import authorizeRoles from "../auth/auth.js";
 import { getUsers } from "../handlers/user.handler.ts";
 import { patientSignup, userLogin, userSignup, validateUser } from "../handlers/auth.handler.ts";
-
+import {getAllDoctors,getDoctorByID} from "../handlers/doctor.handler.js"
 
 export const HttpMethod = {
 	GET    : "GET",
@@ -44,7 +44,9 @@ var routes: Route[] = [
 
 	// users router
 	{ path: "/users/active", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getUsers },
-
+	//doctors router
+	{ path: "/doctors",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctors },
+	{path: "/doctors/:id",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getDoctorByID},
 
 ];
 
