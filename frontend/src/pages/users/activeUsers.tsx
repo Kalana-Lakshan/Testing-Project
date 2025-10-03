@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { createTimer } from "@/services/utils";
+import { createTimer, toNormalTimestamp } from "@/services/utils";
 import { Eye, Trash } from "lucide-react";
 import { Role } from "@/utils";
 import DeleteUser from "./user.delete";
@@ -75,10 +75,12 @@ const Users: React.FC = () => {
           Created At
         </Button>
       ),
+      cell: ({ row }) => toNormalTimestamp(row.original.created_at),
     },
     {
       accessorKey: "is_approved",
       header: "Approved",
+      cell: ({ row }) => (row.original.is_approved ? "True" : "False"),
     },
     {
       header: "Actions",
