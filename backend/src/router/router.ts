@@ -13,20 +13,20 @@ export const HttpMethod = {
 };
 
 export const Role = {
-	SUPER_ADMIN		: "SUPER_ADMIN",
-	BRANCH_MANAGER	: "BRANCH_MANAGER",
-	DOCTOR			: "DOCTOR",
-	ADMIN_STAFF		: "ADMIN_STAFF",
-	NURSE			: "NURSE",
-	RECEPTIONIST	: "RECEPTIONIST",
-	BILLING_STAFF	: "BILLING_STAFF",
-	INSURANCE_AGENT	: "INSURANCE_AGENT",
-	PATIENT			: "PATIENT",
-	PUBLIC			: "PUBLIC",		// open access 
+	SUPER_ADMIN: 			"Super_Admin",
+	BRANCH_MANAGER: 	"Branch_Manager",
+	DOCTOR: 					"Doctor",
+	ADMIN_STAFF: 			"Admin_Staff",
+	NURSE: 						"Nurse",
+	RECEPTIONIST: 		"Receptionist",
+	BILLING_STAFF: 		"Billing_Staff",
+	INSURANCE_AGENT:	"Insurance_Agent",
+	PATIENT: 					"Patient",
+	PUBLIC: 					"Public",		// open access 
 	// to group the user related roles those who have access to login to the system
-	USER			: "USER",
+	USER: 						"User",
 	// to group the medical related staff
-	MEDICAL_STAFF	: "MEDICAL_STAFF",
+	MEDICAL_STAFF: 		"Medical_Staff",
 };
 
 interface Route {
