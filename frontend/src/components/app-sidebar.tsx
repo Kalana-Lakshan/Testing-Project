@@ -163,7 +163,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "Appointment details",
-        url: "",
+        url: "/doctors-appointments",
         icon: FileUser,
         hideIf: (role) => typeof role !== "string" ||
           ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),

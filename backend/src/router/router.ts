@@ -3,6 +3,7 @@ import authorizeRoles from "../auth/auth.js";
 import { getUsers } from "../handlers/user.handler.ts";
 import { patientSignup, userLogin, userSignup, validateUser } from "../handlers/auth.handler.ts";
 import {getAllDoctors,getDoctorByID} from "../handlers/doctor.handler.js"
+import { getAllDoctorAppointments } from "../handlers/doctor.appointment.handler.ts";
 
 export const HttpMethod = {
 	GET    : "GET",
@@ -47,6 +48,7 @@ var routes: Route[] = [
 	//doctors router
 	{ path: "/doctors",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctors },
 	{path: "/doctors/:id",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getDoctorByID},
+	{path: "/doctors-appointments",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctorAppointments},
 
 ];
 

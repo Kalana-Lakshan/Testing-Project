@@ -23,7 +23,7 @@ export default function DoctorsDetails() {
         
         // Update state with the fetched data
         setDoctors(doctorsData);
-        
+
       } catch (err) {
         // Handle any errors
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';

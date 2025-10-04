@@ -41,9 +41,10 @@ export const getDoctorByID = async (req:Request,res:Response) =>{
         FROM doctor
         WHERE doctor_id = ?;
         `;
-        const[rows] = await pool.execute(query,[id]);
+        const [rows] = await pool.execute(query, [id]);
+        const doctorRows = rows as any[];
 
-        if (rows.length === 0){
+        if (doctorRows.length === 0){
             return res.status(404).json({
                 success: false,
                 message : 'Doctor not found',
@@ -53,7 +54,7 @@ export const getDoctorByID = async (req:Request,res:Response) =>{
         res.status(200).json({
             success:true,
             message : 'Doctor found',
-            data: rows[0]
+            data: doctorRows
         });
     }
     catch (error){
