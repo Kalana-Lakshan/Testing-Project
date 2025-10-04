@@ -5,14 +5,14 @@ export const getAllDoctors = async (req:Request, res:Response) =>{
     try{
         const query = `
         SELECT doctor_id,name,fee_per_patient,basic_monthly_salary,gender
-        FROM doctor
-        ORDER BY name ASC;
+        FROM medsync.doctor
+        ORDER BY doctor_id ASC;
         `;
         const [rows] = await pool.execute(query);
         res.status(200).json({
             success:true,
             message: 'Doctors fetched successfully',
-            data:[]
+            data:rows
         });
     }
     catch (error){
@@ -31,7 +31,7 @@ export const getDoctorByID = async (req:Request,res:Response) =>{
         if (!id || isNaN(Number(id))){
             return res.status(400).json({
                 success:false,
-                message:"Please provide a valid ddoctor ID",
+                message:"Please provide a valid doctor ID",
                 data:null
             });
         }

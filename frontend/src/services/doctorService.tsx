@@ -17,7 +17,7 @@ export const doctorService = {
                 throw new Error(`Server responded with status: ${response.status}`);
 
             }
-            const data:DoctorApiResponse = await response.json();
+            const data:DoctorsApiResponse = await response.json();
 
             if(data.success){
                 return data.data;
