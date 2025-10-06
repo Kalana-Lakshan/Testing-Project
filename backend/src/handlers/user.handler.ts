@@ -68,7 +68,7 @@ export const updateUser = async (req: Request, res: Response) => {
         Number(branch_id),
         Boolean(is_approved));
     }
-    return res.json({ message: "User updated successfully" });
+    return res.status(200).json({ message: "User updated successfully" });
   } catch (error) {
     console.error("Error in update user handler:", error);
     res.status(500).json({ error: "Internal Server Error" });
