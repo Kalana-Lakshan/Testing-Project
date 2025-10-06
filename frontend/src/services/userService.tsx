@@ -53,7 +53,7 @@ export const getAllInactiveUsers = async (count: number, offset: number) => {
 
 export const editUser = async (data: any) => {
   try {
-    const response = await axiosInstance.put(`/user/update/${data.user_id}`,
+    const response = await axiosInstance.put(`/user/${data.user_id}`,
       {
         role: data.role,
         branch_id: data.branch_id,
@@ -75,7 +75,7 @@ export const editUser = async (data: any) => {
 
 export const deleteUser = async (user_id: number) => {
   try {
-    const response = await axiosInstance.delete(`/user/delete/${user_id}`)
+    const response = await axiosInstance.delete(`/user/${user_id}`)
     return response.data
   } catch (error: unknown) {
     console.error("Error deleting user:", error);
@@ -91,7 +91,7 @@ export const deleteUser = async (user_id: number) => {
 
 export const restoreDeletedUser = async (user_id: number) => {
   try {
-    const response = await axiosInstance.put(`/user/restore/${user_id}`)
+    const response = await axiosInstance.put(`/user/${user_id}`)
     return response.data
   } catch (error: unknown) {
     console.error("Error restoring user:", error);
