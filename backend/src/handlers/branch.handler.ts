@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { createBranch, getAllBranches, getBranchCount, getBranchesForPagination, type Branch } from "../models/branch.model.ts";
+import { createBranch, getAllBranches, getBranchCount, getBranchesForPagination, updateBranch, type Branch } from "../models/branch.model.ts";
 
 export const createNewBranch = async (req: Request, res: Response) => {
   let { name, location, landline_no } = req.body;
@@ -10,7 +10,7 @@ export const createNewBranch = async (req: Request, res: Response) => {
       landline_no,
     );
   } catch (error) {
-    console.error("Error in getUsers handler:", error);
+    console.error("Error in createNewBranch handler:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
@@ -38,6 +38,19 @@ export const getBranches = async (req: Request, res: Response) => {
       branches: branches
     });
   } catch (error) {
-
+    console.log("error in getBranches handler: ", error);
+    res.status(500).json({ error: "Internal Server Error" });
   };
+};
+
+export const updateBranchByID = async (req: Request, res: Response) => {
+  const { branch_name, location, landline_no } = req.body;
+  const { id } = req.params;
+  try {
+    await updateBranch(Number(id), branch_name, location, landline_no);
+    return res.status(200).json({ message: "Branch updated successfully" });
+  } catch (error) {
+    console.error("Error in updateBranchByID handler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };
