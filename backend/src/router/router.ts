@@ -2,7 +2,10 @@ import type { Express } from "express";
 import authorizeRoles from "../auth/auth.js";
 import { deleteUser, getDeletedUsers, getUsers, restoreUser, updateUser } from "../handlers/user.handler.ts";
 import { patientSignup, staffSignup, userLogin, validateUser } from "../handlers/auth.handler.ts";
-import { getBranches } from "../handlers/branch.handler.ts";
+import { getBranches, updateBranchByID } from "../handlers/branch.handler.ts";
+import { getLogsForPagination } from "../handlers/log.handler.ts";
+import { dischargePatientByID, getPatients, updateCurrentPatientDetails } from "../handlers/patient.handler.ts";
+import { getAllStaff, updateStaffByID } from "../handlers/staff.handler.ts";
 
 
 export const HttpMethod = {
@@ -52,6 +55,7 @@ var routes: Route[] = [
 
 	// branches router
 	{ path: "/branches", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranches },
+	{ path: "/branch/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranches },
 
 ];
 
