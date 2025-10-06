@@ -71,6 +71,7 @@ CREATE Table `patient` (
     `address` VARCHAR(100) NULL,
     `date_of_birth` DATE,
     `blood_type` VARCHAR(5) NULL,    -- A+, A-, AB-, O+,....
+    `is_ex_patient` BOOLEAN DEFAULT false,
     PRIMARY KEY(`patient_id`),
     Foreign Key (`patient_id`) 
       REFERENCES `user`(`user_id`)
@@ -285,7 +286,7 @@ CREATE TABLE `log` (
   `action_id` int,
   `table_name` varchar(255),
   `record_id` int,
-  `time_Stamp` timestamp,
+  `time_Stamp` timestamp DEFAULT CURRENT_TIMESTAMP,
   `details` varchar(255),
   PRIMARY KEY (`log_id`),
   FOREIGN KEY (`action_id`)
