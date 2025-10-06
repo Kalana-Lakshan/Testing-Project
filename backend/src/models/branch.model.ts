@@ -19,13 +19,13 @@ export const createBranch = async (
       [branch_name, location, landline_no]
     );
   } catch (error) {
-    console.error("Error creating staff:", error);
+    console.error("Error creating branch:", error);
     throw error;
   }
 };
 
 export const updateBranch = async (
-  branch_id: string,
+  branch_id: number,
   branch_name: string,
   location: string,
   landline_no: string,
@@ -36,7 +36,7 @@ export const updateBranch = async (
       [branch_id, branch_name, location, landline_no]
     );
   } catch (error) {
-    console.error("Error creating branch:", error);
+    console.error("Error updating branch:", error);
     throw error;
   }
 };
