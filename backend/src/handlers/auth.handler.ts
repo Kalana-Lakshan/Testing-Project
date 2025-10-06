@@ -45,7 +45,7 @@ export const userLogin = async (req: Request, res: Response) => {
         }
         if (username !== user_DB.username) {
             res.status(401).json({ error: "Wrong username or password" });
-        }else if (await comparePasswords(String(password), user_DB.password_hash)) {
+        } else if (await comparePasswords(String(password), user_DB.password_hash)) {
             var token_string: string = generateToken({
                 userId: String(user_DB.user_id),
                 username: user_DB.username,
