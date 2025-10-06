@@ -286,7 +286,7 @@ CREATE TABLE `log` (
   `action_id` int,
   `table_name` varchar(255),
   `record_id` int,
-  `time_Stamp` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `time_stamp` timestamp DEFAULT CURRENT_TIMESTAMP,
   `details` varchar(255),
   PRIMARY KEY (`log_id`),
   FOREIGN KEY (`action_id`)

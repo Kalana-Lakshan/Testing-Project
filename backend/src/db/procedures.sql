@@ -26,6 +26,8 @@ DROP PROCEDURE IF EXISTS create_patient;
 
 DROP PROCEDURE IF EXISTS update_patient;
 
+DROP PROCEDURE IF EXISTS discharge_patient;
+
 DROP PROCEDURE IF EXISTS delete_patient;
 
 DROP PROCEDURE IF EXISTS get_patient_by_id;
@@ -36,6 +38,8 @@ DROP PROCEDURE IF EXISTS get_patients_by_branch;
 
 DROP PROCEDURE IF EXISTS get_all_patients;
 
+DROP PROCEDURE IF EXISTS get_patient_count;
+
 -- Staff model functions
 DROP PROCEDURE IF EXISTS create_staff;
 
@@ -45,13 +49,15 @@ DROP PROCEDURE IF EXISTS delete_staff;
 
 DROP PROCEDURE IF EXISTS get_staff_by_id;
 
-DROP PROCEDURE IF EXISTS get_staffs_by_type;
+DROP PROCEDURE IF EXISTS get_staff_by_type;
 
-DROP PROCEDURE IF EXISTS get_staffs_by_type_and_branch;
+DROP PROCEDURE IF EXISTS get_staff_by_type_and_branch;
 
-DROP PROCEDURE IF EXISTS get_all_staffs;
+DROP PROCEDURE IF EXISTS get_all_staff;
 
-DROP PROCEDURE IF EXISTS get_staffs_by_branch_id;
+DROP PROCEDURE IF EXISTS get_staff_count;
+
+DROP PROCEDURE IF EXISTS get_staff_by_branch_id;
 
 -- Branch Manager model functions
 DROP PROCEDURE IF EXISTS create_branch_manager;
@@ -226,7 +232,8 @@ CREATE PROCEDURE update_patient(
     IN p_nic VARCHAR(12),
     IN p_address VARCHAR(100),
     IN p_date_of_birth DATE,
-    IN p_blood_type VARCHAR(5)
+    IN p_blood_type VARCHAR(5),
+    IN p_is_ex TINYINT
 )
 BEGIN
     UPDATE `patient`
@@ -236,8 +243,16 @@ BEGIN
         nic = p_nic,
         address = p_address,
         date_of_birth = p_date_of_birth,
-        blood_type = p_blood_type
+        blood_type = p_blood_type,
+        is_ex_patient = p_is_ex
     WHERE patient_id = p_patient_id;
+END$$
+
+CREATE PROCEDURE discharge_patient(IN p_id INT)
+BEGIN
+    UPDATE `patient`
+    SET is_ex_patient = 1
+    WHERE patient_id = p_id;
 END$$
 
 CREATE PROCEDURE get_patient_by_id(IN p_id INT)
@@ -256,23 +271,31 @@ BEGIN
     LIMIT patient_count OFFSET count_start;
 END$$
 
-CREATE PROCEDURE get_patients_by_branch(IN p_branch_id INT, IN patient_count INT, IN count_start INT)
+CREATE PROCEDURE get_patients_by_branch(IN p_branch_id INT, IN patient_count INT, IN count_start INT, IN p_is_ex TINYINT)
 BEGIN
     SELECT p.patient_id, p.name, p.gender, p.emergency_contact_no, p.nic, p.address, p.date_of_birth, p.blood_type
     FROM `patient` p
     JOIN `user` u ON p.patient_id = u.user_id
-    WHERE u.branch_id = p_branch_id
+    WHERE u.branch_id = p_branch_id AND p.is_ex_patient = p_is_ex
     ORDER BY patient_id
     LIMIT patient_count OFFSET count_start;
 END$$
 
-CREATE PROCEDURE get_all_patients(IN patient_count INT, IN count_start INT)
+CREATE PROCEDURE get_all_patients(IN patient_count INT, IN count_start INT, IN p_is_ex TINYINT)
 BEGIN
     SELECT p.patient_id, p.name, p.gender, p.emergency_contact_no, p.nic, p.address, p.date_of_birth, p.blood_type, u.branch_id
     FROM `patient` p
     JOIN `user` u ON p.patient_id = u.user_id
+    WHERE p.is_ex_patient = p_is_ex
     ORDER BY patient_id
     LIMIT patient_count OFFSET count_start;
+END$$
+
+CREATE PROCEDURE get_patient_count(IN p_is_ex TINYINT)
+BEGIN
+    SELECT COUNT(patient_id) AS branch_count
+    FROM `patient`
+    WHERE is_ex_patient = p_is_ex;
 END$$
 
 CREATE PROCEDURE delete_patient(IN p_id INT)
@@ -316,7 +339,7 @@ BEGIN
     WHERE staff_id = p_id;
 END$$
 
-CREATE PROCEDURE get_staffs_by_type(IN p_type ENUM('Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent'))
+CREATE PROCEDURE get_staff_by_type(IN p_type ENUM('Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent'))
 BEGIN
     SELECT s.staff_id, s.name, s.type, s.gender, s.monthly_salary, u.branch_id, u.name as branch_name
     FROM `staff` s
@@ -324,7 +347,7 @@ BEGIN
     WHERE s.`type` = p_type;
 END$$
 
-CREATE PROCEDURE get_staffs_by_branch_id(IN p_branch_id INT)
+CREATE PROCEDURE get_staff_by_branch_id(IN p_branch_id INT)
 BEGIN
     SELECT s.staff_id, s.name, s.type, s.gender, s.monthly_salary
     FROM `staff` s
@@ -332,7 +355,10 @@ BEGIN
     WHERE u.branch_id = p_branch_id;
 END$$
 
-CREATE PROCEDURE get_staffs_by_type_and_branch(IN p_type ENUM('Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent'), IN p_branch_id INT)
+CREATE PROCEDURE get_staff_by_type_and_branch(
+    IN p_type ENUM('Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent'), 
+    IN p_branch_id INT
+)
 BEGIN
     SELECT s.staff_id, s.name, s.type, s.gender, s.monthly_salary
     FROM `staff` s
@@ -340,13 +366,20 @@ BEGIN
     WHERE u.branch_id = p_branch_id AND s.`type` = p_type;
 END$$
 
-CREATE PROCEDURE get_all_staffs(IN staff_count INT, IN count_start INT)
+CREATE PROCEDURE get_all_staff(IN staff_count INT, IN count_start INT)
 BEGIN
-    SELECT s.staff_id, s.name, s.type, s.gender, s.monthly_salary, u.branch_id
+    SELECT s.staff_id, s.name, s.type, u.branch_id, b.name AS branch_name, s.gender, s.monthly_salary
     FROM `staff` s
     JOIN `user` u ON s.staff_id = u.user_id
+    LEFT JOIN `branch` b ON b.branch_id = u.branch_id
     ORDER BY s.staff_id
     LIMIT staff_count OFFSET count_start;
+END$$
+
+CREATE PROCEDURE get_staff_count()
+BEGIN
+    SELECT COUNT(staff_id) AS staff_count
+    FROM `staff`;
 END$$
 
 CREATE PROCEDURE delete_staff(IN p_id INT)
