@@ -2,7 +2,7 @@ import type { Express } from "express";
 import authorizeRoles from "../auth/auth.js";
 import { deleteUser, getDeletedUsers, getUsers, restoreUser, updateUser } from "../handlers/user.handler.ts";
 import { patientSignup, staffSignup, userLogin, validateUser } from "../handlers/auth.handler.ts";
-import { getBranches, updateBranchByID } from "../handlers/branch.handler.ts";
+import { getAllBranchNames, getBranches, updateBranchByID } from "../handlers/branch.handler.ts";
 import { getLogsForPagination } from "../handlers/log.handler.ts";
 import { dischargePatientByID, getPatients, updateCurrentPatientDetails } from "../handlers/patient.handler.ts";
 import { getAllStaff, updateStaffByID } from "../handlers/staff.handler.ts";
@@ -51,9 +51,10 @@ var routes: Route[] = [
 	{ path: "/users/inactive", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDeletedUsers },
 	{ path: "/user/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateUser },
 	{ path: "/user/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteUser },
-	{ path: "/user/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: restoreUser },
+	{ path: "/user/restore/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: restoreUser },
 
 	// branches router
+	{ path: "/all-branches", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBranchNames },
 	{ path: "/branches", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranches },
 	{ path: "/branch/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranches },
 	{ path: "/branch/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateBranchByID },
@@ -89,6 +90,7 @@ export const MapRouters = (app: Express) => {
 				app.put(route.path, authorizeRoles(route.AccessibleBy), (req, res) => {
 					route.handler(req, res);
 				});
+				break;
 			case HttpMethod.DELETE:
 				app.delete(route.path, authorizeRoles(route.AccessibleBy), (req, res) => {
 					route.handler(req, res);
