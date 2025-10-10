@@ -13,12 +13,12 @@ export interface User {
   created_at: string;
 }
 
-export const getAllUsers = async (count: number, offset: number) => {
+export const getAllUsers = async (count: number, offset: number, Role: string, Branch: string) => {
   try {
     const users_db = await axiosInstance.get<{
       user_count: number;
       users: Array<User>;
-    }>(`/users/active?count=${count}&offset=${offset}`);
+    }>(`/users/active?count=${count}&offset=${offset}&role=${Role}&branch=${Branch}`);
     return users_db.data;
   } catch (error: unknown) {
     console.error("Error getting all users:", error);
@@ -91,7 +91,7 @@ export const deleteUser = async (user_id: number) => {
 
 export const restoreDeletedUser = async (user_id: number) => {
   try {
-    const response = await axiosInstance.put(`/user/${user_id}`)
+    const response = await axiosInstance.put(`/user/restore/${user_id}`)
     return response.data
   } catch (error: unknown) {
     console.error("Error restoring user:", error);
