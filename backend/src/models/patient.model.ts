@@ -78,13 +78,19 @@ export const getPatientByID = async (id: number): Promise<Patient> => {
 export const getAllPatients = async (
   count: number,
   offset: number,
-  isExPatient: boolean
+  isExPatient: boolean,
+  branch: string,
+  blood_group: string,
+  gender: string
 ): Promise<Patient[]> => {
   try {
-    const [rows] = await sql.query("CALL get_all_patients(?, ?, ?)", [
+    const [rows] = await sql.query("CALL get_all_patients(?, ?, ?, ?, ?, ?)", [
       count,
       offset,
-      isExPatient
+      isExPatient,
+      (branch == "All" ? -1 : Number(branch)),
+      blood_group,
+      gender
     ]);
     return (rows as any)[0] as Patient[];
   } catch (error) {
@@ -93,9 +99,19 @@ export const getAllPatients = async (
   }
 };
 
-export const getPatientsCount = async (isExPatient: boolean): Promise<Number> => {
+export const getPatientsCount = async (
+  isExPatient: boolean,
+  branch: string,
+  blood_group: string,
+  gender: string
+): Promise<Number> => {
   try {
-    const [rows]: any = await sql.query("CALL get_patient_count(?)", [isExPatient]);
+    const [rows]: any = await sql.query("CALL get_patient_count(?)", [
+      isExPatient,
+      (branch == "All" ? -1 : Number(branch)),
+      blood_group,
+      gender
+    ]);
     return rows[0][0].user_count;
   } catch (error) {
     console.error("Error fetching count of patients:", error);
