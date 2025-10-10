@@ -56,13 +56,30 @@ export const dischargePatientByID = async (req: Request, res: Response) => {
 };
 
 export const getPatients = async (req: Request, res: Response) => {
-  const { count, offset, isExPatient } = req.query;
+  const { count, offset, isExPatient, branch, bloodGroup, gender } = req.query;
   try {
-    const patients: Patient[] = await getAllPatients(Number(count), Number(offset), Boolean(isExPatient));
+    if (!count || !offset || !isExPatient || !branch || !bloodGroup || !gender) {
+      res.status(400).json({ error: "Params count, offset, isExPatient, branch, bloodGroup or gender undefined" });
+      return;
+    }
+    const patients: Patient[] = await getAllPatients(
+      Number(count), 
+      Number(offset), 
+      Boolean(isExPatient), 
+      String(branch), 
+      String(bloodGroup), 
+      String(gender)
+    );
     if (patients.length < 1) {
       res.status(404).json({ error: "Patients not found" });
+      return;
     }
-    const patients_count: Number = await getPatientsCount(Boolean(isExPatient));
+    const patients_count: Number = await getPatientsCount(
+      Boolean(isExPatient), 
+      String(branch), 
+      String(bloodGroup), 
+      String(gender)
+    );
     if (patients_count == undefined) {
       console.log("error in finding the patient count, count = " + patients_count);
       res.status(500).json({ error: "Internal Server Error" });
