@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { createTimer } from "@/services/utils";
+import { createTimer, toNormalTimestamp } from "@/services/utils";
 import { RotateCcw } from "lucide-react";
 import { Role } from "@/utils";
 import UndoDeleteUser from "./user-restore";
@@ -74,10 +74,12 @@ const InactiveUsers: React.FC = () => {
           Created At
         </Button>
       ),
+      cell: ({ row }) => toNormalTimestamp(row.original.created_at),
     },
     {
       accessorKey: "is_approved",
       header: "Approved",
+      cell: ({ row }) => (row.original.is_approved ? "True" : "False"),
     },
     {
       header: "Action",
@@ -134,7 +136,7 @@ const InactiveUsers: React.FC = () => {
     toast.loading("Loading...");
 
     return Promise.allSettled([
-      getAllInactiveUsers(itemsPerPage, page),
+      getAllInactiveUsers(itemsPerPage, (page - 1) * itemsPerPage),
       createTimer(500),
     ])
       .then((hu) => {
