@@ -4,17 +4,23 @@ import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { createTimer, toNormalTimestamp } from "@/services/utils";
+import { createTimer, formatRole, toNormalTimestamp } from "@/services/utils";
 import { Eye, Trash } from "lucide-react";
 import { Role } from "@/utils";
-import DeleteUser from "./user.delete";
+import DeleteUser from "./user-delete";
 import ViewUser from "./user-view";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { getAllBranches } from "@/services/branchServices";
+import { Roles } from "../Authentication/staff-sign-up";
 
 
 const Users: React.FC = () => {
   const [Users, setUsers] = useState<Array<User>>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [action, setAction] = useState<"edit" | "delete" | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string>("All");
+  const [selectedBranch, setSelectedBranch] = useState<string>("All");
   const columns: ColumnDef<User>[] = [
     {
       accessorKey: "user_id",
@@ -51,6 +57,7 @@ const Users: React.FC = () => {
           Role
         </Button>
       ),
+      cell: ({ row }) => formatRole(row.original.role),
     },
     {
       accessorKey: "branch_name",
@@ -149,22 +156,13 @@ const Users: React.FC = () => {
     toast.loading("Loading...");
 
     return Promise.allSettled([
-      getAllUsers(itemsPerPage, page),
+      getAllUsers(itemsPerPage, (page - 1) * itemsPerPage, String(selectedRole), selectedBranch === "All" ? "-1" : selectedBranch),
       createTimer(500),
     ])
       .then((hu) => {
         if (hu[0].status === "rejected") {
           throw hu[0].reason;
         }
-        // const mappedUsers: UserDTO[] = hu[0].value.users.map((u: any) => ({
-        //   user_id: u.user_id,
-        //   username: u.username,
-        //   role: u.role,
-        //   branch_name: u.branch_name,
-        //   created_at: u.created_at,
-        //   is_approved: Boolean(u.is_approved),
-        // }));
-        // setUsers(mappedUsers);
         setUsers(hu[0].value.users);
         console.log("set", hu[0].value, itemsPerPage);
         setPageCount(Math.ceil(hu[0].value.user_count / itemsPerPage));
@@ -179,13 +177,69 @@ const Users: React.FC = () => {
       .finally(() => {
         toast.dismiss();
       });
-  }, [table]);
+  }, [table, selectedBranch, selectedRole]);
+
+
+  const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const data = await getAllBranches();
+        const mappedBranches = data.branches.map((b) => ({
+          value: String(b.branch_id),
+          label: b.name,
+        }));
+        setBranches(mappedBranches);
+      } catch (err) {
+        toast.error("Failed to load branches");
+      }
+    };
+
+    fetchBranches();
+  }, []);
 
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers, pagination]);
+  }, [fetchUsers, pagination, selectedRole, selectedBranch]);
   return (
     <>
+      <div className="grid gap-4 grid-cols-6 mb-4">
+        <div className="grid gap-2">
+          <Label>Role</Label>
+          <Select value={selectedRole} onValueChange={setSelectedRole} >
+            <SelectTrigger id="role" className="w-full">
+              <SelectValue placeholder="All Roles" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem key="All" value="All">All</SelectItem>
+              {Roles.map((r) => (
+                console.log(r),
+                <SelectItem key={r.value} value={r.value}>
+                  {r.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="grid gap-2">
+          <Label>Branch</Label>
+          <Select value={selectedBranch} onValueChange={setSelectedBranch} >
+            <SelectTrigger id="branch" className="w-full">
+              <SelectValue placeholder="All Branches" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem key="All" value="All">All</SelectItem>
+              {branches.map((b) => (
+                <SelectItem key={b.value} value={b.value}>
+                  {b.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <ViewUser
         isOpen={action === "edit" && selectedUser !== null}
         selectedUser={selectedUser}
