@@ -1,4 +1,4 @@
-import pool from "../db/db.js";
+import pool from "../db/db.ts";
 import type {Request,Response} from 'express';
 
 export const getAllDoctors = async (req:Request, res:Response) =>{

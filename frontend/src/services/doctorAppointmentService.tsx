@@ -16,7 +16,7 @@ export const doctorAppointmentService = {
             if (!response.ok) {
                 throw new Error('Failed to fetch doctor appointments');
             }
-            const data = await response.json();
+            const data: DoctorAppointmentsApiResponse = await response.json();
 
             if(data.success){
                 console.log('Fetched doctor appointments:', data.data);

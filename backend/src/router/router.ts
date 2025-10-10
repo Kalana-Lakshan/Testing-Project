@@ -47,8 +47,8 @@ var routes: Route[] = [
 	{ path: "/users/active", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getUsers },
 	//doctors router
 	{ path: "/doctors",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctors },
-	{path: "/doctors/:id",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getDoctorByID},
-	{path: "/doctors-appointments",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctorAppointments},
+	{ path: "/doctors/:id",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getDoctorByID},
+	{ path: "/doctors-appointments",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctorAppointments},
 
 ];
 

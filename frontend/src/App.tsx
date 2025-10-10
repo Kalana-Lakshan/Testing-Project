@@ -10,6 +10,7 @@ import SignUp from './pages/Authentication/sign-up';
 import Users from './pages/users/activeUsers';
 import DoctorsDetails from './pages/doctors/doctorsDetails';
 import { ThemeProvider } from './components/theme-provider';
+import DoctorsAppointmentDetails from './pages/doctors/doctorsAppointmentDetails';
 
 
 function App() {
@@ -82,6 +83,16 @@ function App() {
                 <>
                   <PageTitle title="Doctors | MedSync" />
                   <DoctorsDetails />
+                </>
+              }
+            />
+
+            <Route
+              path="/doctors-appointments"
+              element={
+                <>
+                  <PageTitle title="Appointment details | MedSync" />
+                  <DoctorsAppointmentDetails />
                 </>
               }
             />

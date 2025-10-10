@@ -65,7 +65,7 @@ export default function DoctorsDetails() {
   // Show actual data
   return (
     <div className="space-y-6">
-      <PageTitle title="Doctors' Details" />
+      <PageTitle title="Doctors' Details | Medsync" />
       
       <div>
         <h2>All Doctors ({doctors.length})</h2>
