@@ -100,7 +100,7 @@ export default function DoctorsAppointmentDetails() {
   // Show actual data
   return (
     <div className="space-y-6">
-      <PageTitle title="DoctorAppointments' Details" />
+      <PageTitle title="Appointment details | MedSync" />
       
       <div>
         <h2>All Doctor Appointments ({appointments.length})</h2>

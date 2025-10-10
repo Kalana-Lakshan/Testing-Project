@@ -12,6 +12,7 @@ import DoctorsDetails from './pages/doctors/doctorsDetails';
 import { ThemeProvider } from './components/theme-provider';
 import DoctorsAppointmentDetails from './pages/doctors/doctorsAppointmentDetails';
 import DoctorsPatientsHistory from './pages/doctors/doctorsPatientsHistory';
+import DoctorSpeciality from './pages/doctors/doctorSpeciality';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -103,6 +104,18 @@ function App() {
                 <>
                   <PageTitle title="Patients' history | MedSync" />
                   <DoctorsPatientsHistory />
+                </>
+              }
+            />
+
+        
+
+          <Route
+              path="/doctors-specialities"
+              element={
+                <>
+                  <PageTitle title="Doctors' specialities | MedSync" />
+                  <DoctorSpeciality />
                 </>
               }
             />

@@ -71,7 +71,7 @@ INSERT INTO `doctor` (doctor_id, name, fee_per_patient, basic_monthly_salary, ge
 -- ===========================
 -- 9. Doctor_Speciality
 -- ===========================
-INSERT INTO `doctor_speciality` (doctor_id, specialiy_id, added_at) VALUES
+INSERT INTO `doctor_speciality` (doctor_id, speciality_id, added_at) VALUES
 (1, 1, NOW()),
 (2, 2, NOW()),
 (3, 3, NOW()),
@@ -247,7 +247,7 @@ INSERT INTO `speciality` (speciality_id, speciality_name, description) VALUES
 (8, 'Psychiatry', 'Mental health conditions');
 
 -- Doctor Specialities for new doctors
-INSERT INTO `doctor_speciality` (doctor_id, specialiy_id, added_at) VALUES
+INSERT INTO `doctor_speciality` (doctor_id, speciality_id, added_at) VALUES
 (5, 1, NOW()),  -- Dr. Sarah Connor - Cardiology
 (5, 5, NOW()),  -- Dr. Sarah Connor - Dermatology
 (6, 3, NOW()),  -- Dr. James Wilson - Orthopedics

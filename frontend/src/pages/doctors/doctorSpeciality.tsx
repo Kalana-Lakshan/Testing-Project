@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import PageTitle from "@/components/PageTitle";
-import {doctorPatientsHistoryService} from '@/services/doctorpatientshistory';
-import type { DoctorPatientsHistory } from '@/types/doctor.patients.history.types'; 
 
+import type { DoctorSpeciality } from '@/types/doctor.specialities.types';    
+import { doctorSpecialityService } from '@/services/doctorSpecialityService';
 
 
 //for table
@@ -10,9 +10,9 @@ import { useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel,
 import { DataTable } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
 
-export default function DoctorsPatientsHistory() {
+export default function DoctorsSpecialityDetails() {
   // State variables - like boxes that hold our data
-  const [patientsHistory, setPatientsHistory] = useState<DoctorPatientsHistory[]>([]);  // Array of doctor patients history
+  const [specialities, setSpecialities] = useState<DoctorSpeciality[]>([]);  // Array of doctor specialities
   const [loading, setLoading] = useState<boolean>(true);  // Is data loading?
   const [error, setError] = useState<string | null>(null);  // Any error message
 
@@ -22,21 +22,16 @@ export default function DoctorsPatientsHistory() {
   const [globalFilter, setGlobalFilter] = useState("");
 
   // Column definitions for DataTable
-    const columns: ColumnDef<DoctorPatientsHistory>[] = [
-    { accessorKey: "medical_history_id", header: "Medical History ID" },
-    { accessorKey: "appointment_id", header: "Appointment ID" },
-    { accessorKey: "visit_date", header: "Visit Date" },
-    { accessorKey: "diagnosis", header: "Diagnosis" },
-    { accessorKey: "symptoms", header: "Symptoms" },
-    { accessorKey: "allergies", header: "Allergies" },
-    { accessorKey: "notes", header: "Notes" },
-    { accessorKey: "follow_up_date", header: "Follow Up Date" },
-    { accessorKey: "created_at", header: "Created At" },
-    { accessorKey: "updated_at", header: "Updated At" },
+    const columns: ColumnDef<DoctorSpeciality>[] = [
+        { accessorKey: "doctor_id", header: "Doctor ID" },
+        { accessorKey: "speciality_id", header: "Speciality ID" },
+        { accessorKey: "name", header: "Doctor Name" },
+        { accessorKey: "speciality_name", header: "Speciality Name" },
+        { accessorKey: "added_at", header: "Added At" },
     ];
   
     const table = useReactTable({
-      data: patientsHistory,
+      data: specialities,
       columns,
       onSortingChange: setSorting,
       onColumnFiltersChange: setColumnFilters,
@@ -51,22 +46,22 @@ export default function DoctorsPatientsHistory() {
   // useEffect runs when component first loads (mounts)
   useEffect(() => {
     // Function to fetch doctors data
-    const fetchDoctorPatientsHistory = async () => {
+    const fetchDoctorAppointments = async () => {
       try {
         setLoading(true);  // Show loading state
         setError(null);    // Clear any previous errors
 
-        // Call our service to get doctor patients history
-        const patientsHistoryData = await doctorPatientsHistoryService.getAllDoctorPatientsHistory();
+        // Call our service to get doctor appointments
+        const appointmentsData = await doctorSpecialityService.getAllDoctorSpecialities();
 
         // Update state with the fetched data
-        setPatientsHistory(patientsHistoryData);
-        
+        setSpecialities(appointmentsData);
+
       } catch (err) {
         // Handle any errors
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         setError(errorMessage);
-        console.error('Failed to fetch doctor patients history:', err);
+        console.error('Failed to fetch doctors:', err);
         
       } finally {
         setLoading(false);  // Hide loading state
@@ -74,15 +69,15 @@ export default function DoctorsPatientsHistory() {
     };
 
     // Actually call the function
-    fetchDoctorPatientsHistory();
+    fetchDoctorAppointments();
   }, []);  // Empty array means "run once when component mounts"
 
   // Show loading state
   if (loading) {
     return (
       <div className="space-y-6">
-        <PageTitle title="DoctorAppointments' Details" />
-        <div>Loading doctor appointments data...</div>
+        <PageTitle title="Doctors' Specialities Details" />
+        <div>Loading doctor specialities data...</div>
       </div>
     );
   }
@@ -91,7 +86,7 @@ export default function DoctorsPatientsHistory() {
   if (error) {
     return (
       <div className="space-y-6">
-        <PageTitle title="DoctorAppointments' Details" />
+        <PageTitle title="Doctors' Specialities Details" />
         <div style={{ color: 'red' }}>Error: {error}</div>
         <button onClick={() => window.location.reload()}>
           Try Again
@@ -103,17 +98,17 @@ export default function DoctorsPatientsHistory() {
   // Show actual data
   return (
     <div className="space-y-6">
-      <PageTitle title="Patients' history | MedSync" />
+      <PageTitle title="Doctors' Specialities Details | MedSync" />
       
       <div>
-        <h2>All Doctor Patients History ({patientsHistory.length})</h2>
+        <h2>All Doctor Specialities ({specialities.length})</h2>
 
-        {patientsHistory.length === 0 ? (
-          <p>No doctor patients history found in database.</p>
+        {specialities.length === 0 ? (
+          <p>No doctor specialities found in database.</p>
         ) : (
             <div className="space-y-4">
             <Input
-              placeholder="Search patients history..."
+              placeholder="Search specialities..."
               value={globalFilter ?? ""}
               onChange={(event) => setGlobalFilter(String(event.target.value))}
               className="max-w-sm"
