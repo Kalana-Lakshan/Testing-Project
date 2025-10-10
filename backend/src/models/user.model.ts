@@ -107,12 +107,16 @@ export const getUserById = async (id: number): Promise<User> => {
 // Get All active Users (pagination)
 export const getAllUser = async (
   count: number,
-  offset: number
+  offset: number,
+  role: string,
+  branch: string,
 ): Promise<User[]> => {
   try {
-    const [rows] = await sql.query("CALL get_all_users(?, ?)", [
+    const [rows] = await sql.query("CALL get_all_users(?, ?, ?, ?)", [
       count,
       offset,
+      role,
+      Number(branch)
     ]);
     return (rows as any)[0] as User[];
   } catch (error) {
@@ -122,9 +126,12 @@ export const getAllUser = async (
 };
 
 
-export const getActiveUserCount = async (): Promise<Number> => {
+export const getActiveUserCount = async (
+  role: string,
+  branch: string,
+): Promise<Number> => {
   try {
-    const [rows]: any = await sql.query("CALL get_all_active_users_count()");
+    const [rows]: any = await sql.query("CALL get_all_active_users_count(?, ?)", [role, Number(branch)]);
     return rows[0][0].user_count;
   } catch (error) {
     console.error("Error fetching count of active users:", error);

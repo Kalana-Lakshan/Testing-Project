@@ -160,21 +160,33 @@ BEGIN
     WHERE u.username = p_username AND u.is_deleted = 0;
 END$$
 
-CREATE PROCEDURE get_all_users(IN user_count INT, IN start_count INT)
+CREATE PROCEDURE get_all_users(IN user_count INT, IN start_count INT, IN in_role VARCHAR(20), IN in_branch_id INT)
 BEGIN
-    SELECT u.user_id, u.username, u.password_hash, u.role, b.branch_id, b.name as branch_name, u.is_approved, u.created_at
+    SELECT 
+        u.user_id, 
+        u.username, 
+        u.password_hash, 
+        u.role, 
+        b.branch_id, 
+        b.name as branch_name, 
+        u.is_approved, 
+        u.created_at
     FROM `user` u
     LEFT JOIN `branch` b ON u.branch_id = b.branch_id
     WHERE u.is_deleted = 0
+        AND (in_role = 'All' OR u.role = in_role)
+        AND (in_branch_id = -1 OR u.branch_id = in_branch_id)
     ORDER BY u.user_id
     LIMIT user_count OFFSET start_count;
 END$$
 
-CREATE PROCEDURE get_all_active_users_count()
+CREATE PROCEDURE get_all_active_users_count(IN in_role VARCHAR(20), IN in_branch_id INT)
 BEGIN
     SELECT COUNT(user_id) AS user_count
     FROM `user`
-    WHERE is_deleted = 0;
+    WHERE is_deleted = 0
+        AND (in_role = 'All' OR role = in_role)
+        AND (in_branch_id = -1 OR branch_id = in_branch_id);
 END$$
 
 CREATE PROCEDURE get_all_deleted_users(IN user_count INT, IN start_count INT)
@@ -262,40 +274,70 @@ BEGIN
     WHERE patient_id = p_id;
 END$$
 
-CREATE PROCEDURE get_patients_by_blood_type(IN p_blood VARCHAR(5), IN patient_count INT, IN count_start INT)
-BEGIN
-    SELECT patient_id, name, gender, emergency_contact_no, nic, address, date_of_birth, blood_type
-    FROM `patient`
-    WHERE blood_type = p_blood
-    ORDER BY patient_id
-    LIMIT patient_count OFFSET count_start;
-END$$
+-- CREATE PROCEDURE get_patients_by_blood_type(IN p_blood VARCHAR(5), IN patient_count INT, IN count_start INT)
+-- BEGIN
+--     SELECT patient_id, name, gender, emergency_contact_no, nic, address, date_of_birth, blood_type
+--     FROM `patient`
+--     WHERE blood_type = p_blood
+--     ORDER BY patient_id
+--     LIMIT patient_count OFFSET count_start;
+-- END$$
 
-CREATE PROCEDURE get_patients_by_branch(IN p_branch_id INT, IN patient_count INT, IN count_start INT, IN p_is_ex TINYINT)
+-- CREATE PROCEDURE get_patients_by_branch(IN p_branch_id INT, IN patient_count INT, IN count_start INT, IN p_is_ex TINYINT)
+-- BEGIN
+--     SELECT p.patient_id, p.name, p.gender, p.emergency_contact_no, p.nic, p.address, p.date_of_birth, p.blood_type
+--     FROM `patient` p
+--     JOIN `user` u ON p.patient_id = u.user_id
+--     WHERE u.branch_id = p_branch_id AND p.is_ex_patient = p_is_ex
+--     ORDER BY patient_id
+--     LIMIT patient_count OFFSET count_start;
+-- END$$
+
+CREATE PROCEDURE get_all_patients(
+    IN patient_count INT, 
+    IN count_start INT, 
+    IN p_is_ex TINYINT, 
+    IN p_branch_id INT, 
+    IN p_blood VARCHAR(5),
+    IN p_gender VARCHAR(6)
+)
 BEGIN
-    SELECT p.patient_id, p.name, p.gender, p.emergency_contact_no, p.nic, p.address, p.date_of_birth, p.blood_type
+    SELECT 
+        p.patient_id, 
+        p.name, 
+        p.gender, 
+        p.emergency_contact_no, 
+        p.nic, 
+        p.address, 
+        p.date_of_birth, 
+        p.blood_type, 
+        u.branch_id, 
+        b.name as branch_name
     FROM `patient` p
     JOIN `user` u ON p.patient_id = u.user_id
-    WHERE u.branch_id = p_branch_id AND p.is_ex_patient = p_is_ex
+    JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE p.is_ex_patient = p_is_ex
+        AND (p_branch_id = -1 or u.branch_id = p_branch_id)
+        AND (p_blood = 'All' or p.blood_type = p_blood)
+        AND (p_gender = 'All' or p.gender = p_gender)
     ORDER BY patient_id
     LIMIT patient_count OFFSET count_start;
 END$$
 
-CREATE PROCEDURE get_all_patients(IN patient_count INT, IN count_start INT, IN p_is_ex TINYINT)
+CREATE PROCEDURE get_patient_count(
+    IN p_is_ex TINYINT, 
+    IN p_branch_id INT, 
+    IN p_blood VARCHAR(5),
+    IN p_gender VARCHAR(6)
+)
 BEGIN
-    SELECT p.patient_id, p.name, p.gender, p.emergency_contact_no, p.nic, p.address, p.date_of_birth, p.blood_type, u.branch_id
+    SELECT COUNT(p.patient_id) AS patient_count
     FROM `patient` p
     JOIN `user` u ON p.patient_id = u.user_id
     WHERE p.is_ex_patient = p_is_ex
-    ORDER BY patient_id
-    LIMIT patient_count OFFSET count_start;
-END$$
-
-CREATE PROCEDURE get_patient_count(IN p_is_ex TINYINT)
-BEGIN
-    SELECT COUNT(patient_id) AS branch_count
-    FROM `patient`
-    WHERE is_ex_patient = p_is_ex;
+        AND (p_branch_id = -1 or u.branch_id = p_branch_id)
+        AND (p_blood = 'All' or p.blood_type = p_blood)
+        AND (p_gender = 'All' or p.gender = p_gender);
 END$$
 
 CREATE PROCEDURE delete_patient(IN p_id INT)
