@@ -3,11 +3,45 @@ import PageTitle from "@/components/PageTitle";
 import { doctorService } from '@/services/doctorService';
 import type { Doctor } from '@/types/doctor.types';
 
+//for table
+import { useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel, getPaginationRowModel, type ColumnDef, type SortingState, type ColumnFiltersState } from "@tanstack/react-table";
+import { DataTable } from "@/components/data-table";
+import { Input } from "@/components/ui/input";
+
+
 export default function DoctorsDetails() {
   // State variables - like boxes that hold our data
   const [doctors, setDoctors] = useState<Doctor[]>([]);  // Array of doctors
   const [loading, setLoading] = useState<boolean>(true);  // Is data loading?
   const [error, setError] = useState<string | null>(null);  // Any error message
+
+  // Table state
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
+
+  // Column definitions for DataTable
+  const columns: ColumnDef<Doctor>[] = [
+    { accessorKey: "doctor_id", header: "ID" },
+    { accessorKey: "name", header: "Name" },
+    { accessorKey: "gender", header: "Gender" },
+    { accessorKey: "fee_per_patient", header: "Fee per Patient", cell: ({ row }) => `Rs.${row.getValue("fee_per_patient")}` },
+    { accessorKey: "basic_monthly_salary", header: "Monthly Salary", cell: ({ row }) => `Rs.${row.getValue("basic_monthly_salary")}` },
+  ];
+
+  const table = useReactTable({
+    data: doctors,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    state: { sorting, columnFilters, globalFilter },
+  });
+
   //console.log("RENDERING DOCTORS DETAILS COMPONENT");
   //console.log(doctors);
   // useEffect runs when component first loads (mounts)
@@ -73,28 +107,15 @@ export default function DoctorsDetails() {
         {doctors.length === 0 ? (
           <p>No doctors found in the database.</p>
         ) : (
-          <table border={1} style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Gender</th>
-                <th>Fee per Patient</th>
-                <th>Monthly Salary</th>
-              </tr>
-            </thead>
-            <tbody>
-              {doctors.map((doctor) => (
-                <tr key={doctor.doctor_id}>
-                  <td>{doctor.doctor_id}</td>
-                  <td>{doctor.name}</td>
-                  <td>{doctor.gender}</td>
-                  <td>Rs.{doctor.fee_per_patient}</td>
-                  <td>Rs.{doctor.basic_monthly_salary}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="space-y-4">
+            <Input
+              placeholder="Search doctors..."
+              value={globalFilter ?? ""}
+              onChange={(event) => setGlobalFilter(String(event.target.value))}
+              className="max-w-sm"
+            />
+            <DataTable table={table} />
+          </div>
         )}
       </div>
     </div>

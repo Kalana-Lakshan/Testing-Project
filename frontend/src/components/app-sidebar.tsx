@@ -170,8 +170,8 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       },
       {
         type: "child",
-        title: "Patients history",
-        url: "",
+        title: "Patients' history",
+        url: "/doctors-patients-history",
         icon: BookUser,
         hideIf: (role) => typeof role !== "string" ||
           ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),

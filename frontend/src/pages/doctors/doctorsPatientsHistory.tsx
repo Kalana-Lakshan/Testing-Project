@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import PageTitle from "@/components/PageTitle";
-import { doctorAppointmentService } from '@/services/doctorappointmentservice';
-import type { DoctorAppointment } from '@/types/doctor.appointments.types';
+import {doctorPatientsHistoryService} from '@/services/doctorpatientshistory';
+import type { DoctorPatientsHistory } from '@/types/doctor.patients.history.types'; 
+
 
 
 //for table
@@ -9,9 +10,9 @@ import { useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel,
 import { DataTable } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
 
-export default function DoctorsAppointmentDetails() {
+export default function DoctorsPatientsHistory() {
   // State variables - like boxes that hold our data
-  const [appointments, setAppointments] = useState<DoctorAppointment[]>([]);  // Array of doctor appointments
+  const [patientsHistory, setPatientsHistory] = useState<DoctorPatientsHistory[]>([]);  // Array of doctor patients history
   const [loading, setLoading] = useState<boolean>(true);  // Is data loading?
   const [error, setError] = useState<string | null>(null);  // Any error message
 
@@ -21,19 +22,21 @@ export default function DoctorsAppointmentDetails() {
   const [globalFilter, setGlobalFilter] = useState("");
 
   // Column definitions for DataTable
-    const columns: ColumnDef<DoctorAppointment>[] = [
-      { accessorKey: "appointment_id", header: "Appointment_ID" },
-      { accessorKey: "patient_id", header: "Patient_ID" },
-      { accessorKey: "doctor_id", header: "Doctor_ID" },
-      { accessorKey: "patient_note", header: "Patient Note"},
-      { accessorKey: "date", header: "Date" },
-      { accessorKey: "time_slot", header: "Time Slot" },
-      { accessorKey: "status", header: "Status" },
-      { accessorKey: "time_stamp", header: "Time Stamp" },
+    const columns: ColumnDef<DoctorPatientsHistory>[] = [
+    { accessorKey: "medical_history_id", header: "Medical History ID" },
+    { accessorKey: "appointment_id", header: "Appointment ID" },
+    { accessorKey: "visit_date", header: "Visit Date" },
+    { accessorKey: "diagnosis", header: "Diagnosis" },
+    { accessorKey: "symptoms", header: "Symptoms" },
+    { accessorKey: "allergies", header: "Allergies" },
+    { accessorKey: "notes", header: "Notes" },
+    { accessorKey: "follow_up_date", header: "Follow Up Date" },
+    { accessorKey: "created_at", header: "Created At" },
+    { accessorKey: "updated_at", header: "Updated At" },
     ];
   
     const table = useReactTable({
-      data: appointments,
+      data: patientsHistory,
       columns,
       onSortingChange: setSorting,
       onColumnFiltersChange: setColumnFilters,
@@ -48,22 +51,22 @@ export default function DoctorsAppointmentDetails() {
   // useEffect runs when component first loads (mounts)
   useEffect(() => {
     // Function to fetch doctors data
-    const fetchDoctorAppointments = async () => {
+    const fetchDoctorPatientsHistory = async () => {
       try {
         setLoading(true);  // Show loading state
         setError(null);    // Clear any previous errors
 
-        // Call our service to get doctor appointments
-        const appointmentsData = await doctorAppointmentService.getAllDoctorAppointments();
+        // Call our service to get doctor patients history
+        const patientsHistoryData = await doctorPatientsHistoryService.getAllDoctorPatientsHistory();
 
         // Update state with the fetched data
-        setAppointments(appointmentsData);
+        setPatientsHistory(patientsHistoryData);
         
       } catch (err) {
         // Handle any errors
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         setError(errorMessage);
-        console.error('Failed to fetch doctors:', err);
+        console.error('Failed to fetch doctor patients history:', err);
         
       } finally {
         setLoading(false);  // Hide loading state
@@ -71,7 +74,7 @@ export default function DoctorsAppointmentDetails() {
     };
 
     // Actually call the function
-    fetchDoctorAppointments();
+    fetchDoctorPatientsHistory();
   }, []);  // Empty array means "run once when component mounts"
 
   // Show loading state
@@ -103,14 +106,14 @@ export default function DoctorsAppointmentDetails() {
       <PageTitle title="DoctorAppointments' Details" />
       
       <div>
-        <h2>All Doctor Appointments ({appointments.length})</h2>
+        <h2>All Doctor Patients History ({patientsHistory.length})</h2>
 
-        {appointments.length === 0 ? (
-          <p>No doctor appointments found in database.</p>
+        {patientsHistory.length === 0 ? (
+          <p>No doctor patients history found in database.</p>
         ) : (
             <div className="space-y-4">
             <Input
-              placeholder="Search appointments..."
+              placeholder="Search patients history..."
               value={globalFilter ?? ""}
               onChange={(event) => setGlobalFilter(String(event.target.value))}
               className="max-w-sm"
