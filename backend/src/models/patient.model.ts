@@ -8,7 +8,9 @@ export interface Patient {
   nic: string,
   address: string,
   date_of_birth: string,
-  blood_type: string
+  blood_type: string,
+  branch_id: number,
+  branch_name: string,
 };
 
 export const createPatient = async (
@@ -79,7 +81,7 @@ export const getAllPatients = async (
   count: number,
   offset: number,
   isExPatient: boolean,
-  branch: string,
+  branch: number,
   blood_group: string,
   gender: string
 ): Promise<Patient[]> => {
@@ -88,7 +90,7 @@ export const getAllPatients = async (
       count,
       offset,
       isExPatient,
-      (branch == "All" ? -1 : Number(branch)),
+      branch,
       blood_group,
       gender
     ]);
@@ -106,13 +108,13 @@ export const getPatientsCount = async (
   gender: string
 ): Promise<Number> => {
   try {
-    const [rows]: any = await sql.query("CALL get_patient_count(?)", [
+    const [rows]: any = await sql.query("CALL get_patient_count(?, ?, ?, ?)", [
       isExPatient,
-      (branch == "All" ? -1 : Number(branch)),
+      Number(branch),
       blood_group,
       gender
     ]);
-    return rows[0][0].user_count;
+    return rows[0][0].patient_count;
   } catch (error) {
     console.error("Error fetching count of patients:", error);
     throw error;
