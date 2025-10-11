@@ -3,6 +3,10 @@ import PageTitle from "@/components/PageTitle";
 import { doctorService } from '@/services/doctorService';
 import type { Doctor } from '@/types/doctor.types';
 
+//adding a button to add new doctor
+import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+
 //for table
 import { useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel, getPaginationRowModel, type ColumnDef, type SortingState, type ColumnFiltersState } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
@@ -100,9 +104,17 @@ export default function DoctorsDetails() {
   return (
     <div className="space-y-6">
       <PageTitle title="Doctors' Details | Medsync" />
-      
+
+      {/* adding button to add new doctor */}
       <div>
-        <h2>All Doctors ({doctors.length})</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2>All Doctors ({doctors.length})</h2> 
+        <Link to="/doctor-add">    
+          <Button className="bg-blue-600 hover:bg-blue-700"> 
+            + Add New Doctor
+          </Button>
+        </Link>
+      </div>
         
         {doctors.length === 0 ? (
           <p>No doctors found in the database.</p>

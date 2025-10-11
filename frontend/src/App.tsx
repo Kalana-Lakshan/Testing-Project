@@ -13,6 +13,7 @@ import { ThemeProvider } from './components/theme-provider';
 import DoctorsAppointmentDetails from './pages/doctors/doctorsAppointmentDetails';
 import DoctorsPatientsHistory from './pages/doctors/doctorsPatientsHistory';
 import DoctorSpeciality from './pages/doctors/doctorSpeciality';
+import AddDoctor from './pages/doctors/addDoctor';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -119,6 +120,16 @@ function App() {
                 </>
               }
             />
+
+            <Route
+                path="/doctor-add"
+                element={
+                  <>
+                    <PageTitle title="Add Doctor | MedSync" />
+                    <AddDoctor />
+                  </>
+                }
+              />
 
           </Route>
         </Routes>

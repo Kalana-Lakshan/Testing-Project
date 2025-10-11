@@ -55,5 +55,34 @@ export const doctorService = {
                 throw error;
             }
         },
+        // Add this method to your existing doctorService object
+addDoctor: async (doctorData: {
+  name: string;
+  fee_per_patient: string;
+  basic_monthly_salary: string;
+  gender: string;
+  branch_id: string;
+}) => {
+  const response = await fetch(`${API_BASE_URL}/doctors`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: doctorData.name,
+      fee_per_patient: parseFloat(doctorData.fee_per_patient),
+      basic_monthly_salary: parseFloat(doctorData.basic_monthly_salary),
+      gender: doctorData.gender,
+      branch_id: doctorData.branch_id,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Server responded with status: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
+}
     };
             
