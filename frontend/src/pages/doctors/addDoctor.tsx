@@ -38,13 +38,17 @@ export default function AddDoctor() {
   useEffect(() => {
   const fetchBranches = async () => {
     try {
+      console.log('Fetching branches...');
       const response = await fetch('http://localhost:8000/branches');
+      console.log('Branches response status:', response.status);
       const data = await response.json();
+      console.log('Branches data:', data);
       if (data.success) {
         setBranches(data.data);
+        console.log('Set branches:', data.data);
       }
     } catch (error) {
-      console.log('Could not fetch branches');
+      console.log('Could not fetch branches:', error);
     }
   };
 

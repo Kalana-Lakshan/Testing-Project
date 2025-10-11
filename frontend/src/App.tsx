@@ -14,6 +14,8 @@ import DoctorsAppointmentDetails from './pages/doctors/doctorsAppointmentDetails
 import DoctorsPatientsHistory from './pages/doctors/doctorsPatientsHistory';
 import DoctorSpeciality from './pages/doctors/doctorSpeciality';
 import AddDoctor from './pages/doctors/addDoctor';
+import Speciality from './pages/doctors/speciality';
+import AddSpeciality from './pages/doctors/addSpeciality';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -127,6 +129,26 @@ function App() {
                   <>
                     <PageTitle title="Add Doctor | MedSync" />
                     <AddDoctor />
+                  </>
+                }
+              />
+
+              <Route
+                path="/speciality"
+                element={
+                  <>
+                    <PageTitle title="Specialities | MedSync" />
+                    <Speciality />
+                  </>
+                }
+              />
+
+              <Route
+                path="/speciality-add"
+                element={
+                  <>
+                    <PageTitle title="Add Speciality | MedSync" />
+                    <AddSpeciality />
                   </>
                 }
               />

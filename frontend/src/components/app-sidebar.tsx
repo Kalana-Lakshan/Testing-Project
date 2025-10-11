@@ -184,6 +184,14 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         hideIf: (role) => typeof role !== "string" ||
           ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
+      {
+        type: "child",
+        title: "Speciality",
+        url: "/speciality",
+        icon: BookUser,
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
     ],
   },
   {

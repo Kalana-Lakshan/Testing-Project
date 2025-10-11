@@ -125,7 +125,7 @@ CREATE TABLE `user_contact` (
 );
 
 CREATE TABLE `speciality` (
-  `speciality_id` int,
+  `speciality_id` int AUTO_INCREMENT,
   `speciality_name` varchar(20),
   `description` varchar(255),
   PRIMARY KEY (`speciality_id`)
