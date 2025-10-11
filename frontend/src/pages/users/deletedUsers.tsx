@@ -4,9 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { createTimer, toNormalTimestamp } from "@/services/utils";
+import { createTimer, Role, toNormalTimestamp } from "@/services/utils";
 import { RotateCcw } from "lucide-react";
-import { Role } from "@/utils";
 import UndoDeleteUser from "./user-restore";
 
 
@@ -88,8 +87,6 @@ const InactiveUsers: React.FC = () => {
           return <div className="text-muted-foreground mt-3 h-6">N/A</div>;
         }
         return (
-          <div className="flex gap-2">
-
             <Button
               size="icon"
               variant="outline"
@@ -100,7 +97,6 @@ const InactiveUsers: React.FC = () => {
             >
               <RotateCcw />
             </Button>
-          </div>
         );
       },
     },
