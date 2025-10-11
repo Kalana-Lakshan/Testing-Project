@@ -362,6 +362,7 @@ CREATE PROCEDURE update_staff(
     IN p_staff_id INT,
     IN p_name VARCHAR(50),
     IN p_type ENUM('Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent'),
+    IN p_branch_id INT,
     IN p_gender ENUM('Male','Female'),
     IN p_monthly_salary DECIMAL(8,2)
 )
@@ -372,6 +373,10 @@ BEGIN
         gender = p_gender,
         monthly_salary = p_monthly_salary
     WHERE staff_id = p_staff_id;
+
+    UPDATE `user`
+    SET branch_id = p_branch_id
+    WHERE user_id = p_staff_id;
 END$$
 
 CREATE PROCEDURE get_staff_by_id(IN p_id INT)
@@ -381,47 +386,52 @@ BEGIN
     WHERE staff_id = p_id;
 END$$
 
-CREATE PROCEDURE get_staff_by_type(IN p_type ENUM('Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent'))
-BEGIN
-    SELECT s.staff_id, s.name, s.type, s.gender, s.monthly_salary, u.branch_id, u.name as branch_name
-    FROM `staff` s
-    JOIN `user` u ON s.staff_id = u.user_id
-    WHERE s.`type` = p_type;
-END$$
+-- CREATE PROCEDURE get_staff_by_type(IN p_type ENUM('Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent'))
+-- BEGIN
+--     SELECT s.staff_id, s.name, s.type, s.gender, s.monthly_salary, u.branch_id, u.name as branch_name
+--     FROM `staff` s
+--     JOIN `user` u ON s.staff_id = u.user_id
+--     WHERE s.`type` = p_type;
+-- END$$
 
-CREATE PROCEDURE get_staff_by_branch_id(IN p_branch_id INT)
-BEGIN
-    SELECT s.staff_id, s.name, s.type, s.gender, s.monthly_salary
-    FROM `staff` s
-    JOIN `user` u ON s.staff_id = u.user_id
-    WHERE u.branch_id = p_branch_id;
-END$$
+-- CREATE PROCEDURE get_staff_by_branch_id(IN p_branch_id INT)
+-- BEGIN
+--     SELECT s.staff_id, s.name, s.type, s.gender, s.monthly_salary
+--     FROM `staff` s
+--     JOIN `user` u ON s.staff_id = u.user_id
+--     WHERE u.branch_id = p_branch_id;
+-- END$$
 
-CREATE PROCEDURE get_staff_by_type_and_branch(
-    IN p_type ENUM('Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent'), 
-    IN p_branch_id INT
-)
-BEGIN
-    SELECT s.staff_id, s.name, s.type, s.gender, s.monthly_salary
-    FROM `staff` s
-    JOIN `user` u ON s.staff_id = u.user_id
-    WHERE u.branch_id = p_branch_id AND s.`type` = p_type;
-END$$
+-- CREATE PROCEDURE get_staff_by_type_and_branch(
+--     IN p_type ENUM('Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent'),
+--     IN p_branch_id INT
+-- )
+-- BEGIN
+--     SELECT s.staff_id, s.name, s.type, s.gender, s.monthly_salary
+--     FROM `staff` s
+--     JOIN `user` u ON s.staff_id = u.user_id
+--     WHERE u.branch_id = p_branch_id AND s.`type` = p_type;
+-- END$$
 
-CREATE PROCEDURE get_all_staff(IN staff_count INT, IN count_start INT)
+CREATE PROCEDURE get_all_staff(IN staff_count INT, IN count_start INT, IN p_role VARCHAR(20), IN p_branch_id INT)
 BEGIN
     SELECT s.staff_id, s.name, s.type, u.branch_id, b.name AS branch_name, s.gender, s.monthly_salary
     FROM `staff` s
     JOIN `user` u ON s.staff_id = u.user_id
     LEFT JOIN `branch` b ON b.branch_id = u.branch_id
+    WHERE (p_role = 'All' OR s.type = p_role)
+      AND (p_branch_id = -1 OR u.branch_id = p_branch_id)
     ORDER BY s.staff_id
     LIMIT staff_count OFFSET count_start;
 END$$
 
-CREATE PROCEDURE get_staff_count()
+CREATE PROCEDURE get_staff_count(IN p_role VARCHAR(20), IN p_branch_id INT)
 BEGIN
-    SELECT COUNT(staff_id) AS staff_count
-    FROM `staff`;
+    SELECT COUNT(s.staff_id) AS staff_count
+    FROM `staff` s
+    JOIN `user` u ON s.staff_id = u.user_id
+    WHERE (p_role = 'All' OR s.type = p_role)
+      AND (p_branch_id = -1 OR u.branch_id = p_branch_id);
 END$$
 
 CREATE PROCEDURE delete_staff(IN p_id INT)
