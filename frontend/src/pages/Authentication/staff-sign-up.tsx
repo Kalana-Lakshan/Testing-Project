@@ -56,7 +56,7 @@ export const Roles = [
   },
 ]
 
-const StaffRoles = [
+export const StaffRoles = [
   {
     value: "Nurse",
     label: "Nurse",

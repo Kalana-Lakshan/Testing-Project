@@ -29,7 +29,8 @@ import {
   PanelRightOpen,
   UsersRound,
   UserRoundX,
-  UserRoundCheck
+  UserRoundCheck,
+  MapPinHouse
 } from "lucide-react"
 // billing and paments - Receipt
 // patient - Users
@@ -73,9 +74,8 @@ import {
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Role } from "@/utils";
 import { LOCAL_STORAGE__ROLE, LOCAL_STORAGE__TOKEN, LOCAL_STORAGE__USER, LOCAL_STORAGE__USER_ID, LOCAL_STORAGE__USERNAME } from "@/services/authServices";
-import { formatRole } from "@/services/utils";
+import { formatRole, Role } from "@/services/utils";
 
 
 const ROLE_SUPER_ADMIN = Role.SUPER_ADMIN;
@@ -125,6 +125,14 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     //   ![ROLE_RECEPTIONIST, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
   },
   {
+    type: "child",
+    title: "Branch",
+    url: "/branches",
+    icon: MapPinHouse,
+    // hideIf: (role) => typeof role !== "string" ||
+    //   ![ROLE_RECEPTIONIST, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+  },
+  {
     type: "parent",
     title: "Users",
     icon: UsersRound,
@@ -145,6 +153,37 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
   },
   {
     type: "parent",
+    title: "Employees",
+    icon: Users,
+    children: [
+      {
+        type: "child",
+        title: "All Managers",
+        url: "",
+        icon: UserSearch,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_ADMIN_STAFF, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
+        title: "All Staff",
+        url: "/staff",
+        icon: UserSearch,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_ADMIN_STAFF, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      // {
+      //   type: "child",
+      //   title: "Reports",
+      //   url: "",
+      //   icon: ClipboardPenLine,
+      //   hideIf: (role) => typeof role !== "string" ||
+      //     ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      // },
+    ],
+  },
+  {
+    type: "parent",
     title: "Patients",
     icon: HeartPulse,
     // hideIf: (role) => typeof role !== "string" || role != ROLE_PATIENT,
@@ -152,7 +191,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "In-Patients",
-        url: "",
+        url: "/current-patients",
         icon: HeartPulse,
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
@@ -160,7 +199,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "Ex-Patients",
-        url: "",
+        url: "/ex-patients",
         icon: HeartPulse,
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
@@ -260,29 +299,6 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
       },
-    ],
-  },
-  {
-    type: "parent",
-    title: "Staff",
-    icon: Users,
-    children: [
-      {
-        type: "child",
-        title: "All Staffs",
-        url: "",
-        icon: UserSearch,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_ADMIN_STAFF, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      // {
-      //   type: "child",
-      //   title: "Reports",
-      //   url: "",
-      //   icon: ClipboardPenLine,
-      //   hideIf: (role) => typeof role !== "string" ||
-      //     ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      // },
     ],
   },
   {
