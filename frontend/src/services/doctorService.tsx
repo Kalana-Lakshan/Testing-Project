@@ -62,6 +62,7 @@ addDoctor: async (doctorData: {
   basic_monthly_salary: string;
   gender: string;
   branch_id: string;
+  specialties?: number[];
 }) => {
   const response = await fetch(`${API_BASE_URL}/doctors`, {
     method: 'POST',
@@ -74,6 +75,7 @@ addDoctor: async (doctorData: {
       basic_monthly_salary: parseFloat(doctorData.basic_monthly_salary),
       gender: doctorData.gender,
       branch_id: doctorData.branch_id,
+      specialties: doctorData.specialties || [],
     }),
   });
 

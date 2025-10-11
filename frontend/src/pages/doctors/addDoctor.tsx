@@ -17,13 +17,23 @@ export default function AddDoctor() {
     basic_monthly_salary: '',
     gender: '',
     branch_id: '',
+    specialties: [] as number[],
   });
   type Branch = {
     branch_id: number | string;
     name: string;
     location: string;
   };
+
+  type Specialty = {
+    speciality_id: number;
+    speciality_name: string;
+    description: string;
+  };
+
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [specialties, setSpecialties] = useState<Specialty[]>([]);
+  const [selectedSpecialties, setSelectedSpecialties] = useState<number[]>([]);
 
   useEffect(() => {
   const fetchBranches = async () => {
@@ -37,7 +47,25 @@ export default function AddDoctor() {
       console.log('Could not fetch branches');
     }
   };
+
+  const fetchSpecialties = async () => {
+    try {
+      console.log('Fetching specialties...');
+      const response = await fetch('http://localhost:8000/specialities');
+      console.log('Specialties response status:', response.status);
+      const data = await response.json();
+      console.log('Specialties data:', data);
+      if (data.success) {
+        setSpecialties(data.data);
+        console.log('Set specialties:', data.data);
+      }
+    } catch (error) {
+      console.log('Could not fetch specialties:', error);
+    }
+  };
+
   fetchBranches();
+  fetchSpecialties();
 }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,7 +74,8 @@ export default function AddDoctor() {
     
     try {
       await doctorService.addDoctor({
-        ...formData
+        ...formData,
+        specialties: selectedSpecialties
       });
       alert('Doctor added successfully!');
       navigate('/doctors');
@@ -127,6 +156,42 @@ export default function AddDoctor() {
                 ))}
                 </SelectContent>
             </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="specialties">Specialties</Label>
+              {specialties.length === 0 ? (
+                <p className="text-sm text-gray-500">Loading specialties... ({specialties.length} found)</p>
+              ) : (
+                <div className="border rounded-md p-3 space-y-2 max-h-40 overflow-y-auto">
+                  {specialties.map((specialty) => (
+                    <div key={specialty.speciality_id} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id={`specialty-${specialty.speciality_id}`}
+                        checked={selectedSpecialties.includes(specialty.speciality_id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedSpecialties([...selectedSpecialties, specialty.speciality_id]);
+                          } else {
+                            setSelectedSpecialties(selectedSpecialties.filter(id => id !== specialty.speciality_id));
+                          }
+                        }}
+                        className="rounded"
+                      />
+                      <Label 
+                        htmlFor={`specialty-${specialty.speciality_id}`}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {specialty.speciality_name}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-sm text-gray-500 mt-1">
+                Selected: {selectedSpecialties.length} specialties | Available: {specialties.length} specialties
+              </p>
             </div>
             
             <div className="flex gap-4">

@@ -75,7 +75,7 @@ export const addDoctor = async (req: Request, res: Response) => {
     // Start transaction
     await connection.beginTransaction();
 
-    const { name, fee_per_patient, basic_monthly_salary, gender, branch_id } = req.body;
+    const { name, fee_per_patient, basic_monthly_salary, gender, branch_id, specialties } = req.body;
 
     // Validate required fields
     if (!name || !fee_per_patient || !basic_monthly_salary || !gender) {
@@ -111,8 +111,6 @@ export const addDoctor = async (req: Request, res: Response) => {
 
     console.log(`Created user with ID: ${userId} and username: doctor${userId}`);
 
-    console.log(`Created user with ID: ${userId} and username: doctor${userId}`);
-
     // 4. Insert into doctor table using the same user_id
     await connection.execute(
       'INSERT INTO doctor (doctor_id, name, fee_per_patient, basic_monthly_salary, gender) VALUES (?, ?, ?, ?, ?)',
@@ -120,6 +118,16 @@ export const addDoctor = async (req: Request, res: Response) => {
     );
 
     console.log('Created doctor record');
+
+    // 4. Insert doctor specialties
+    if (specialties && specialties.length > 0) {
+      for (const specialtyId of specialties) {
+        await connection.execute(
+          'INSERT INTO doctor_speciality (doctor_id, speciality_id, added_at) VALUES (?, ?, NOW())',
+          [userId, specialtyId]
+        );
+      }
+    }
 
     // Commit transaction
     await connection.commit();
@@ -134,7 +142,8 @@ export const addDoctor = async (req: Request, res: Response) => {
         fee_per_patient,
         basic_monthly_salary,
         gender,
-        branch_id
+        branch_id,
+        specialties: specialties || []
       }
     });
 

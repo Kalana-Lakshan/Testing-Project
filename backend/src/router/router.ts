@@ -9,6 +9,8 @@ import { getAllDoctorSpecialities } from "../handlers/doctor.speciality.handler.
 
 import { addDoctor } from "../handlers/doctor.handler.js"; // add new doctor button
 import { getAllBranches } from "../handlers/branch.handler.js";
+// Add this import
+import { getAllSpecialties } from "../handlers/speciality.handler.ts";
 
 export const HttpMethod = {
 	GET    : "GET",
@@ -57,7 +59,8 @@ var routes: Route[] = [
 	{ path: "/doctors-patients-history",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctorPatientsHistory},
 	{ path: "/doctors-specialities",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctorSpecialities},
 	{ path: "/doctors",AccessibleBy: availableForRoles([Role.PUBLIC]),method: HttpMethod.POST,handler: addDoctor}, //add new doctor button
-	{path: "/branches",AccessibleBy: availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler: getAllBranches},
+	{ path: "/branches",AccessibleBy: availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler: getAllBranches},
+	{ path: "/specialities", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllSpecialties },
 ];
 
 
