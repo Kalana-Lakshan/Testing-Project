@@ -33,13 +33,14 @@ export const UpdateStaff = async (
   staff_id: number,
   name: string,
   type: string,
+  branch_id: number,
   gender: string,
   monthly_salary: number,
 ): Promise<void> => {
   try {
     await sql.query(
-      "CALL update_staff(?, ?, ?, ?, ?)",
-      [staff_id, name, type, gender, monthly_salary]
+      "CALL   update_staff(?, ?, ?, ?, ?, ?)",
+      [staff_id, name, type, branch_id, gender, monthly_salary]
     );
   } catch (error) {
     console.error("Error updating staff details:", error);
@@ -50,22 +51,32 @@ export const UpdateStaff = async (
 export const getAllStaffForPagination = async (
   count: number,
   offset: number,
+  role: string,
+  branch: string
 ): Promise<Staff[]> => {
   try {
-    const [rows] = await sql.query("CALL get_all_staff(?, ?)", [
+    const [rows] = await sql.query("CALL get_all_staff(?, ?, ?, ?)", [
       count,
       offset,
+      role,
+      branch
     ]);
     return (rows as any)[0] as Staff[];
   } catch (error) {
-    console.error("Error fetching all staff:", error);
+    console.error("Error fetching all staff with filters:", error);
     throw error;
   }
 };
 
-export const getStaffCount = async (): Promise<Number> => {
+export const getStaffCount = async (
+  role: string,
+  branch: string
+): Promise<Number> => {
   try {
-    const [rows]: any = await sql.query("CALL get_staff_count()");
+    const [rows]: any = await sql.query("CALL get_staff_count(?, ?)",[
+      role,
+      Number(branch)
+    ]);
     return rows[0][0].staff_count;
   } catch (error) {
     console.error("Error fetching count of staff:", error);

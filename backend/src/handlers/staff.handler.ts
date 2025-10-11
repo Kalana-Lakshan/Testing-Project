@@ -3,13 +3,14 @@ import { getAllStaffForPagination, getStaffCount, UpdateStaff, type Staff } from
 
 
 export const updateStaffByID = async (req: Request, res: Response) => {
-  let { name, type, gender, monthly_salary } = req.body;
+  let { name, type, branch_id, gender, monthly_salary } = req.body;
   let { id } = req.params;
   try {
     await UpdateStaff(
       Number(id),
       name,
       type,
+      branch_id,
       gender,
       monthly_salary,
     );
@@ -22,13 +23,22 @@ export const updateStaffByID = async (req: Request, res: Response) => {
 
 
 export const getAllStaff = async (req: Request, res: Response) => {
-  const { count, offset } = req.query;
+  const { count, offset, role, branch } = req.query;
   try {
-    const staff: Staff[] = await getAllStaffForPagination(Number(count), Number(offset));
+    const staff: Staff[] = await getAllStaffForPagination(
+      Number(count),
+      Number(offset),
+      role as string,
+      branch as string
+    );
     if (staff.length < 1) {
       res.status(404).json({ error: "Staff not found" });
+      return;
     }
-    const staff_count: Number = await getStaffCount();
+    const staff_count: Number = await getStaffCount(
+      role as string,
+      branch as string
+    );
     if (staff_count == undefined) {
       console.log("error in finding the staff count, count = " + staff_count);
       res.status(500).json({ error: "Internal Server Error" });
@@ -36,10 +46,10 @@ export const getAllStaff = async (req: Request, res: Response) => {
     }
     res.status(200).json({
       staff_count: staff_count,
-      staff: staff
+      staff: staff,
     });
   } catch (error) {
-    console.log("Error in getAllStaff handler: ", error)
+    console.error("Error in getAllStaff handler:", error);
     res.status(500).json({ error: "Internal Server Error" });
-  };
+  }
 };
