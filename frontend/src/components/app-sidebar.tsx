@@ -206,6 +206,35 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       },
       {
         type: "child",
+        title: "Appointment details",
+        url: "/doctors-appointments",
+        icon: FileUser,
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
+        title: "Patients' history",
+        url: "/doctors-patients-history",
+        icon: BookUser,
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
+        title: "Doctors' specialities",
+        url: "/doctors-specialities",
+        icon: BookUser,
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
+        title: "Speciality",
+        url: "/speciality",
+        icon: BookUser,
+        hideIf: (role) => typeof role !== "string" ||
+          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
         title: "Medical History",
         url: "",
         icon: BookOpen,

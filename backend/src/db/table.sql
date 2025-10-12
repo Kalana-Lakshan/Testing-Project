@@ -1,4 +1,4 @@
-USE `Project-MedSync`;
+-- USE `Project-MedSync`;
 
 -- child → parent drop order
 DROP TABLE IF EXISTS `billing_payment`;
@@ -126,7 +126,7 @@ CREATE TABLE `user_contact` (
 );
 
 CREATE TABLE `speciality` (
-  `speciality_id` int,
+  `speciality_id` int AUTO_INCREMENT,
   `speciality_name` varchar(20),
   `description` varchar(255),
   PRIMARY KEY (`speciality_id`)
@@ -143,10 +143,10 @@ CREATE TABLE `doctor` (
 
 CREATE TABLE `doctor_speciality` (
   `doctor_id` int,
-  `specialiy_id` int,
+  `speciality_id` int,
   `added_at` timestamp,
-  PRIMARY KEY (`doctor_id`, `specialiy_id`),
-  FOREIGN KEY (`specialiy_id`) 
+  PRIMARY KEY (`doctor_id`, `speciality_id`),
+  FOREIGN KEY (`speciality_id`) 
       REFERENCES `speciality`(`speciality_id`),
   FOREIGN KEY (`doctor_id`)
       REFERENCES `doctor`(`doctor_id`)

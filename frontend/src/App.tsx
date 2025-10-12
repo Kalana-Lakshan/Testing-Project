@@ -6,8 +6,16 @@ import DefaultLayout from './layouts/DefaultLayout';
 import StaffSignIn from "./pages/Authentication/staff-sign-in";
 import StaffSignUp from './pages/Authentication/staff-sign-up';
 import Users from './pages/users/activeUsers';
-import InactiveUsers from './pages/users/deletedUsers';
+import DoctorsDetails from './pages/doctors/doctorsDetails';
 import { ThemeProvider } from './components/theme-provider';
+import DoctorsAppointmentDetails from './pages/doctors/doctorsAppointmentDetails';
+import DoctorsPatientsHistory from './pages/doctors/doctorsPatientsHistory';
+import DoctorSpeciality from './pages/doctors/doctorSpeciality';
+import AddDoctor from './pages/doctors/addDoctor';
+import Speciality from './pages/doctors/speciality';
+import AddSpeciality from './pages/doctors/addSpeciality';
+import InactiveUsers from './pages/users/deletedUsers';
+
 import PatientSignIn from './pages/Authentication/patient-sign-in';
 import PatientSignUp from './pages/Authentication/patient-sign-up';
 import DashboardRedirect from './pages/DashboardRedirect';
@@ -156,6 +164,78 @@ function App() {
                 </>
               }
             />
+
+            <Route
+              path="/doctors"
+              element={
+                <>
+                  <PageTitle title="Doctors | MedSync" />
+                  <DoctorsDetails />
+                </>
+              }
+            />
+
+            <Route
+              path="/doctors-appointments"
+              element={
+                <>
+                  <PageTitle title="Appointment details | MedSync" />
+                  <DoctorsAppointmentDetails />
+                </>
+              }
+            />
+
+            <Route
+              path="/doctors-patients-history"
+              element={
+                <>
+                  <PageTitle title="Patients' history | MedSync" />
+                  <DoctorsPatientsHistory />
+                </>
+              }
+            />
+
+        
+
+          <Route
+              path="/doctors-specialities"
+              element={
+                <>
+                  <PageTitle title="Doctors' specialities | MedSync" />
+                  <DoctorSpeciality />
+                </>
+              }
+            />
+
+            <Route
+                path="/doctor-add"
+                element={
+                  <>
+                    <PageTitle title="Add Doctor | MedSync" />
+                    <AddDoctor />
+                  </>
+                }
+              />
+
+              <Route
+                path="/speciality"
+                element={
+                  <>
+                    <PageTitle title="Specialities | MedSync" />
+                    <Speciality />
+                  </>
+                }
+              />
+
+              <Route
+                path="/speciality-add"
+                element={
+                  <>
+                    <PageTitle title="Add Speciality | MedSync" />
+                    <AddSpeciality />
+                  </>
+                }
+              />
 
           </Route>
         </Routes>
