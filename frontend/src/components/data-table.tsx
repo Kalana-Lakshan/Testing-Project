@@ -8,11 +8,21 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { type Table as Table_, flexRender } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
 
 interface DataTableProps<TData> {
 	table: Table_<TData>;
+	errorCode?: number | null;
 }
-export function DataTable<TData>({ table }: DataTableProps<TData>) {
+export function DataTable<TData>({ table, errorCode }: DataTableProps<TData>) {
+	const [noResultsMessage, setNoResultsMessage] = useState("No results.");
+
+	useEffect(() => {
+		if (errorCode && errorCode === 404) {
+			setNoResultsMessage("No results found.");
+		}
+	}, [errorCode]);
+
 	return (
 		<>
 			<DataTablePagination table={table} />
@@ -25,7 +35,7 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
 									return (
 										<TableHead
 											key={header.id}
-											className="cursor-pointer select-none"
+											className="cursor-pointer select-none text-center bg-muted"
 											onClick={(event) =>
 												header.column.getToggleSortingHandler()?.(event)
 											}
@@ -67,7 +77,7 @@ export function DataTable<TData>({ table }: DataTableProps<TData>) {
 									colSpan={table.getAllColumns().length}
 									className="h-24 text-center"
 								>
-									No results.
+									{noResultsMessage}
 								</TableCell>
 							</TableRow>
 						)}

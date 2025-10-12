@@ -2,11 +2,9 @@ import './App.css'
 import { useEffect, useState } from "react";
 import { Route, Routes, useLocation } from 'react-router-dom';
 import PageTitle from './components/PageTitle';
-import DefaultLayout from './DefaultLayout';
-import Dashboard from './pages/dashboard';
-import { Skeleton } from "./components/ui/skeleton";
-import SignIn from "./pages/Authentication/sign-in";
-import SignUp from './pages/Authentication/sign-up';
+import DefaultLayout from './layouts/DefaultLayout';
+import StaffSignIn from "./pages/Authentication/staff-sign-in";
+import StaffSignUp from './pages/Authentication/staff-sign-up';
 import Users from './pages/users/activeUsers';
 import DoctorsDetails from './pages/doctors/doctorsDetails';
 import { ThemeProvider } from './components/theme-provider';
@@ -16,6 +14,19 @@ import DoctorSpeciality from './pages/doctors/doctorSpeciality';
 import AddDoctor from './pages/doctors/addDoctor';
 import Speciality from './pages/doctors/speciality';
 import AddSpeciality from './pages/doctors/addSpeciality';
+import InactiveUsers from './pages/users/deletedUsers';
+
+import PatientSignIn from './pages/Authentication/patient-sign-in';
+import PatientSignUp from './pages/Authentication/patient-sign-up';
+import DashboardRedirect from './pages/DashboardRedirect';
+import Loader from './components/Loader';
+import LoginLayout from './layouts/LoginLayout';
+import StaffPage from './pages/staff/staff';
+import CurrentPatients from './pages/patients/currentPatients';
+import ExPatients from './pages/patients/exPatients';
+import Branches from './pages/branches/branches';
+import Home from './pages/Home';
+
 
 function App() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -27,56 +38,129 @@ function App() {
 
   return loading ? (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <div className="flex flex-col space-y-3">
-        <Skeleton className="h-[200px] w-[500px] rounded-xl" />
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-[500px]" />
-          <Skeleton className="h-4 w-[300px]" />
-          <Skeleton className="h-4 w-[150px]" />
-        </div>
-      </div>
+      <Loader />
     </ThemeProvider>
   ) : (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <>
         <Routes>
+
           <Route
-            path="/sign-in"
+            path="/home"
             element={
               <>
-                <PageTitle title="Sign-in | MedSync" />
-                <SignIn />
+                <PageTitle title="Home | MedSync" />
+                <Home />
               </>
             }
           />
 
-          <Route
-            path="/sign-up"
-            element={
-              <>
-                <PageTitle title="Sign-up | MedSync" />
-                <SignUp />
-              </>
-            }
-          />
+          <Route element={<LoginLayout />}>
 
-          <Route element={<DefaultLayout />}>
             <Route
-              index
+              path="/sign-in"
               element={
                 <>
-                  <PageTitle title="Dashboard | MedSync" />
-                  <Dashboard />
+                  <PageTitle title="Sign-in | MedSync" />
+                  <PatientSignIn />
                 </>
               }
             />
 
             <Route
-              path="/users"
+              path="/sign-up"
               element={
                 <>
-                  <PageTitle title="Users | MedSync" />
+                  <PageTitle title="Sign-up | MedSync" />
+                  <PatientSignUp />
+                </>
+              }
+            />
+
+            <Route
+              path="/staff/sign-in"
+              element={
+                <>
+                  <PageTitle title="Sign-in | MedSync" />
+                  <StaffSignIn />
+                </>
+              }
+            />
+
+            <Route
+              path="/staff/sign-up"
+              element={
+                <>
+                  <PageTitle title="Sign-up | MedSync" />
+                  <StaffSignUp />
+                </>
+              }
+            />
+
+          </Route>
+          <Route element={<DefaultLayout />}>
+
+            <Route
+              index
+              element={<DashboardRedirect />}
+            />
+
+            <Route
+              path="/users/active"
+              element={
+                <>
+                  <PageTitle title="Active Users | MedSync" />
                   <Users />
+                </>
+              }
+            />
+
+            <Route
+              path="/users/inactive"
+              element={
+                <>
+                  <PageTitle title="Deleted Users | MedSync" />
+                  <InactiveUsers />
+                </>
+              }
+            />
+
+            <Route
+              path="/staff"
+              element={
+                <>
+                  <PageTitle title="Staff | MedSync" />
+                  <StaffPage />
+                </>
+              }
+            />
+
+            <Route
+              path="/current-patients"
+              element={
+                <>
+                  <PageTitle title="Patients | MedSync" />
+                  <CurrentPatients />
+                </>
+              }
+            />
+
+            <Route
+              path="/ex-patients"
+              element={
+                <>
+                  <PageTitle title="Ex-Patients | MedSync" />
+                  <ExPatients />
+                </>
+              }
+            />
+
+            <Route
+              path="/branches"
+              element={
+                <>
+                  <PageTitle title="Branch | MedSync" />
+                  <Branches />
                 </>
               }
             />
@@ -160,4 +244,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
