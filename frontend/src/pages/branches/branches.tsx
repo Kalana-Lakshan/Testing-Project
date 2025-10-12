@@ -1,64 +1,65 @@
-import { getAllInactiveUsers, type User } from "@/services/userService";
-import { DataTable } from "../../components/data-table"
-import { useCallback, useEffect, useState } from "react";
-import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
+import React, { useCallback, useEffect, useState } from "react";
+import { useReactTable, getCoreRowModel, getSortedRowModel, getPaginationRowModel } from "@tanstack/react-table";
+import type { ColumnDef, SortingState } from "@tanstack/react-table";
+import { DataTable } from "@/components/data-table";
+import type { Branch } from "@/services/branchServices";
+import { getBranchesForPagination } from "@/services/branchServices";
 import { Button } from "@/components/ui/button";
+import { createTimer, toNormalTimestamp } from "@/services/utils";
 import toast from "react-hot-toast";
-import { createTimer, Role, toNormalTimestamp } from "@/services/utils";
-import { RotateCcw } from "lucide-react";
-import UndoDeleteUser from "./user-restore";
+import { Eye } from "lucide-react";
 
+const Branches: React.FC = () => {
+  const [branches, setBranches] = useState<Array<Branch>>([]);
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+  const [action, setAction] = useState<"edit" | null>(null);
 
-const InactiveUsers: React.FC = () => {
-  const [Users, setUsers] = useState<Array<User>>([]);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [action, setAction] = useState<"undo" | null>(null);
-  const columns: ColumnDef<User>[] = [
+  const columns: ColumnDef<Branch>[] = [
     {
-      accessorKey: "user_id",
+      accessorKey: "branch_id",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0"
         >
-          User ID
+          Branch ID
         </Button>
       ),
     },
     {
-      accessorKey: "username",
+      accessorKey: "name",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0"
         >
-          Username
+          Branch Name
         </Button>
       ),
     },
     {
-      accessorKey: "role",
+      accessorKey: "location",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0"
         >
-          Role
+          Location
         </Button>
       ),
     },
     {
-      accessorKey: "branch_name",
+      accessorKey: "landline_no",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0"
         >
-          Branch
+          Landline No
         </Button>
       ),
     },
@@ -76,27 +77,19 @@ const InactiveUsers: React.FC = () => {
       cell: ({ row }) => toNormalTimestamp(row.original.created_at),
     },
     {
-      accessorKey: "is_approved",
-      header: "Approved",
-      cell: ({ row }) => (row.original.is_approved ? "True" : "False"),
-    },
-    {
-      header: "Action",
+      header: "Actions",
       cell: ({ row }) => {
-        if (row.original.role === Role.SUPER_ADMIN) {
-          return <div className="text-muted-foreground mt-3 h-6">N/A</div>;
-        }
         return (
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => {
-                setSelectedUser(row.original);
-                setAction("undo");
-              }}
-            >
-              <RotateCcw />
-            </Button>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => {
+              setSelectedBranch(row.original);
+              setAction("edit");
+            }}
+          >
+            <Eye />
+          </Button>
         );
       },
     },
@@ -110,7 +103,7 @@ const InactiveUsers: React.FC = () => {
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
-    data: Users,
+    data: branches,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -125,29 +118,29 @@ const InactiveUsers: React.FC = () => {
     onPaginationChange: setPagination,
   });
 
-  const fetchUsers = useCallback(async () => {
+  const fetchBranches = useCallback(async () => {
     const tableState = table.getState();
     const page = tableState.pagination.pageIndex + 1;
     const itemsPerPage = tableState.pagination.pageSize;
     toast.loading("Loading...");
 
     return Promise.allSettled([
-      getAllInactiveUsers(itemsPerPage, (page - 1) * itemsPerPage),
+      getBranchesForPagination(itemsPerPage, (page - 1) * itemsPerPage),
       createTimer(500),
     ])
       .then((hu) => {
         if (hu[0].status === "rejected") {
           throw hu[0].reason;
         }
-        setUsers(hu[0].value.users);
+        setBranches(hu[0].value.branches);
         console.log("set", hu[0].value, itemsPerPage);
-        setPageCount(Math.ceil(hu[0].value.user_count / itemsPerPage));
+        setPageCount(Math.ceil(hu[0].value.branch_count / itemsPerPage));
       })
       .catch((error) => {
         if (typeof error === "string") {
           toast.error(error);
         } else {
-          toast.error("Failed to fetch users");
+          toast.error("Failed to fetch branches");
         }
       })
       .finally(() => {
@@ -155,23 +148,25 @@ const InactiveUsers: React.FC = () => {
       });
   }, [table]);
 
+  
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers, pagination]);
+    fetchBranches();
+  }, [fetchBranches, pagination]);
+
   return (
     <>
-      <UndoDeleteUser
-        isOpen={action === "undo" && selectedUser !== null}
-        selectedUser={selectedUser}
-        onFinished={fetchUsers}
+      {/* <ViewBranch
+        isOpen={action === "edit" && selectedBranch !== null}
+        selectedBranch={selectedBranch}
+        onFinished={fetchBranches}
         onClose={() => {
           setAction(null);
-          setSelectedUser(null);
+          setSelectedBranch(null);
         }}
-      />
+      /> */}
       <DataTable table={table} />
     </>
   );
 };
 
-export default InactiveUsers;
+export default Branches;

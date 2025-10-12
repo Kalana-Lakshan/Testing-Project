@@ -56,7 +56,7 @@ export const Roles = [
   },
 ]
 
-const StaffRoles = [
+export const StaffRoles = [
   {
     value: "Nurse",
     label: "Nurse",
@@ -162,7 +162,7 @@ const StaffSignUp: React.FC = () => {
         toast.success(message);
         navigate("/staff/sign-in");
       } catch (error: any) {
-        toast.error(error.message || "Failed to create staff account");
+        toast.error(error || "Failed to create staff account");
       } finally {
         setLoading(false);
       }

@@ -32,7 +32,7 @@ const StaffSignIn: React.FC = () => {
           navigate("/");
         })
         .catch((error) => {
-          toast.error(error?.message || "Invalid username or password");
+          toast.error(error);
           setLoading(false);
         });
     } else if (username === "" || password === "") {

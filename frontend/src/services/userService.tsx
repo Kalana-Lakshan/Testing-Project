@@ -13,12 +13,12 @@ export interface User {
   created_at: string;
 }
 
-export const getAllUsers = async (count: number, offset: number) => {
+export const getAllUsers = async (count: number, offset: number, Role: string, Branch: string) => {
   try {
     const users_db = await axiosInstance.get<{
       user_count: number;
       users: Array<User>;
-    }>(`/users/active?count=${count}&offset=${offset}`);
+    }>(`/users/active?count=${count}&offset=${offset}&role=${Role}&branch=${Branch}`);
     return users_db.data;
   } catch (error: unknown) {
     console.error("Error getting all users:", error);
@@ -53,7 +53,7 @@ export const getAllInactiveUsers = async (count: number, offset: number) => {
 
 export const editUser = async (data: any) => {
   try {
-    const response = await axiosInstance.put(`/user/update/${data.user_id}`,
+    const response = await axiosInstance.put(`/user/${data.user_id}`,
       {
         role: data.role,
         branch_id: data.branch_id,
@@ -75,7 +75,7 @@ export const editUser = async (data: any) => {
 
 export const deleteUser = async (user_id: number) => {
   try {
-    const response = await axiosInstance.delete(`/user/delete/${user_id}`)
+    const response = await axiosInstance.delete(`/user/${user_id}`)
     return response.data
   } catch (error: unknown) {
     console.error("Error deleting user:", error);

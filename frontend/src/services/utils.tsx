@@ -1,3 +1,15 @@
+export const Role = {
+	SUPER_ADMIN		: "Super_Admin",
+	BRANCH_MANAGER	: "Branch_Manager",
+	DOCTOR			: "Doctor",
+	ADMIN_STAFF		: "Admin_Staff",
+	NURSE			: "Nurse",
+	RECEPTIONIST	: "Receptionist",
+	BILLING_STAFF	: "Billing_Staff",
+	INSURANCE_AGENT	: "Insurance_Agent",
+	PATIENT			: "Patient",
+};
+
 export function createTimer(ms: number): Promise<void> {
 	return new Promise<void>((resolve) => {
 		setTimeout(() => {
@@ -35,4 +47,22 @@ export function toMySQLDate(dateStr: string): string {
 	const m = month.padStart(2, "0");
 
 	return `${year}-${m}-${d}`; // YYYY-MM-DD
+}
+
+export function formatSalary(amount: number): string {
+  return amount.toLocaleString("en-LK", {
+    style: "currency",
+    currency: "LKR",
+    minimumFractionDigits: 2,
+  });
+}
+
+export function formatDate(dateString: string): string {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }

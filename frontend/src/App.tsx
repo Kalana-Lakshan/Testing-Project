@@ -13,6 +13,11 @@ import PatientSignUp from './pages/Authentication/patient-sign-up';
 import DashboardRedirect from './pages/DashboardRedirect';
 import Loader from './components/Loader';
 import LoginLayout from './layouts/LoginLayout';
+import StaffPage from './pages/staff/staff';
+import CurrentPatients from './pages/patients/currentPatients';
+import ExPatients from './pages/patients/exPatients';
+import Branches from './pages/branches/branches';
+import Home from './pages/Home';
 
 
 function App() {
@@ -31,6 +36,17 @@ function App() {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <>
         <Routes>
+
+          <Route
+            path="/home"
+            element={
+              <>
+                <PageTitle title="Home | MedSync" />
+                <Home />
+              </>
+            }
+          />
+
           <Route element={<LoginLayout />}>
 
             <Route
@@ -101,6 +117,46 @@ function App() {
               }
             />
 
+            <Route
+              path="/staff"
+              element={
+                <>
+                  <PageTitle title="Staff | MedSync" />
+                  <StaffPage />
+                </>
+              }
+            />
+
+            <Route
+              path="/current-patients"
+              element={
+                <>
+                  <PageTitle title="Patients | MedSync" />
+                  <CurrentPatients />
+                </>
+              }
+            />
+
+            <Route
+              path="/ex-patients"
+              element={
+                <>
+                  <PageTitle title="Ex-Patients | MedSync" />
+                  <ExPatients />
+                </>
+              }
+            />
+
+            <Route
+              path="/branches"
+              element={
+                <>
+                  <PageTitle title="Branch | MedSync" />
+                  <Branches />
+                </>
+              }
+            />
+
           </Route>
         </Routes>
       </>
@@ -108,4 +164,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

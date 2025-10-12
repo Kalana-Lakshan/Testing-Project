@@ -2,7 +2,10 @@ import type { Express } from "express";
 import authorizeRoles from "../auth/auth.js";
 import { deleteUser, getDeletedUsers, getUsers, restoreUser, updateUser } from "../handlers/user.handler.ts";
 import { patientSignup, staffSignup, userLogin, validateUser } from "../handlers/auth.handler.ts";
-import { getBranches } from "../handlers/branch.handler.ts";
+import { getAllBranchNames, getBranches, updateBranchByID } from "../handlers/branch.handler.ts";
+import { getLogsForPagination } from "../handlers/log.handler.ts";
+import { dischargePatientByID, getPatients, updateCurrentPatientDetails } from "../handlers/patient.handler.ts";
+import { getAllStaff, updateStaffByID } from "../handlers/staff.handler.ts";
 
 
 export const HttpMethod = {
@@ -46,13 +49,27 @@ var routes: Route[] = [
 	// users router
 	{ path: "/users/active", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getUsers },
 	{ path: "/users/inactive", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDeletedUsers },
-	{ path: "/user/update/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateUser },
-	{ path: "/user/delete/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteUser },
+	{ path: "/user/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateUser },
+	{ path: "/user/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteUser },
 	{ path: "/user/restore/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: restoreUser },
 
 	// branches router
+	{ path: "/all-branches", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBranchNames },
 	{ path: "/branches", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranches },
+	{ path: "/branch/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranches },
+	{ path: "/branch/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateBranchByID },
 
+	// patients router
+	{ path: "/patients", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatients },
+	{ path: "/patient/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateCurrentPatientDetails },
+	{ path: "/patient/discharge/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: dischargePatientByID },
+
+	// staff router
+	{ path: "/staff", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllStaff },
+	{ path: "/staff/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateStaffByID },
+
+	// logs router
+	{ path: "/logs", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getLogsForPagination },	
 ];
 
 
@@ -73,6 +90,7 @@ export const MapRouters = (app: Express) => {
 				app.put(route.path, authorizeRoles(route.AccessibleBy), (req, res) => {
 					route.handler(req, res);
 				});
+				break;
 			case HttpMethod.DELETE:
 				app.delete(route.path, authorizeRoles(route.AccessibleBy), (req, res) => {
 					route.handler(req, res);

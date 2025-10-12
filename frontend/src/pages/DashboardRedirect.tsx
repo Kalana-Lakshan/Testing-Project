@@ -2,9 +2,10 @@ import { Navigate } from "react-router-dom";
 import PageTitle from "@/components/PageTitle";
 import PatientDashboard from "./patientDashboard";
 import AdminDashboard from "./adminDashboard";
+import { LOCAL_STORAGE__USER } from "@/services/authServices";
 
 const DashboardRedirect = () => {
-  const user = localStorage.getItem("user");
+  const user = localStorage.getItem(LOCAL_STORAGE__USER);
 
   if (!user) {
     // if no user in localStorage, redirect to patient login

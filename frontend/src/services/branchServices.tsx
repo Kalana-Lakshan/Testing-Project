@@ -17,7 +17,7 @@ export const getBranchesForPagination = async (count: number, offset: number) =>
     }>(`/branches?count=${count}&offset=${offset}`);
     return branches_db.data;
   } catch (error: unknown) {
-    console.error("Error logging in:", error);
+    console.error("Error getting branches for pagination:", error);
     if (error instanceof AxiosError) {
       if (error.response?.data?.error) {
         throw error.response.data.error;
@@ -33,10 +33,10 @@ export const getAllBranches = async () => {
     const branches_db = await axiosInstance.get<{
       branch_count: number;
       branches: Array<Branch>;
-    }>(`/branches`);
+    }>(`/all-branches`);
     return branches_db.data;
   } catch (error: unknown) {
-    console.error("Error logging in:", error);
+    console.error("Error getting all branches:", error);
     if (error instanceof AxiosError) {
       if (error.response?.data?.error) {
         throw error.response.data.error;
