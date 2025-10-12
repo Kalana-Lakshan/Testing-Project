@@ -17,6 +17,7 @@ import StaffPage from './pages/staff/staff';
 import CurrentPatients from './pages/patients/currentPatients';
 import ExPatients from './pages/patients/exPatients';
 import Branches from './pages/branches/branches';
+import Home from './pages/Home';
 
 
 function App() {
@@ -35,6 +36,17 @@ function App() {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <>
         <Routes>
+
+          <Route
+            path="/home"
+            element={
+              <>
+                <PageTitle title="Home | MedSync" />
+                <Home />
+              </>
+            }
+          />
+
           <Route element={<LoginLayout />}>
 
             <Route
@@ -152,4 +164,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
