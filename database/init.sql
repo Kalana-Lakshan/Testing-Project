@@ -71,7 +71,7 @@ INSERT INTO `doctor` (doctor_id, name, fee_per_patient, basic_monthly_salary, ge
 -- ===========================
 -- 9. Doctor_Speciality
 -- ===========================
-INSERT INTO `doctor_speciality` (doctor_id, specialiy_id, added_at) VALUES
+INSERT INTO `doctor_speciality` (doctor_id, speciality_id, added_at) VALUES
 (1, 1, NOW()),
 (2, 2, NOW()),
 (3, 3, NOW()),

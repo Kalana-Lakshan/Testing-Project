@@ -12,9 +12,11 @@ import { dischargePatientByID, getPatients, updateCurrentPatientDetails } from "
 import { getAllStaff, updateStaffByID } from "../handlers/staff.handler.ts";
 
 import { addDoctor } from "../handlers/doctor.handler.js"; // add new doctor button
-import { getAllBranches } from "../handlers/branch.handler.js";
 // Add this import
 import { getAllSpecialties, addSpecialty } from "../handlers/speciality.handler.ts";
+import { checkServiceCodeHandler, createTreatmentHandler, getAllTreatmentsHandler } from "../handlers/treatment.handler.ts";
+import { getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
+import { getAllMedicationsHandler, getMedicationsByPatientHandler } from "../handlers/medication.handlers.ts";
 
 export const HttpMethod = {
 	GET    : "GET",
@@ -87,7 +89,20 @@ var routes: Route[] = [
 	{ path: "/staff/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateStaffByID },
 
 	// logs router
-	{ path: "/logs", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getLogsForPagination },	
+	{ path: "/logs", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getLogsForPagination },
+	
+	//treatments router
+	{path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getAllTreatmentsHandler },
+	{path: "/treatments/check-service-code", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:checkServiceCodeHandler },
+	{path: "/treatments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler:createTreatmentHandler },
+
+	//medical history router
+	{path: "/medical-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getMedicalHistoryHandler },
+	
+	//medication router
+	{ path: "/medications", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllMedicationsHandler },
+	{ path: "/medications/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicationsByPatientHandler }
+
 ];
 
 

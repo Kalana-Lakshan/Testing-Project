@@ -141,10 +141,10 @@ CREATE TABLE `doctor` (
 
 CREATE TABLE `doctor_speciality` (
   `doctor_id` int,
-  `specialiy_id` int,
+  `speciality_id` int,
   `added_at` timestamp,
-  PRIMARY KEY (`doctor_id`, `specialiy_id`),
-  FOREIGN KEY (`specialiy_id`) 
+  PRIMARY KEY (`doctor_id`, `speciality_id`),
+  FOREIGN KEY (`speciality_id`) 
       REFERENCES `speciality`(`speciality_id`),
   FOREIGN KEY (`doctor_id`)
       REFERENCES `doctor`(`doctor_id`)

@@ -649,4 +649,78 @@ CREATE PROCEDURE get_all_specialities()
 BEGIN
     SELECT * FROM `speciality`;
 END$$
+
+
+-- treatment  functions
+
+-- CREATE PROCEDURE to get all treatments
+
+CREATE PROCEDURE `get_all_treatments`()
+BEGIN
+  select tc.service_code, tc.name, tc.fee , tc.description, tc.speciality_id, speciality_name 
+from treatment_catelogue as tc left outer join speciality as s on tc.speciality_id = s.speciality_id
+  ORDER BY service_code;
+END$$
+
+-- CREATE PROCEDURE to CHECK SERVICE CODE EXISTS
+
+CREATE PROCEDURE `check_service_code_exists`(IN p_code INT)
+BEGIN
+  SELECT EXISTS(
+    SELECT 1 FROM treatment_catelogue WHERE service_code = p_code
+  ) AS exists_flag;
+END$$
+
+-- CREATE PROCEDURE to CREATE A NEW TREATMENT
+
+CREATE PROCEDURE `create_treatment`(
+  IN p_service_code INT,
+  IN p_name         VARCHAR(50),
+  IN p_fee          DECIMAL(8,2),
+  IN p_description  VARCHAR(255),
+  IN p_speciality_id INT
+)
+BEGIN
+  INSERT INTO treatment_catelogue(service_code, name, fee, description, speciality_id)
+  VALUES (p_service_code, p_name, p_fee, p_description, p_speciality_id);
+
+  SELECT
+    service_code, name, fee, description, speciality_id, NOW() AS created_at
+  FROM treatment_catelogue
+  WHERE service_code = p_service_code;
+END$$
+
+-- medical history model functions
+
+-- CREATE PROCEDURE to get all medical histories
+
+CREATE PROCEDURE get_all_medical_histories()
+BEGIN
+    SELECT * FROM `medical_history`;
+END$$
+
+-- medication history of a patient
+
+-- CREATE PROCEDURE to get medication history
+CREATE PROCEDURE get_all_medications()
+BEGIN
+    SELECT appointment_id, consultation_note, prescription_items_details, prescribed_at, is_active, patient_id, name
+    FROM prescription
+    NATURAL JOIN appointment
+    NATURAL JOIN patient;
+END$$
+
+-- create procedure to get medications by patient id
+CREATE PROCEDURE get_medications_by_patient_id(IN p_patient_id INT)
+BEGIN
+  SELECT p.appointment_id, a.patient_id, pat.name AS name, p.consultation_note AS consultation_note, p.prescription_items_details, p.prescribed_at, p.is_active
+  FROM prescription AS p
+  JOIN appointment  AS a   ON p.appointment_id = a.appointment_id
+  JOIN patient      AS pat ON a.patient_id     = pat.patient_id
+  WHERE a.patient_id = p_patient_id
+  ORDER BY p.prescribed_at DESC;
+END$$
+
+
 DELIMITER ;
+
