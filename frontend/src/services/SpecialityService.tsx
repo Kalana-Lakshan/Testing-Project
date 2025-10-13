@@ -1,58 +1,49 @@
-import type {Speciality,SpecialitiesApiResponse} from '../types/speciality.types';
+import { AxiosError } from "axios";
+import axiosInstance from "../axiosConfig";
 
-const API_BASE_URL = 'http://localhost:8000';
+export interface Speciality {
+  speciality_id: number;
+  speciality_name: string;
+  description: string;
+}
 
-export const specialityService = {
-    getAllSpecialities: async ():Promise<Speciality[]> =>{
-        try {
-            const response = await fetch(`${API_BASE_URL}/specialities`,
-                {
-                    method:'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-            if (!response.ok) {
-                throw new Error('Failed to fetch doctor specialities');
-            }
-            const data: SpecialitiesApiResponse = await response.json();
+export const getAllSpecialities = async (
+  // count: number,
+  // offset: number,
+) => {
+  try {
+    const response = await axiosInstance.get<{
+      // speciality_count: number;
+      // specialities: Array<Speciality>;
+    }>(`/specialities`);
+    return response.data;
+  } catch (error: unknown) {
+    console.error("Error getting all specialities data:", error);
+    if (error instanceof AxiosError) {
+      if (error.response?.data?.error) {
+        throw error.response.data.error;
+      }
+      throw error.message;
+    }
+    throw "Unknown error occurred";
+  }
+};
 
-            if(data.success){
-                console.log('Fetched doctor specialities:', data.data);
-                return data.data;
-            }else{
-                throw new Error(data.message || 'Failed to fetch doctor specialities');
-            }
-        } catch (error) {
-            console.error(error);
-            throw error;
-        }
-    },
-    addSpeciality: async (specialityData: {
-  speciality_id: string;
+export const addSpeciality = async (specialityData: {
   speciality_name: string;
   description: string;
 }) => {
-  const response = await fetch(`${API_BASE_URL}/specialities`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      speciality_id: specialityData.speciality_id,
-      speciality_name: specialityData.speciality_name,
-      description: specialityData.description,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Server responded with status: ${response.status}`);
+  try {
+    const response = await axiosInstance.post(`/specialities`, specialityData);
+    return response.data.message;
+  } catch (error: unknown) {
+    console.error("Error adding new speciality data:", error);
+    if (error instanceof AxiosError) {
+      if (error.response?.data?.error) {
+        throw error.response.data.error;
+      }
+      throw error.message;
+    }
+    throw "Unknown error occurred";
   }
-
-  const data = await response.json();
-  return data;
-}
 };
-
-       
