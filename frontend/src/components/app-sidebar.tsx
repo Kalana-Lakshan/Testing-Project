@@ -30,7 +30,8 @@ import {
   UsersRound,
   UserRoundX,
   UserRoundCheck,
-  MapPinHouse
+  MapPinHouse,
+  Logs
 } from "lucide-react"
 // billing and paments - Receipt
 // patient - Users
@@ -136,6 +137,14 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     title: "Reports",
     url: "",
     icon: ClipboardPenLine,
+    // hideIf: (role) => typeof role !== "string" ||
+    //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+  },
+  {
+    type: "child",
+    title: "Logs",
+    url: "/logs",
+    icon: Logs,
     // hideIf: (role) => typeof role !== "string" ||
     //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
   },
