@@ -702,18 +702,24 @@ END$$
 -- CREATE PROCEDURE to get medical histories by patient id
 CREATE PROCEDURE get_medical_histories_by_patient_id(IN p_patient_id INT)
 BEGIN
-  SELECT *
+  SELECT pat.patient_id, mh.appointment_id, visit_date, diagnosis, symptoms, allergies, notes, follow_up_date, created_at, updated_at
   FROM medical_history AS mh
-  JOIN patient         AS p ON mh.patient_id = p.patient_id
-  WHERE mh.patient_id = p_patient_id
-  ORDER BY mh.recorded_at DESC;
+  JOIN appointment as a ON mh.appointment_id = a.appointment_id
+  JOIN patient      AS pat ON a.patient_id     = pat.patient_id
+  WHERE a.patient_id = pat.patient_id
+  ORDER BY mh.created_at DESC;
 END$$
 
 -- medication history of a patient
 
 -- CREATE PROCEDURE to get medication history
 CREATE PROCEDURE get_all_medications()
-
+BEGIN
+    SELECT appointment_id, consultation_note, prescription_items_details, prescribed_at, is_active, patient_id, name
+    FROM prescription
+    NATURAL JOIN appointment
+    NATURAL JOIN patient;
+END$$
 
 -- create procedure to get medications by patient id
 CREATE PROCEDURE get_medications_by_patient_id(IN p_patient_id INT)
