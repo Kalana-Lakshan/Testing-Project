@@ -15,6 +15,7 @@ export const createNewBranch = async (req: Request, res: Response) => {
       location,
       landline_no,
     );
+    return res.status(201).json({ message: "Branch created successfully" });
   } catch (error) {
     console.error("Error in createNewBranch handler:", error);
     res.status(500).json({ error: "Internal Server Error" });
