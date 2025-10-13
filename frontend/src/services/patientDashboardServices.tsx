@@ -4,6 +4,7 @@ import {
   LOCAL_STORAGE__USER,
   LOCAL_STORAGE__TOKEN,
 } from "@/services/authServices";
+import type { medicalHistory } from "./medicalhistoryServices";
 
 
 export interface PatientDashboardDetails {
