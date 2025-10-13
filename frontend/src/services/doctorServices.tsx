@@ -41,15 +41,14 @@ export interface DoctorPatientsHistory {
   updated_at: string;
 }
 
-export const getAllDoctors = async (
-  // count: number,
-  // offset: number,
-) => {
+export const getAllDoctors = async () => {
   try {
-    const response = await axiosInstance.get<{
-      // doctor_count: number;
-      // doctors: Array<Doctor>;
-    }>(`/doctors`);
+    const response = await axiosInstance.get
+    // <{
+    //   doctor_count: number;
+    //   doctors: Array<Doctor>;
+    // }>
+    (`/doctors`);
     return response.data;
   } catch (error: unknown) {
     console.error("Error getting all doctors data:", error);
@@ -103,15 +102,14 @@ export const addDoctor = async (doctorData: {
 };
 
 
-export const getAllDoctorSpecialities = async (
-  // count: number,
-  // offset: number,
-) => {
+export const getAllDoctorSpecialities = async () => {
   try {
-    const response = await axiosInstance.get<{
-      // doctor_speciality_count: number;
-      // doctor_specialities: Array<DoctorSpeciality>;
-    }>(`/doctors-specialities`);
+    const response = await axiosInstance.get
+    // <{
+    //   doctor_speciality_count: number;
+    //   doctor_specialities: Array<DoctorSpeciality>;
+    // }>
+    (`/doctors-specialities`);
     return response.data;
   } catch (error: unknown) {
     console.error("Error getting all doctors' speciality data:", error);
@@ -125,15 +123,14 @@ export const getAllDoctorSpecialities = async (
   }
 };
 
-export const getAllDoctorAppointments = async (
-  // count: number,
-  // offset: number,
-) => {
+export const getAllDoctorAppointments = async () => {
   try {
-    const response = await axiosInstance.get<{
-      // doctor_appointment_count: number;
-      // doctor_appointments: Array<DoctorAppointment>;
-    }>(`/doctors-appointments`);
+    const response = await axiosInstance.get
+    // <{
+    //   doctor_appointment_count: number;
+    //   doctor_appointments: Array<DoctorAppointment>;
+    // }>
+    (`/doctors-appointments`);
     return response.data;
   } catch (error: unknown) {
     console.error("Error getting all doctors' appointments data:", error);
@@ -147,15 +144,14 @@ export const getAllDoctorAppointments = async (
   }
 };
 
-export const getAllDoctorPatientsHistory = async (
-  // count: number,
-  // offset: number,
-) => {
+export const getAllDoctorPatientsHistory = async () => {
   try {
-    const response = await axiosInstance.get<{
-      // doctors_patients_history_count: number;
-      // doctors_patients_history: Array<DoctorPatientsHistory>;
-    }>(`/doctors-patients-history`);
+    const response = await axiosInstance.get
+    // <{
+    //   doctors_patients_history_count: number;
+    //   doctors_patients_history: Array<DoctorPatientsHistory>;
+    // }>
+    (`/doctors-patients-history`);
     return response.data;
   } catch (error: unknown) {
     console.error("Error getting all doctors' patients History data:", error);

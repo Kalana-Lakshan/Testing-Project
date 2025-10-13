@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { specialityService } from '@/services/SpecialityService';
+import { addSpeciality, getAllSpecialities } from '@/services/specialityServices';
 
 export default function AddSpeciality() {
   const navigate = useNavigate();
@@ -24,30 +23,28 @@ export default function AddSpeciality() {
     description: string;
   };
 
-  // const [branches, setBranches] = useState<Branch[]>([]);
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
-  const [selectedSpecialties, setSelectedSpecialties] = useState<number[]>([]);
-  const [error, setError] = useState<string | null>(null); 
-  useEffect(() => {
-  const fetchSpecialities = async () => {
-    try {
-      const response = await specialityService.getAllSpecialities();
-      setSpecialties(response);
-    } catch (error) {
-      console.log('Could not fetch specialities:', error);
-    }
-  };
 
-  
-  fetchSpecialities();
-}, []);
+  useEffect(() => {
+    const fetchSpecialities = async () => {
+      try {
+        const response = await getAllSpecialities();
+        setSpecialties(response);
+      } catch (error) {
+        console.log('Could not fetch specialities:', error);
+      }
+    };
+
+
+    fetchSpecialities();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
-      await specialityService.addSpeciality({
+      await addSpeciality({
         ...formData
       });
       alert('Speciality added successfully!');
@@ -62,7 +59,7 @@ export default function AddSpeciality() {
   return (
     <div className="space-y-6">
       <PageTitle title="Add Speciality | Medsync " />
-      
+
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Speciality Information</CardTitle>
@@ -74,7 +71,7 @@ export default function AddSpeciality() {
               <Input
                 id="name"
                 value={formData.speciality_name}
-                onChange={(e) => setFormData({...formData, speciality_name: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, speciality_name: e.target.value })}
                 required
               />
             </div>
@@ -84,7 +81,7 @@ export default function AddSpeciality() {
               <Input
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 required
               />
             </div>

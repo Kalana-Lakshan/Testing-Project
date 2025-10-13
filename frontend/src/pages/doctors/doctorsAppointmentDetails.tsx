@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import PageTitle from "@/components/PageTitle";
-import { doctorAppointmentService } from '@/services/doctorappointmentservice';
-import type { DoctorAppointment } from '@/types/doctor.appointments.types';
 
 
 //for table
 import { useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel, getPaginationRowModel, type ColumnDef, type SortingState, type ColumnFiltersState } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
+import { getAllDoctorAppointments, type DoctorAppointment } from '@/services/doctorServices';
 
 export default function DoctorsAppointmentDetails() {
   // State variables - like boxes that hold our data
@@ -54,7 +53,7 @@ export default function DoctorsAppointmentDetails() {
         setError(null);    // Clear any previous errors
 
         // Call our service to get doctor appointments
-        const appointmentsData = await doctorAppointmentService.getAllDoctorAppointments();
+        const appointmentsData = await getAllDoctorAppointments();
 
         // Update state with the fetched data
         setAppointments(appointmentsData);

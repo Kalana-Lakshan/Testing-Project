@@ -7,15 +7,14 @@ export interface Speciality {
   description: string;
 }
 
-export const getAllSpecialities = async (
-  // count: number,
-  // offset: number,
-) => {
+export const getAllSpecialities = async () => {
   try {
-    const response = await axiosInstance.get<{
-      // speciality_count: number;
-      // specialities: Array<Speciality>;
-    }>(`/specialities`);
+    const response = await axiosInstance.get
+      // <{
+      //   speciality_count: number;
+      //   specialities: Array<Speciality>;
+      // }>
+      (`/specialities`);
     return response.data;
   } catch (error: unknown) {
     console.error("Error getting all specialities data:", error);

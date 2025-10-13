@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import PageTitle from "@/components/PageTitle";
-import { doctorService } from '@/services/doctorService';
-import type { Doctor } from '@/types/doctor.types';
 
 //adding a button to add new doctor
 import { Link } from 'react-router-dom';
@@ -11,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel, getPaginationRowModel, type ColumnDef, type SortingState, type ColumnFiltersState } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
+import { getAllDoctors, type Doctor } from '@/services/doctorServices';
 
 
 export default function DoctorsDetails() {
@@ -55,10 +54,10 @@ export default function DoctorsDetails() {
       try {
         setLoading(true);  // Show loading state
         setError(null);    // Clear any previous errors
-        
+
         // Call our service to get doctors
-        const doctorsData = await doctorService.getAllDoctors();
-        
+        const doctorsData = await getAllDoctors();
+
         // Update state with the fetched data
         setDoctors(doctorsData);
 
@@ -67,7 +66,7 @@ export default function DoctorsDetails() {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         setError(errorMessage);
         console.error('Failed to fetch doctors:', err);
-        
+
       } finally {
         setLoading(false);  // Hide loading state
       }
@@ -107,15 +106,15 @@ export default function DoctorsDetails() {
 
       {/* adding button to add new doctor */}
       <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2>All Doctors ({doctors.length})</h2> 
-        <Link to="/doctor-add">    
-          <Button className="bg-blue-600 hover:bg-blue-700"> 
-            + Add New Doctor
-          </Button>
-        </Link>
-      </div>
-        
+        <div className="flex justify-between items-center mb-4">
+          <h2>All Doctors ({doctors.length})</h2>
+          <Link to="/doctor-add">
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              + Add New Doctor
+            </Button>
+          </Link>
+        </div>
+
         {doctors.length === 0 ? (
           <p>No doctors found in the database.</p>
         ) : (

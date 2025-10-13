@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { doctorService } from '@/services/doctorService';
+import { getAllSpecialities } from '@/services/specialityServices';
+import { addDoctor } from '@/services/doctorServices';
 
 export default function AddDoctor() {
   const navigate = useNavigate();
@@ -36,48 +37,44 @@ export default function AddDoctor() {
   const [selectedSpecialties, setSelectedSpecialties] = useState<number[]>([]);
 
   useEffect(() => {
-  const fetchBranches = async () => {
-    try {
-      console.log('Fetching branches...');
-      const response = await fetch('http://localhost:8000/branches');
-      console.log('Branches response status:', response.status);
-      const data = await response.json();
-      console.log('Branches data:', data);
-      if (data.success) {
-        setBranches(data.data);
-        console.log('Set branches:', data.data);
+    const fetchBranches = async () => {
+      try {
+        console.log('Fetching branches...');
+        const response = await fetch('http://localhost:8000/branches');
+        console.log('Branches response status:', response.status);
+        const data = await response.json();
+        console.log('Branches data:', data);
+        if (data.success) {
+          setBranches(data.data);
+          console.log('Set branches:', data.data);
+        }
+      } catch (error) {
+        console.log('Could not fetch branches:', error);
       }
-    } catch (error) {
-      console.log('Could not fetch branches:', error);
-    }
-  };
+    };
 
-  const fetchSpecialties = async () => {
-    try {
-      console.log('Fetching specialties...');
-      const response = await fetch('http://localhost:8000/specialities');
-      console.log('Specialties response status:', response.status);
-      const data = await response.json();
-      console.log('Specialties data:', data);
-      if (data.success) {
-        setSpecialties(data.data);
-        console.log('Set specialties:', data.data);
+    const fetchSpecialties = async () => {
+      try {
+        const data = await getAllSpecialities()
+        if (data.success) {
+          setSpecialties(data.data);
+          console.log('Set specialties:', data.data);
+        }
+      } catch (error) {
+        console.log('Could not fetch specialties:', error);
       }
-    } catch (error) {
-      console.log('Could not fetch specialties:', error);
-    }
-  };
+    };
 
-  fetchBranches();
-  fetchSpecialties();
-}, []);
+    fetchBranches();
+    fetchSpecialties();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
-      await doctorService.addDoctor({
+      await addDoctor({
         ...formData,
         specialties: selectedSpecialties
       });
@@ -93,7 +90,7 @@ export default function AddDoctor() {
   return (
     <div className="space-y-6">
       <PageTitle title="Add Doctor | Medsync " />
-      
+
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>Doctor Information</CardTitle>
@@ -105,14 +102,14 @@ export default function AddDoctor() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
               />
             </div>
-            
+
             <div>
               <Label htmlFor="gender">Gender</Label>
-              <Select onValueChange={(value) => setFormData({...formData, gender: value})}>
+              <Select onValueChange={(value) => setFormData({ ...formData, gender: value })}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select gender" />
                 </SelectTrigger>
@@ -122,44 +119,44 @@ export default function AddDoctor() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="fee">Fee per Patient (Rs.)</Label>
               <Input
                 id="fee"
                 type="number"
                 value={formData.fee_per_patient}
-                onChange={(e) => setFormData({...formData, fee_per_patient: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, fee_per_patient: e.target.value })}
                 required
               />
             </div>
-            
+
             <div>
               <Label htmlFor="salary">Basic Monthly Salary (Rs.)</Label>
               <Input
                 id="salary"
                 type="number"
                 value={formData.basic_monthly_salary}
-                onChange={(e) => setFormData({...formData, basic_monthly_salary: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, basic_monthly_salary: e.target.value })}
                 required
               />
             </div>
 
-             
+
             <div>
-            <Label htmlFor="branch">Branch</Label>
-            <Select onValueChange={(value) => setFormData({...formData, branch_id: value})}>
+              <Label htmlFor="branch">Branch</Label>
+              <Select onValueChange={(value) => setFormData({ ...formData, branch_id: value })}>
                 <SelectTrigger>
-                <SelectValue placeholder="Select branch" />
+                  <SelectValue placeholder="Select branch" />
                 </SelectTrigger>
                 <SelectContent>
-                {branches.map((branch) => (
+                  {branches.map((branch) => (
                     <SelectItem key={branch.branch_id} value={branch.branch_id.toString()}>
-                    {branch.name} - {branch.location}
+                      {branch.name} - {branch.location}
                     </SelectItem>
-                ))}
+                  ))}
                 </SelectContent>
-            </Select>
+              </Select>
             </div>
 
             <div>
@@ -183,7 +180,7 @@ export default function AddDoctor() {
                         }}
                         className="rounded"
                       />
-                      <Label 
+                      <Label
                         htmlFor={`specialty-${specialty.speciality_id}`}
                         className="text-sm font-normal cursor-pointer"
                       >
@@ -197,7 +194,7 @@ export default function AddDoctor() {
                 Selected: {selectedSpecialties.length} specialties | Available: {specialties.length} specialties
               </p>
             </div>
-            
+
             <div className="flex gap-4">
               <Button type="submit" disabled={loading}>
                 {loading ? 'Adding...' : 'Add Doctor'}
