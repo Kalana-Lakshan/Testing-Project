@@ -205,38 +205,6 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       },
       {
         type: "child",
-        title: "Appointment details",
-        url: "/doctors-appointments",
-        icon: FileUser,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
-        title: "Patients' history",
-        url: "/doctors-patients-history",
-        icon: BookUser,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
-        title: "Doctors' specialities",
-        url: "/doctors-specialities",
-        icon: BookUser,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
-        title: "Speciality",
-        url: "/speciality",
-        icon: BookUser,
-        // hideIf: (role) => typeof role !== "string" ||
-        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
         title: "Medical History",
         url: "",
         icon: BookOpen,
@@ -258,7 +226,23 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         icon: FileClock,
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
-      }
+      },
+      {
+        type: "child",
+        title: "**Appointment details",
+        url: "/doctors-appointments",
+        icon: FileUser,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
+        title: "**Patients' history",
+        url: "/doctors-patients-history",
+        icon: BookUser,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
     ],
   },
   // {
@@ -310,7 +294,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "All Doctors",
-        url: "",
+        url: "/doctors",
         icon: HeartPulse,
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
@@ -318,14 +302,14 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "Doctors' Specialities",
-        url: "",
+        url: "/doctors-specialities",
         icon: FileUser,
         hideIf: (role) => typeof role !== "string",
       },
       {
         type: "child",
         title: "All Specialities",
-        url: "",
+        url: "/speciality",
         icon: BookUser,
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
