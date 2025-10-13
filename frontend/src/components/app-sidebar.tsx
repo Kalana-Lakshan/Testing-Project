@@ -73,7 +73,6 @@ import {
 
 
 import { NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { LOCAL_STORAGE__ROLE, LOCAL_STORAGE__TOKEN, LOCAL_STORAGE__USER, LOCAL_STORAGE__USER_ID, LOCAL_STORAGE__USERNAME } from "@/services/authServices";
 import { formatRole, Role } from "@/services/utils";
 
@@ -133,6 +132,14 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     //   ![ROLE_RECEPTIONIST, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
   },
   {
+    type: "child",
+    title: "Reports",
+    url: "",
+    icon: ClipboardPenLine,
+    // hideIf: (role) => typeof role !== "string" ||
+    //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+  },
+  {
     type: "parent",
     title: "Users",
     icon: UsersRound,
@@ -172,14 +179,6 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_ADMIN_STAFF, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
-      // {
-      //   type: "child",
-      //   title: "Reports",
-      //   url: "",
-      //   icon: ClipboardPenLine,
-      //   hideIf: (role) => typeof role !== "string" ||
-      //     ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      // },
     ],
   },
   {
@@ -209,32 +208,35 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         title: "Appointment details",
         url: "/doctors-appointments",
         icon: FileUser,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Patients' history",
         url: "/doctors-patients-history",
         icon: BookUser,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Doctors' specialities",
         url: "/doctors-specialities",
         icon: BookUser,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Speciality",
         url: "/speciality",
         icon: BookUser,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
         title: "Medical History",
         url: "",
         icon: BookOpen,
@@ -454,7 +456,6 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
 ]
 
 export function AppSidebar() {
-  const [loading, setLoading] = useState<boolean>(false);
   const { toggleSidebar, open } = useSidebar();
   const navigate = useNavigate();
   const userStringified = localStorage.getItem(LOCAL_STORAGE__USER);
@@ -471,15 +472,7 @@ export function AppSidebar() {
     navigate("/sign-in");
   };
 
-  return loading ? (
-    <SidebarMenu>
-      {Array.from({ length: 5 }).map((_, index) => (
-        <SidebarMenuItem key={index}>
-          <SidebarMenuSkeleton />
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
-  ) : (
+  return (
     <Sidebar
       collapsible="icon"
       onClick={!open ? toggleSidebar : undefined}
