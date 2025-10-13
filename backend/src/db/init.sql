@@ -485,7 +485,7 @@ VALUES
 (21, 'Dr. Jayasinghe', 2600.00, 165000.00, 'Male');
 
 -- DOCTOR SPECIALITY
-INSERT INTO `doctor_speciality` (`doctor_id`, `specialiy_id`, `added_at`)
+INSERT INTO `doctor_speciality` (`doctor_id`, `speciality_id`, `added_at`)
 VALUES
 (3, 1, '2025-01-10 10:00:00'),
 (18, 2, '2025-01-11 09:30:00'),
