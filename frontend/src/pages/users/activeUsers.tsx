@@ -109,8 +109,7 @@ const Users: React.FC = () => {
         }
         if (userRole === Role.SUPER_ADMIN) {
           return (
-            <div className="grid grid-cols-2 place-items-center">
-
+            <div className="flex gap-1 md:gap-2 lg:gap-5 place-content-center">
               <Button
                 size="icon"
                 variant="outline"
@@ -132,21 +131,20 @@ const Users: React.FC = () => {
               >
                 <Trash />
               </Button>
-
             </div>
           );
         } else if (userRole === Role.BRANCH_MANAGER) {
           return (
-              <Button
-                size="icon"
-                variant="outline"
-                onClick={() => {
-                  setSelectedUser(row.original);
-                  setAction("edit");
-                }}
-              >
-                <Eye />
-              </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                setSelectedUser(row.original);
+                setAction("edit");
+              }}
+            >
+              <Eye />
+            </Button>
           );
         }
       },
