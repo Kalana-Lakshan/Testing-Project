@@ -11,6 +11,7 @@ import UndoDeleteUser from "./user-restore";
 
 const InactiveUsers: React.FC = () => {
   const [Users, setUsers] = useState<Array<User>>([]);
+  const [userCount, setUserCount] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [action, setAction] = useState<"undo" | null>(null);
   const columns: ColumnDef<User>[] = [
@@ -87,16 +88,16 @@ const InactiveUsers: React.FC = () => {
           return <div className="text-muted-foreground mt-3 h-6">N/A</div>;
         }
         return (
-            <Button
-              size="icon"
-              variant="outline"
-              onClick={() => {
-                setSelectedUser(row.original);
-                setAction("undo");
-              }}
-            >
-              <RotateCcw />
-            </Button>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => {
+              setSelectedUser(row.original);
+              setAction("undo");
+            }}
+          >
+            <RotateCcw />
+          </Button>
         );
       },
     },
@@ -140,6 +141,7 @@ const InactiveUsers: React.FC = () => {
           throw hu[0].reason;
         }
         setUsers(hu[0].value.users);
+        setUserCount(hu[0].value.user_count);
         console.log("set", hu[0].value, itemsPerPage);
         setPageCount(Math.ceil(hu[0].value.user_count / itemsPerPage));
       })
@@ -159,7 +161,12 @@ const InactiveUsers: React.FC = () => {
     fetchUsers();
   }, [fetchUsers, pagination]);
   return (
-    <>
+    <div className="space-y-6 p-4">
+      <div>
+        <h2 className="text-lg font-medium">Deleted Users</h2>
+        <p className="text-sm text-muted-foreground">{userCount} items</p>
+      </div>
+
       <UndoDeleteUser
         isOpen={action === "undo" && selectedUser !== null}
         selectedUser={selectedUser}
@@ -170,7 +177,7 @@ const InactiveUsers: React.FC = () => {
         }}
       />
       <DataTable table={table} />
-    </>
+    </div>
   );
 };
 

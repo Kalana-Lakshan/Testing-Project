@@ -18,6 +18,7 @@ import { Navigate } from "react-router-dom";
 
 const Users: React.FC = () => {
   const [Users, setUsers] = useState<Array<User>>([]);
+  const [userCount, setUserCount] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [action, setAction] = useState<"edit" | "delete" | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>("All");
@@ -196,6 +197,7 @@ const Users: React.FC = () => {
           throw hu[0].reason;
         }
         setUsers(hu[0].value.users);
+        setUserCount(hu[0].value.user_count);
         console.log("set", hu[0].value, itemsPerPage);
         setPageCount(Math.ceil(hu[0].value.user_count / itemsPerPage));
       })
@@ -234,7 +236,12 @@ const Users: React.FC = () => {
     fetchUsers();
   }, [fetchUsers, pagination, selectedRole, selectedBranch]);
   return (
-    <>
+    <div className="space-y-6 p-4">
+      <div>
+        <h2 className="text-lg font-medium">Active Users</h2>
+        <p className="text-sm text-muted-foreground">{userCount} items</p>
+      </div>
+
       <div className="grid gap-4 grid-cols-6 mb-4">
         <div className="grid gap-2">
           <Label>Role</Label>
@@ -296,7 +303,7 @@ const Users: React.FC = () => {
         }}
       />
       <DataTable table={table} />
-    </>
+    </div>
   );
 };
 

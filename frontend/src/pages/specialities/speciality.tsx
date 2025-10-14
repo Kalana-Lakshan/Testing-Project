@@ -126,15 +126,13 @@ export default function SpecialityPage() {
 
   return (
     <div className="space-y-6 p-4">
-      <PageTitle title="Specialities | MedSync" />
-
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-lg font-medium">All Specialities</h2>
           <p className="text-sm text-muted-foreground">{total} items</p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex place-content-end gap-3 md:pt-5">
           <Dialog open={openAdd} onOpenChange={setOpenAdd}>
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700">+ Add New Speciality</Button>

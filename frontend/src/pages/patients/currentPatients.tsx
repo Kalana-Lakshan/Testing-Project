@@ -15,6 +15,7 @@ import { createTimer, formatDate } from "@/services/utils";
 
 const CurrentPatients: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [patientCount, setPatientCount] = useState<number>(0);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [action, setAction] = useState<"edit" | null>(null);
   const [selectedGender, setSelectedGender] = useState<string>("All");
@@ -193,6 +194,7 @@ const CurrentPatients: React.FC = () => {
       }
 
       setPatients(response[0].value.patients);
+      setPatientCount(response[0].value.patient_count)
       setPageCount(Math.ceil(response[0].value.patient_count / itemsPerPage));
       setErrorCode(null);
     } catch (error: any) {
@@ -229,7 +231,13 @@ const CurrentPatients: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <div className="space-y-6 p-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-medium">Current Patients</h2>
+          <p className="text-sm text-muted-foreground">{patientCount} items</p>
+        </div>
+      </div>
       <div className="grid gap-4 grid-cols-8 mb-4">
         <div className="grid gap-2">
           <Label>Gender</Label>
@@ -295,7 +303,7 @@ const CurrentPatients: React.FC = () => {
           setSelectedPatient(null);
         }}
       />
-    </>
+    </div>
   );
 };
 

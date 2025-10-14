@@ -8,7 +8,7 @@ import { Eye } from "lucide-react";
 import { Label } from "../../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { getAllBranches } from "../../services/branchServices";
-import {  LOCAL_STORAGE__USER } from "@/services/authServices";
+import { LOCAL_STORAGE__USER } from "@/services/authServices";
 import { Navigate } from "react-router-dom";
 import ViewBranchManager from "./manager-view";
 import { getAllManagers, type BranchManager } from "@/services/managerServices";
@@ -17,6 +17,7 @@ import { getAllManagers, type BranchManager } from "@/services/managerServices";
 
 const BranchManagerPage: React.FC = () => {
   const [manager, setManager] = useState<Array<BranchManager>>([]);
+  const [managerCount, setManagerCount] = useState<number>(0);
   const [selectedManager, setSelectedManager] = useState<BranchManager | null>(null);
   const [action, setAction] = useState<"edit" | null>(null);
   const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
@@ -138,6 +139,7 @@ const BranchManagerPage: React.FC = () => {
       }
 
       setManager(response[0].value.managers);
+      setManagerCount(response[0].value.manager_count);
       setErrorCode(null);
     } catch (error: any) {
       if (error.response?.status === 404) {
@@ -171,7 +173,7 @@ const BranchManagerPage: React.FC = () => {
     fetchStaff();
   }, [fetchStaff, selectedBranch, errorCode]);
   return (
-    <>
+    <div className="space-y-6 p-4">
       <ViewBranchManager
         isOpen={action === "edit" && selectedManager !== null}
         selectedManager={selectedManager}
@@ -181,6 +183,12 @@ const BranchManagerPage: React.FC = () => {
           setSelectedManager(null);
         }}
       />
+
+      <div>
+        <h2 className="text-lg font-medium">All Branch Managers</h2>
+        <p className="text-sm text-muted-foreground">{managerCount} items</p>
+      </div>
+
       <div className="grid gap-4 grid-cols-6 mb-4">
         <div className="grid gap-2">
           <Label>Branch</Label>
@@ -204,8 +212,8 @@ const BranchManagerPage: React.FC = () => {
           </Select>
         </div>
       </div>
-      <DataTable table={table} errorCode={errorCode} hideHeader={true}/>
-    </>
+      <DataTable table={table} errorCode={errorCode} hideHeader={true} />
+    </div>
   );
 };
 

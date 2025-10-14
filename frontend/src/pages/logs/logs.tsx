@@ -10,6 +10,7 @@ import { getAllLogs, type Log } from "@/services/logsServices";
 
 const LogsTable: React.FC = () => {
   const [Logs, setLogs] = useState<Array<Log>>([]);
+  const [logCount, setLogCount] = useState<number>(0);
   const user = localStorage.getItem(LOCAL_STORAGE__USER)
   if (!user) {
     return <Navigate to="/staff/sign-in" replace />;
@@ -166,6 +167,7 @@ const LogsTable: React.FC = () => {
           throw hu[0].reason;
         }
         setLogs(hu[0].value.logs);
+        setLogCount(hu[0].value.logs_count);
         console.log("set", hu[0].value, itemsPerPage);
         setPageCount(Math.ceil(hu[0].value.logs_count / itemsPerPage));
       })
@@ -185,9 +187,14 @@ const LogsTable: React.FC = () => {
     fetchUsers();
   }, [fetchUsers, pagination]);
   return (
-    <>
+    <div className="space-y-6 p-4">
+      <div>
+        <h2 className="text-lg font-medium">All Logs</h2>
+        <p className="text-sm text-muted-foreground">{logCount} items</p>
+      </div>
+
       <DataTable table={table} />
-    </>
+    </div>
   );
 };
 

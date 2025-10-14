@@ -18,10 +18,10 @@ import { Navigate } from "react-router-dom";
 
 const StaffPage: React.FC = () => {
   const [Staff, setStaff] = useState<Array<Staff>>([]);
+  const [staffCount, setStaffCount] = useState<number>(0);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const [action, setAction] = useState<"edit" | null>(null);
   const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
-  // const [selectedBranch, setSelectedBranch] = useState("All");
   const [selectedRole, setSelectedRole] = useState("All");
   const [errorCode, setErrorCode] = useState<number | null>(null);
   const user = localStorage.getItem(LOCAL_STORAGE__USER)
@@ -177,6 +177,7 @@ const StaffPage: React.FC = () => {
       }
 
       setStaff(response[0].value.staff);
+      setStaffCount(response[0].value.staff_count);
       setPageCount(Math.ceil(response[0].value.staff_count / itemsPerPage));
       setErrorCode(null);
     } catch (error: any) {
@@ -211,7 +212,12 @@ const StaffPage: React.FC = () => {
     fetchStaff();
   }, [fetchStaff, pagination, selectedRole, selectedBranch, errorCode]);
   return (
-    <>
+    <div className="space-y-6 p-4">
+      <div>
+        <h2 className="text-lg font-medium">All Staff</h2>
+        <p className="text-sm text-muted-foreground">{staffCount} items</p>
+      </div>
+
       <ViewStaff
         isOpen={action === "edit" && selectedStaff !== null}
         selectedStaff={selectedStaff}
@@ -221,6 +227,7 @@ const StaffPage: React.FC = () => {
           setSelectedStaff(null);
         }}
       />
+
       <div className="grid gap-4 grid-cols-6 mb-4">
         <div className="grid gap-2">
           <Label>Role</Label>
@@ -274,7 +281,7 @@ const StaffPage: React.FC = () => {
         </div>
       </div>
       <DataTable table={table} errorCode={errorCode} />
-    </>
+    </div >
   );
 };
 
