@@ -13,8 +13,9 @@ import { useEffect, useState } from "react";
 interface DataTableProps<TData> {
 	table: Table_<TData>;
 	errorCode?: number | null;
+	hideHeader?: boolean | null;
 }
-export function DataTable<TData>({ table, errorCode }: DataTableProps<TData>) {
+export function DataTable<TData>({ table, errorCode, hideHeader }: DataTableProps<TData>) {
 	const [noResultsMessage, setNoResultsMessage] = useState("No results.");
 
 	useEffect(() => {
@@ -25,7 +26,8 @@ export function DataTable<TData>({ table, errorCode }: DataTableProps<TData>) {
 
 	return (
 		<>
-			<DataTablePagination table={table} />
+			{(!hideHeader) ? <DataTablePagination table={table} /> : null}
+
 			<div className="overflow-hidden rounded-md border">
 				<Table>
 					<TableHeader>
