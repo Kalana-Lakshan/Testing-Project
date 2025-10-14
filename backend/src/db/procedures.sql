@@ -706,7 +706,7 @@ BEGIN
   FROM medical_history AS mh
   JOIN appointment as a ON mh.appointment_id = a.appointment_id
   JOIN patient      AS pat ON a.patient_id     = pat.patient_id
-  WHERE a.patient_id = pat.patient_id
+  WHERE a.patient_id = p_patient_id
   ORDER BY mh.created_at DESC;
 END$$
 

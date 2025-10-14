@@ -1,24 +1,13 @@
 // pages/patient/PatientDashboard.tsx
 import { useEffect, useMemo, useState } from "react";
-import {
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type SortingState,
-} from "@tanstack/react-table";
+import {getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState,} from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-
-import {
-
-  getPatientDashboardDetails,
-  type PatientDashboardDetails,
-} from "@/services/patientDashboardServices";
+import {getPatientDashboardDetails,type PatientDashboardDetails,} from "@/services/patientDashboardServices";
 import { DataTable } from "../components/data-table";
 import toast from "react-hot-toast";
 import { type medicalHistory, getMedicalHistoriesByPatientId } from "@/services/medicalhistoryServices";
 import { getMedicationsByPatientId, type medication } from "@/services/medicationServices";
-import MedicalHistory from "./patients/medicalhistory/medicalhistory";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export default function PatientDashboard() {
   // Prefer aligning the service type to include `name` if it's real.
@@ -46,17 +35,42 @@ export default function PatientDashboard() {
   if (!patientDetails) return <div>No data.</div>;
 
   return (
-    <>
+    <div className="space-y-6 text-left">
       {/* If your type really has `name`, add it to PatientDashboardDetails to avoid casting */}
       {"name" in patientDetails ? (
-        <h1>Hi {(patientDetails as any).name}, welcome to your dashboard!</h1>
+        <h1 className="left text-2xl font-bold">Hi {(patientDetails as any).name}, welcome to your dashboard !</h1>
       ) : (
-        <h1>Welcome to your dashboard!</h1>
+        <h1 className="text-2xl font-bold">Welcome to your dashboard!</h1>
       )}
+      <Tabs defaultValue="history" className="w-full">
+        {/* Pills selector */}
+        <div className="flex justify-start">
+          <TabsList className="rounded-full">
+            <TabsTrigger value="history" className="rounded-full">
+              Medical History
+              {/* Optional count badge — pass counts via props/state if you want */}
+              {/* <Badge className="ml-2">3</Badge> */}
+            </TabsTrigger>
+            <TabsTrigger value="prescriptions" className="rounded-full">
+              Prescriptions
+              {/* <Badge className="ml-2">2</Badge> */}
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-      <MedicalHistoryTable patientId={patientDetails.patient_id} />
-      <MedicationTable patientId={patientDetails.patient_id} />
-    </>
+        {/* Panels */}
+        <TabsContent value="history" className="mt-6">
+          <MedicalHistoryTable patientId={patientDetails.patient_id} />
+        </TabsContent>
+
+        <TabsContent value="prescriptions" className="mt-6">
+          <MedicationTable patientId={patientDetails.patient_id} />
+        </TabsContent>
+      </Tabs>
+   
+      {/* <MedicalHistoryTable patientId={patientDetails.patient_id} />
+      <MedicationTable patientId={patientDetails.patient_id} /> */}
+     </div>
   );
 }
 

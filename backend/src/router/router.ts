@@ -15,7 +15,7 @@ import { addDoctor } from "../handlers/doctor.handler.js"; // add new doctor but
 // Add this import
 import { getAllSpecialties, addSpecialty } from "../handlers/speciality.handler.ts";
 import { checkServiceCodeHandler, createTreatmentHandler, getAllTreatmentsHandler } from "../handlers/treatment.handler.ts";
-import { getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
+import { getMedicalHistoriesByPatientHandler, getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
 import { getAllMedicationsHandler, getMedicationsByPatientHandler } from "../handlers/medication.handlers.ts";
 
 export const HttpMethod = {
@@ -99,7 +99,7 @@ var routes: Route[] = [
 
 	//medical history router
 	{path: "/medical-histories", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getMedicalHistoryHandler },
-	
+	{path: "/medical-histories/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler:getMedicalHistoriesByPatientHandler },
 	//medication router
 	{ path: "/medications", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllMedicationsHandler },
 	{ path: "/medications/:patientId", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMedicationsByPatientHandler }
