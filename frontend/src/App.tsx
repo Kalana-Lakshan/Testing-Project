@@ -8,14 +8,10 @@ import StaffSignUp from './pages/Authentication/staff-sign-up';
 import Users from './pages/users/activeUsers';
 import DoctorsDetails from './pages/doctors/doctorsDetails';
 import { ThemeProvider } from './components/theme-provider';
-import DoctorsAppointmentDetails from './pages/doctors/doctorsAppointmentDetails';
-import DoctorsPatientsHistory from './pages/doctors/doctorsPatientsHistory';
 import DoctorSpeciality from './pages/doctors/doctorSpeciality';
 import AddDoctor from './pages/doctors/addDoctor';
-import Speciality from './pages/doctors/speciality';
-import AddSpeciality from './pages/doctors/addSpeciality';
+import Speciality from './pages/specialities/speciality';
 import InactiveUsers from './pages/users/deletedUsers';
-
 import PatientSignIn from './pages/Authentication/patient-sign-in';
 import PatientSignUp from './pages/Authentication/patient-sign-up';
 import DashboardRedirect from './pages/DashboardRedirect';
@@ -35,6 +31,7 @@ import {
   validateToken
 } from "./services/authServices";
 import DashboardSkeleton from './components/dashboard-skeleton';
+import LogsTable from './pages/logs/logs';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -213,7 +210,7 @@ function App() {
               }
             />
 
-            <Route
+            {/* <Route
               path="/doctors-appointments"
               element={
                 <>
@@ -221,9 +218,9 @@ function App() {
                   <DoctorsAppointmentDetails />
                 </>
               }
-            />
+            /> */}
 
-            <Route
+            {/* <Route
               path="/doctors-patients-history"
               element={
                 <>
@@ -231,12 +228,12 @@ function App() {
                   <DoctorsPatientsHistory />
                 </>
               }
-            />
+            /> */}
 
         
 
           <Route
-              path="/doctors-specialities"
+              path="/doctors/specialities"
               element={
                 <>
                   <PageTitle title="Doctors' specialities | MedSync" />
@@ -246,7 +243,7 @@ function App() {
             />
 
             <Route
-                path="/doctor-add"
+                path="/doctors/add"
                 element={
                   <>
                     <PageTitle title="Add Doctor | MedSync" />
@@ -266,11 +263,11 @@ function App() {
               />
 
               <Route
-                path="/speciality-add"
+                path="/logs"
                 element={
                   <>
-                    <PageTitle title="Add Speciality | MedSync" />
-                    <AddSpeciality />
+                    <PageTitle title="Logs | MedSync" />
+                    <LogsTable />
                   </>
                 }
               />
