@@ -1,10 +1,8 @@
-// services/patientDashboardServices.ts
 import axiosInstance from "../axiosConfig";
 import {
   LOCAL_STORAGE__USER,
   LOCAL_STORAGE__TOKEN,
 } from "@/services/authServices";
-import type { medicalHistory } from "./medicalhistoryServices";
 
 
 export interface PatientDashboardDetails {
@@ -33,7 +31,7 @@ export const getPatientDashboardDetails = async (): Promise<PatientDashboardDeta
   const record = resp.data?.patient?.[0];
   if (!record) throw new Error("No patient record found");
 
-  return record; // has .name directly
+  return record; 
 };
 
 

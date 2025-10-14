@@ -121,6 +121,9 @@ DROP PROCEDURE IF EXISTS `get_all_medications`;
 
 DROP PROCEDURE IF EXISTS `get_medications_by_patient_id`;
 
+-- Appointment model functions
+DROP PROCEDURE IF EXISTS `get_appointments_by_patient_id`;
+
 DELIMITER $$
 
 -- User model functions
@@ -732,6 +735,15 @@ BEGIN
   ORDER BY p.prescribed_at DESC;
 END$$
 
+-- CREATE PROCEDURE to GET APPOINTMENTS BY PATIENT ID
+CREATE PROCEDURE get_appointments_by_patient_id(IN p_patient_id INT)
+BEGIN
+	select ap.appointment_id , ap.doctor_id, ap.date, ap.time_slot, ap.status, d.name
+	from appointment as ap join doctor as d
+	on ap.doctor_id= d.doctor_id
+	where ap.patient_id = p_patient_id
+	ORDER BY ap.date DESC;
+END$$
 
 
 
