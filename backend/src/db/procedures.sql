@@ -108,7 +108,6 @@ DROP PROCEDURE IF EXISTS get_all_logs;
 DROP PROCEDURE IF EXISTS get_logs_count;
 
 -- Doctors model functions
-
 DROP PROCEDURE IF EXISTS create_doctor;
 
 DROP PROCEDURE IF EXISTS get_all_doctors;
@@ -118,6 +117,23 @@ DROP PROCEDURE IF EXISTS update_doctor_by_id;
 DROP PROCEDURE IF EXISTS get_all_doctors_count;
 
 DROP PROCEDURE IF EXISTS get_doctor_by_id;
+
+-- Doctors model functions
+DROP PROCEDURE IF EXISTS create_speciality;
+
+DROP PROCEDURE IF EXISTS update_speciality;
+
+DROP PROCEDURE IF EXISTS get_speciality_by_id;
+
+DROP PROCEDURE IF EXISTS get_all_specialities;
+
+DROP PROCEDURE IF EXISTS get_speciality_count;
+
+DROP PROCEDURE IF EXISTS delete_speciality;
+
+-- doctor-speciality model functions
+DROP PROCEDURE IF EXISTS link_doctor_specialty;
+
 
 DELIMITER $$
 
@@ -715,5 +731,68 @@ BEGIN
     WHERE u.role = 'Doctor'
         AND (doc_branch = -1 OR u.branch_id = doc_branch);
 END$$
+
+-- Speciality model functions
+CREATE PROCEDURE create_speciality(
+    IN p_speciality_name VARCHAR(20),
+    IN p_description VARCHAR(255)
+)
+BEGIN
+    INSERT INTO `speciality` (speciality_name, description)
+    VALUES (p_speciality_name, p_description);
+    SELECT * FROM `speciality` WHERE speciality_id = LAST_INSERT_ID();
+END$$
+
+CREATE PROCEDURE update_speciality(
+    IN p_speciality_id INT,
+    IN p_speciality_name VARCHAR(20),
+    IN p_description VARCHAR(255)
+)
+BEGIN
+    UPDATE `speciality`
+    SET speciality_name = p_speciality_name,
+        description = p_description
+    WHERE speciality_id = p_speciality_id;
+END$$
+
+CREATE PROCEDURE get_speciality_by_id(IN p_speciality_id INT)
+BEGIN
+    SELECT speciality_id, speciality_name, description
+    FROM `speciality`
+    WHERE speciality_id = p_speciality_id;
+END$$
+
+CREATE PROCEDURE get_all_specialities(
+    IN speciality_count INT,
+    IN count_start INT
+)
+BEGIN
+    SELECT speciality_id, speciality_name, description
+    FROM `speciality`
+    ORDER BY speciality_id
+    LIMIT speciality_count OFFSET count_start;
+END$$
+
+CREATE PROCEDURE get_speciality_count()
+BEGIN
+    SELECT COUNT(speciality_id) AS speciality_count
+    FROM `speciality`;
+END$$
+
+CREATE PROCEDURE delete_speciality(IN p_speciality_id INT)
+BEGIN
+    DELETE FROM `speciality` WHERE speciality_id = p_speciality_id;
+END$$
+
+-- Doctor-Speciality model functions
+CREATE PROCEDURE link_doctor_specialty(
+    IN p_doctor_id INT,
+    IN p_speciality_id INT
+)
+BEGIN
+    INSERT INTO `doctor_speciality` (doctor_id, speciality_id)
+    VALUES (p_doctor_id, p_speciality_id);
+END$$
+
 
 DELIMITER;

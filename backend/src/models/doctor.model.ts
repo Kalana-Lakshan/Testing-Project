@@ -1,3 +1,4 @@
+import { hashPassword } from "../auth/hash.ts";
 import sql from "../db/db.ts";
 
 export interface Doctor {
@@ -24,6 +25,59 @@ export const createDoctor = async (
     );
   } catch (error) {
     console.error("Error creating doctor:", error);
+    throw error;
+  }
+};
+
+export const createDoctorByAdmin = async (
+  fullname: string,
+  gender: string,
+  fee_per_patient: number,
+  monthly_salary: number,
+  branch_id: number,
+  specialties: string[]
+): Promise<void> => {
+  try {
+    const conn = await sql.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      // create_user signature: (p_username, p_password_hash, p_role, p_branch_id, p_is_approved)
+      const username = nameFormatToUsername(fullname);
+      const [createUserResult]: any = await conn.query(
+        "CALL create_user(?, ?, ?, ?, ?)",
+        [username, hashPassword(username + "_password"), "Doctor", branch_id, 0]
+      );
+
+      const userRow = Array.isArray(createUserResult) ? createUserResult[0] : createUserResult;
+      const user_id = userRow && userRow.user_id ? userRow.user_id : (userRow && userRow[0] && userRow[0].user_id ? userRow[0].user_id : null);
+      if (!user_id) {
+        throw new Error('Failed to create user for doctor');
+      }
+
+      await conn.query(
+        "CALL create_doctor(?, ?, ?, ?, ?)",
+        [Number(user_id), fullname, gender, fee_per_patient, monthly_salary]
+      );
+
+      if (specialties && specialties.length > 0) {
+        for (const specialty of specialties) {
+          await conn.query(
+            "CALL link_doctor_specialty(?, ?)",
+            [Number(user_id), Number(specialty)]
+          );
+        }
+      }
+
+      await conn.commit();
+    } catch (err) {
+      await conn.rollback();
+      throw err;
+    } finally {
+      conn.release();
+    }
+  } catch (error) {
+    console.error("Error creating doctor by admin:", error);
     throw error;
   }
 };
@@ -89,3 +143,12 @@ export const updateDoctorById = async (
     throw error;
   }
 };
+
+function nameFormatToUsername(fullname: string): string {
+  // Convert to lowercase, remove non-alphanumeric, replace spaces with underscores
+  return fullname
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, "")
+    .replace(/\s+/g, "_");
+}
