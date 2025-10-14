@@ -85,7 +85,7 @@ const ViewStaff: React.FC<ViewStaffProps> = ({ isOpen, selectedStaff, onFinished
           {/* Name */}
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" value={name} disabled={!isEditing} onChange={(e) => setName(e.target.value)} className="md:w-[50%]" />
+            <Input id="name" value={name} disabled={!isEditing} onChange={(e) => setName(e.target.value)} className="md:w-full" />
           </div>
 
           <div className="grid md:grid-cols-2 gap-2">
