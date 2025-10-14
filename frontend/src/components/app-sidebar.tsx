@@ -175,7 +175,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "All Managers",
-        url: "",
+        url: "/branch-managers",
         icon: UserSearch,
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_ADMIN_STAFF, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),

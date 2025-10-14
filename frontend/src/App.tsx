@@ -32,6 +32,7 @@ import {
 } from "./services/authServices";
 import DashboardSkeleton from './components/dashboard-skeleton';
 import LogsTable from './pages/logs/logs';
+import BranchManagerPage from './pages/managers/manager';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -166,6 +167,16 @@ function App() {
                 <>
                   <PageTitle title="Staff | MedSync" />
                   <StaffPage />
+                </>
+              }
+            />
+
+            <Route
+              path="/branch-managers"
+              element={
+                <>
+                  <PageTitle title="Branch Managers | MedSync" />
+                  <BranchManagerPage />
                 </>
               }
             />
