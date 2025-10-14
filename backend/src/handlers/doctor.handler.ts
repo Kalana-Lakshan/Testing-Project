@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { createDoctorByAdmin, getAllDoctors, getAllDoctorsCount, getDoctorById } from "../models/doctor.model.ts";
+import { getAllDoctorSpeciality } from '../models/doctor_speciality.model.ts';
 
 export const getAllDoctorsForPagination = async (req: Request, res: Response) => {
   try {
@@ -63,5 +64,21 @@ export const addNewDoctor = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error adding doctor:', error);
     return res.status(500).json({ error: 'Failed to add doctor' });
+  }
+};
+
+export const getAllDoctorSpecialities = async (req: Request, res: Response) => {
+  try {
+    const data = await getAllDoctorSpeciality();
+    if (data.length === 0) {
+      return res.status(404).json({ error: 'No doctor specialities found' });
+    }
+    return res.status(200).json({
+      doc_speciality_count: data.length,
+      doc_specialities: data,
+    });
+  } catch (error) {
+    console.error('Error fetching doctor specialities:', error);
+    return res.status(500).json({ error: 'Failed to fetch doctor specialities' });
   }
 };

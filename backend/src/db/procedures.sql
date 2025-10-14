@@ -134,6 +134,7 @@ DROP PROCEDURE IF EXISTS delete_speciality;
 -- doctor-speciality model functions
 DROP PROCEDURE IF EXISTS link_doctor_specialty;
 
+DROP PROCEDURE IF EXISTS get_all_doctor_speciality;
 
 DELIMITER $$
 
@@ -794,5 +795,13 @@ BEGIN
     VALUES (p_doctor_id, p_speciality_id);
 END$$
 
+CREATE PROCEDURE get_all_doctor_speciality()
+BEGIN
+    SELECT d.doctor_id, d.name AS doctor_name, s.speciality_id, s.speciality_name, s.description, ds.added_at
+    FROM `doctor_speciality` ds
+    LEFT JOIN `doctor` d ON ds.doctor_id = d.doctor_id
+    LEFT JOIN `speciality` s ON ds.speciality_id = s.speciality_id
+    ORDER BY d.doctor_id, s.speciality_name;
+END$$
 
 DELIMITER;
