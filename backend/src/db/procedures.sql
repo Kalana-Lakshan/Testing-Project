@@ -125,7 +125,9 @@ DROP PROCEDURE IF EXISTS update_speciality;
 
 DROP PROCEDURE IF EXISTS get_speciality_by_id;
 
-DROP PROCEDURE IF EXISTS get_all_specialities;
+DROP PROCEDURE IF EXISTS get_all_specialities_pagination;
+
+DROP PROCEDURE IF EXISTS get_all_speciality;
 
 DROP PROCEDURE IF EXISTS get_speciality_count;
 
@@ -652,11 +654,11 @@ CREATE PROCEDURE get_all_logs(
     IN log_offset INT
 )
 BEGIN
-    SELECT l.log_id, l.user_id, l.user_role, a.name, l.table_name, l.record_id, l.details
+    SELECT l.log_id, l.user_id, u.username, l.user_role, a.name AS action, l.table_name, l.record_id, l.time_stamp, l.details
     FROM `log` l
-    LEFT JOIN `action` a
-    ON l.action_id = a.action_id
-    ORDER BY l.log_id
+    LEFT JOIN `action` a ON l.action_id = a.action_id
+    LEFT JOIN `user` u ON u.user_id = l.user_id
+    ORDER BY l.log_id DESC
     LIMIT log_count OFFSET log_offset;
 END$$
 
@@ -763,7 +765,7 @@ BEGIN
     WHERE speciality_id = p_speciality_id;
 END$$
 
-CREATE PROCEDURE get_all_specialities(
+CREATE PROCEDURE get_all_specialities_pagination(
     IN speciality_count INT,
     IN count_start INT
 )
@@ -772,6 +774,13 @@ BEGIN
     FROM `speciality`
     ORDER BY speciality_id
     LIMIT speciality_count OFFSET count_start;
+END$$
+
+CREATE PROCEDURE get_all_speciality()
+BEGIN
+    SELECT speciality_id, speciality_name, description
+    FROM `speciality`
+    ORDER BY speciality_id;
 END$$
 
 CREATE PROCEDURE get_speciality_count()
