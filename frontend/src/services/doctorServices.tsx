@@ -4,9 +4,11 @@ import axiosInstance from "../axiosConfig";
 export interface Doctor {
   doctor_id: number;
   name: string;
+  gender: string;
+  branch_id: number;
+  branch_name: string;
   fee_per_patient: number;
   basic_monthly_salary: number;
-  gender: string;
 }
 
 export interface DoctorSpeciality {
@@ -87,7 +89,7 @@ export const addDoctor = async (doctorData: {
   specialties?: number[];
 }) => {
   try {
-    const response = await axiosInstance.post(`/doctors`, doctorData);
+    const response = await axiosInstance.post(`/doctors/add`, doctorData);
     return response.data.message;
   } catch (error: unknown) {
     console.error("Error adding new doctor data:", error);
@@ -109,7 +111,7 @@ export const getAllDoctorSpecialities = async () => {
     //   doctor_speciality_count: number;
     //   doctor_specialities: Array<DoctorSpeciality>;
     // }>
-    (`/doctors-specialities`);
+    (`/doctors/specialities`);
     return response.data;
   } catch (error: unknown) {
     console.error("Error getting all doctors' speciality data:", error);
