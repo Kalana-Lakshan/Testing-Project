@@ -52,11 +52,11 @@ export const addNewDoctor = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Please provide all required fields' });
     }
     await createDoctorByAdmin(
-      String(name), 
-      String(gender), 
-      Number(fee_per_patient), 
-      Number(basic_monthly_salary), 
-      Number(branch_id), 
+      String(name),
+      String(gender),
+      Number(fee_per_patient),
+      Number(basic_monthly_salary),
+      Number(branch_id),
       Array.isArray(specialties) ? specialties : []
     );
     return res.status(201).json({ message: 'Doctor added successfully' });
