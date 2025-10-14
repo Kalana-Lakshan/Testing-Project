@@ -31,7 +31,8 @@ import {
   UserRoundX,
   UserRoundCheck,
   MapPinHouse,
-  Logs
+  Logs,
+  UserPen
 } from "lucide-react"
 // billing and paments - Receipt
 // patient - Users
@@ -302,18 +303,26 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     children: [
       {
         type: "child",
+        title: "Add Doctor",
+        url: "/doctors/add",
+        icon: UserPen,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
         title: "All Doctors",
         url: "/doctors",
-        icon: HeartPulse,
+        icon: UsersRound,
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Doctors' Specialities",
-        url: "/doctors-specialities",
+        url: "/doctors/specialities",
         icon: FileUser,
-        hideIf: (role) => typeof role !== "string",
+        // hideIf: (role) => typeof role !== "string",
       },
       {
         type: "child",

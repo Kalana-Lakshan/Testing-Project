@@ -241,47 +241,47 @@ function App() {
               }
             /> */}
 
-        
 
-          <Route
+
+            <Route
               path="/doctors/specialities"
               element={
                 <>
-                  <PageTitle title="Doctors' specialities | MedSync" />
+                  <PageTitle title="Doctors' Speciality | MedSync" />
                   <DoctorSpeciality />
                 </>
               }
             />
 
             <Route
-                path="/doctors/add"
-                element={
-                  <>
-                    <PageTitle title="Add Doctor | MedSync" />
-                    <AddDoctor />
-                  </>
-                }
-              />
+              path="/doctors/add"
+              element={
+                <>
+                  <PageTitle title="Add Doctor | MedSync" />
+                  <AddDoctor />
+                </>
+              }
+            />
 
-              <Route
-                path="/speciality"
-                element={
-                  <>
-                    <PageTitle title="Specialities | MedSync" />
-                    <Speciality />
-                  </>
-                }
-              />
+            <Route
+              path="/speciality"
+              element={
+                <>
+                  <PageTitle title="Speciality | MedSync" />
+                  <Speciality />
+                </>
+              }
+            />
 
-              <Route
-                path="/logs"
-                element={
-                  <>
-                    <PageTitle title="Logs | MedSync" />
-                    <LogsTable />
-                  </>
-                }
-              />
+            <Route
+              path="/logs"
+              element={
+                <>
+                  <PageTitle title="Logs | MedSync" />
+                  <LogsTable />
+                </>
+              }
+            />
 
           </Route>
         </Routes>
