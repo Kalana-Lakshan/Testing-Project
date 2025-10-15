@@ -20,7 +20,7 @@ export const getUserByUsername = async (username: string): Promise<User | null> 
     return user;
   } catch (error) {
     console.error("Error fetching user by ID:", error);
-    throw error;
+    return null;
   }
 };
 
@@ -38,15 +38,14 @@ export const createUser = async (
       [username, password_hash, role, branch_id, is_approved]
     );
     console.log("create_user result:", JSON.stringify(resultSets, null, 2));
-    // CALL returns [ [rows], [extraMeta] ]
-    const userRows = (resultSets as any)[0]; // first array = rows
+    const userRows = (resultSets as any)[0];
     if (!userRows || userRows.length === 0) {
       throw new Error("User not created");
     }
     return userRows[0] as User;
   } catch (error) {
     console.error("Error creating user:", error);
-    throw error;
+    throw null;
   }
 };
 
@@ -100,7 +99,7 @@ export const getUserById = async (id: number): Promise<User> => {
     return user;
   } catch (error) {
     console.error("Error fetching user by ID:", error);
-    throw error;
+    throw new Error("User not found");
   }
 };
 
@@ -121,7 +120,7 @@ export const getAllUser = async (
     return (rows as any)[0] as User[];
   } catch (error) {
     console.error("Error fetching all users:", error);
-    throw error;
+    throw new Error("Error fetching users");
   }
 };
 
@@ -135,7 +134,7 @@ export const getActiveUserCount = async (
     return rows[0][0].user_count;
   } catch (error) {
     console.error("Error fetching count of active users:", error);
-    throw error;
+    throw new Error("Error fetching count of active users");
   }
 };
 
@@ -153,7 +152,7 @@ export const getAllDeletedUser = async (
     return (rows as any)[0] as User[];
   } catch (error) {
     console.error("Error fetching all deleted users:", error);
-    throw error;
+    throw new Error("Error fetching deleted users");
   }
 };
 
@@ -164,6 +163,6 @@ export const getInActiveUserCount = async (): Promise<Number> => {
     return rows[0][0].user_count;
   } catch (error) {
     console.error("Error fetching count of deleted users:", error);
-    throw error;
+    throw new Error("Error fetching count of deleted users");
   }
 };
