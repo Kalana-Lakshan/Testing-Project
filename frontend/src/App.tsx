@@ -8,18 +8,13 @@ import StaffSignUp from './pages/Authentication/staff-sign-up';
 import Users from './pages/users/activeUsers';
 import DoctorsDetails from './pages/doctors/doctorsDetails';
 import { ThemeProvider } from './components/theme-provider';
-import DoctorsAppointmentDetails from './pages/doctors/doctorsAppointmentDetails';
-import DoctorsPatientsHistory from './pages/doctors/doctorsPatientsHistory';
 import DoctorSpeciality from './pages/doctors/doctorSpeciality';
 import AddDoctor from './pages/doctors/addDoctor';
-import Speciality from './pages/doctors/speciality';
-import AddSpeciality from './pages/doctors/addSpeciality';
+import Speciality from './pages/specialities/speciality';
 import InactiveUsers from './pages/users/deletedUsers';
-
 import PatientSignIn from './pages/Authentication/patient-sign-in';
 import PatientSignUp from './pages/Authentication/patient-sign-up';
 import DashboardRedirect from './pages/DashboardRedirect';
-import Loader from './components/Loader';
 import LoginLayout from './layouts/LoginLayout';
 import StaffPage from './pages/staff/staff';
 import CurrentPatients from './pages/patients/currentPatients';
@@ -31,18 +26,55 @@ import TreatmentAdd from './pages/patients/treatment/treatment_add';
 import Treatments from './pages/patients/treatment/treatment';
 import Medications from './pages/patients/medication/medication';
 
+import { useNavigate } from "react-router-dom";
+import {
+  LOCAL_STORAGE__ROLE,
+  LOCAL_STORAGE__TOKEN,
+  LOCAL_STORAGE__USER,
+  LOCAL_STORAGE__USER_ID,
+  LOCAL_STORAGE__USERNAME,
+  validateToken
+} from "./services/authServices";
+import DashboardSkeleton from './components/dashboard-skeleton';
+import LogsTable from './pages/logs/logs';
+import BranchManagerPage from './pages/managers/manager';
 
 function App() {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
+  const token = localStorage.getItem(LOCAL_STORAGE__TOKEN);
+  const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  useEffect(() => {
+    const path = window.location.pathname;
+    const isAuthPath =
+      path == "/staff/sign-in" || path == "/staff/sign-up" || path == "/sign-in" || path === "/sign-up";
+    if (!token && !isAuthPath) {
+      navigate("/sign-in");
+      return;
+    }
+    validateToken().then(() => {
+      setLoading(false)
+    }).catch(() => {
+      localStorage.removeItem(LOCAL_STORAGE__TOKEN);
+      localStorage.removeItem(LOCAL_STORAGE__USER);
+      localStorage.removeItem(LOCAL_STORAGE__USERNAME);
+      localStorage.removeItem(LOCAL_STORAGE__ROLE);
+      localStorage.removeItem(LOCAL_STORAGE__USER_ID);
+
+      if (!isAuthPath) {
+        navigate("/sign-in");
+      }
+    });
+  }, []);
+
   return loading ? (
     <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-      <Loader />
+      <DashboardSkeleton />
     </ThemeProvider>
   ) : (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -50,7 +82,7 @@ function App() {
         <Routes>
 
           <Route
-            path="/home"
+            index
             element={
               <>
                 <PageTitle title="Home | MedSync" />
@@ -105,8 +137,13 @@ function App() {
           <Route element={<DefaultLayout />}>
 
             <Route
-              index
-              element={<DashboardRedirect />}
+              path="/dashboard"
+              element={
+                <>
+                  <PageTitle title="Dashboard | MedSync" />
+                  <DashboardRedirect />
+                </>
+              }
             />
 
             <Route
@@ -135,6 +172,16 @@ function App() {
                 <>
                   <PageTitle title="Staff | MedSync" />
                   <StaffPage />
+                </>
+              }
+            />
+
+            <Route
+              path="/branch-managers"
+              element={
+                <>
+                  <PageTitle title="Branch Managers | MedSync" />
+                  <BranchManagerPage />
                 </>
               }
             />
@@ -179,7 +226,7 @@ function App() {
               }
             />
 
-            <Route
+            {/* <Route
               path="/doctors-appointments"
               element={
                 <>
@@ -187,9 +234,9 @@ function App() {
                   <DoctorsAppointmentDetails />
                 </>
               }
-            />
+            /> */}
 
-            <Route
+            {/* <Route
               path="/doctors-patients-history"
               element={
                 <>
@@ -197,50 +244,51 @@ function App() {
                   <DoctorsPatientsHistory />
                 </>
               }
-            />
+            /> */}
 
-        
 
-          <Route
-              path="/doctors-specialities"
+
+            <Route
+              path="/doctors/specialities"
               element={
                 <>
-                  <PageTitle title="Doctors' specialities | MedSync" />
+                  <PageTitle title="Doctors' Speciality | MedSync" />
                   <DoctorSpeciality />
                 </>
               }
             />
 
             <Route
-                path="/doctor-add"
-                element={
-                  <>
-                    <PageTitle title="Add Doctor | MedSync" />
-                    <AddDoctor />
-                  </>
-                }
-              />
+              path="/doctors/add"
+              element={
+                <>
+                  <PageTitle title="Add Doctor | MedSync" />
+                  <AddDoctor />
+                </>
+              }
+            />
 
-              <Route
-                path="/speciality"
-                element={
-                  <>
-                    <PageTitle title="Specialities | MedSync" />
-                    <Speciality />
-                  </>
-                }
-              />
+            <Route
+              path="/speciality"
+              element={
+                <>
+                  <PageTitle title="Speciality | MedSync" />
+                  <Speciality />
+                </>
+              }
+            />
 
-              <Route
-                path="/speciality-add"
-                element={
-                  <>
-                    <PageTitle title="Add Speciality | MedSync" />
-                    <AddSpeciality />
-                  </>
-                }
-              />
-                          <Route path="/patients/treatment" element={
+            <Route
+              path="/logs"
+              element={
+                <>
+                  <PageTitle title="Logs | MedSync" />
+                  <LogsTable />
+                </>
+              }
+            />
+
+            <Route path="/patients/treatment" element={
               <>
                 <PageTitle title="Patient Treatments | MedSync" />
                 <Treatments />

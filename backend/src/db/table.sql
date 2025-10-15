@@ -144,7 +144,7 @@ CREATE TABLE `doctor` (
 CREATE TABLE `doctor_speciality` (
   `doctor_id` int,
   `speciality_id` int,
-  `added_at` timestamp,
+  `added_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`doctor_id`, `speciality_id`),
   FOREIGN KEY (`speciality_id`) 
       REFERENCES `speciality`(`speciality_id`),

@@ -1,45 +1,40 @@
 import type { Express } from "express";
 import authorizeRoles from "../auth/auth.js";
-import {getAllDoctors,getDoctorByID} from "../handlers/doctor.handler.js"
-import { getAllDoctorAppointments } from "../handlers/doctor.appointment.handler.ts";
-import { getAllDoctorPatientsHistory } from "../handlers/doctor.patients.history.handler.ts";
-import { getAllDoctorSpecialities } from "../handlers/doctor.speciality.handler.ts";
+import { addNewDoctor, getAllDoctorsForPagination, getAllDoctorSpecialities, getDoctorDetailsByID } from "../handlers/doctor.handler.js"
 import { deleteUser, getDeletedUsers, getUsers, restoreUser, updateUser } from "../handlers/user.handler.ts";
 import { patientSignup, staffSignup, userLogin, validateUser } from "../handlers/auth.handler.ts";
-import { getAllBranchNames, getBranches, updateBranchByID } from "../handlers/branch.handler.ts";
+import { createNewBranch, getAllBranchNames, getBranches, updateBranchByID } from "../handlers/branch.handler.ts";
 import { getLogsForPagination } from "../handlers/log.handler.ts";
 import { dischargePatientByID, getPatients, updateCurrentPatientDetails } from "../handlers/patient.handler.ts";
 import { getAllStaff, updateStaffByID } from "../handlers/staff.handler.ts";
+import { addNewSpecialty, getAllSpecialties } from "../handlers/speciality.handler.ts";
 
-import { addDoctor } from "../handlers/doctor.handler.js"; // add new doctor button
-// Add this import
-import { getAllSpecialties, addSpecialty } from "../handlers/speciality.handler.ts";
 import { checkServiceCodeHandler, createTreatmentHandler, getAllTreatmentsHandler } from "../handlers/treatment.handler.ts";
 import { getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
 import { getAllMedicationsHandler, getMedicationsByPatientHandler } from "../handlers/medication.handlers.ts";
 
 export const HttpMethod = {
-	GET    : "GET",
-	POST   : "POST",
-	PUT    : "PUT",
-	DELETE : "DELETE",
+	GET: "GET",
+	POST: "POST",
+	PUT: "PUT",
+	DELETE: "DELETE",
 };
 
 export const Role = {
-	SUPER_ADMIN: 			"Super_Admin",
-	BRANCH_MANAGER: 	"Branch_Manager",
-	DOCTOR: 					"Doctor",
-	ADMIN_STAFF: 			"Admin_Staff",
-	NURSE: 						"Nurse",
-	RECEPTIONIST: 		"Receptionist",
-	BILLING_STAFF: 		"Billing_Staff",
-	INSURANCE_AGENT:	"Insurance_Agent",
-	PATIENT: 					"Patient",
-	PUBLIC: 					"Public",		// open access 
-	// to group the user related roles those who have access to login to the system
-	USER: 						"User",
-	// to group the medical related staff
-	MEDICAL_STAFF: 		"Medical_Staff",
+	SUPER_ADMIN: "Super_Admin",
+	BRANCH_MANAGER: "Branch_Manager",
+	DOCTOR: "Doctor",
+	ADMIN_STAFF: "Admin_Staff",
+	NURSE: "Nurse",
+	RECEPTIONIST: "Receptionist",
+	BILLING_STAFF: "Billing_Staff",
+	INSURANCE_AGENT: "Insurance_Agent",
+	PATIENT: "Patient",
+	PUBLIC: "Public",
+
+	// special roles to group the common roles
+	USER: "User",
+	MEDICAL_STAFF: "Medical_Staff",
 };
 
 interface Route {
@@ -58,26 +53,26 @@ var routes: Route[] = [
 
 	// users router
 	{ path: "/users/active", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getUsers },
-	//doctors router
-	{ path: "/doctors",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctors },
-	{ path: "/doctors/:id",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getDoctorByID},
-	{ path: "/doctors-appointments",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctorAppointments},
-	{ path: "/doctors-patients-history",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctorPatientsHistory},
-	{ path: "/doctors-specialities",AccessibleBy:availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler:getAllDoctorSpecialities},
-	{ path: "/doctors",AccessibleBy: availableForRoles([Role.PUBLIC]),method: HttpMethod.POST,handler: addDoctor}, //add new doctor button
-// 	{ path: "/branches",AccessibleBy: availableForRoles([Role.PUBLIC]),method: HttpMethod.GET,handler: getAllBranches},
-	{ path: "/specialities", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllSpecialties },
-	{ path: "/specialities", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: addSpecialty },
 	{ path: "/users/inactive", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDeletedUsers },
 	{ path: "/user/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateUser },
 	{ path: "/user/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.DELETE, handler: deleteUser },
 	{ path: "/user/restore/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: restoreUser },
 
+	//doctors router
+	{ path: "/doctors", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorsForPagination },
+	{ path: "/doctors/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDoctorDetailsByID },
+	{ path: "/doctors/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: addNewDoctor },
+	{ path: "/doctors/specialities", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorSpecialities },
+
+	// speciality router
+	{ path: "/specialities", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllSpecialties },
+	{ path: "/specialities/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: addNewSpecialty },
+
 	// branches router
 	{ path: "/all-branches", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllBranchNames },
 	{ path: "/branches", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranches },
-	{ path: "/branch/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getBranches },
-	{ path: "/branch/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateBranchByID },
+	{ path: "/branchs/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: createNewBranch },
+	{ path: "/branchs/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateBranchByID },
 
 	// patients router
 	{ path: "/patients", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatients },

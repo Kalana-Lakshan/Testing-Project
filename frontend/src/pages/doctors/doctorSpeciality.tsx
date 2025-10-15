@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
 import PageTitle from "@/components/PageTitle";
-
-import type { DoctorSpeciality } from '@/types/doctor.specialities.types';    
-import { doctorSpecialityService } from '@/services/doctorSpecialityService';
-
-
-//for table
-import { useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel, getPaginationRowModel, type ColumnDef, type SortingState, type ColumnFiltersState } from "@tanstack/react-table";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  type ColumnDef,
+  type SortingState,
+  type ColumnFiltersState
+} from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
 import { Input } from "@/components/ui/input";
+import { getAllDoctorSpecialities, type DoctorSpeciality } from '@/services/doctorServices';
+
 
 export default function DoctorsSpecialityDetails() {
   // State variables - like boxes that hold our data
@@ -22,26 +27,26 @@ export default function DoctorsSpecialityDetails() {
   const [globalFilter, setGlobalFilter] = useState("");
 
   // Column definitions for DataTable
-    const columns: ColumnDef<DoctorSpeciality>[] = [
-        { accessorKey: "doctor_id", header: "Doctor ID" },
-        { accessorKey: "speciality_id", header: "Speciality ID" },
-        { accessorKey: "name", header: "Doctor Name" },
-        { accessorKey: "speciality_name", header: "Speciality Name" },
-        { accessorKey: "added_at", header: "Added At" },
-    ];
-  
-    const table = useReactTable({
-      data: specialities,
-      columns,
-      onSortingChange: setSorting,
-      onColumnFiltersChange: setColumnFilters,
-      onGlobalFilterChange: setGlobalFilter,
-      getCoreRowModel: getCoreRowModel(),
-      getSortedRowModel: getSortedRowModel(),
-      getFilteredRowModel: getFilteredRowModel(),
-      getPaginationRowModel: getPaginationRowModel(),
-      state: { sorting, columnFilters, globalFilter },
-    });
+  const columns: ColumnDef<DoctorSpeciality>[] = [
+    { accessorKey: "doctor_id", header: "Doctor ID" },
+    { accessorKey: "speciality_id", header: "Speciality ID" },
+    { accessorKey: "name", header: "Doctor Name" },
+    { accessorKey: "speciality_name", header: "Speciality Name" },
+    { accessorKey: "added_at", header: "Added At" },
+  ];
+
+  const table = useReactTable({
+    data: specialities,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    state: { sorting, columnFilters, globalFilter },
+  });
 
   // useEffect runs when component first loads (mounts)
   useEffect(() => {
@@ -52,7 +57,7 @@ export default function DoctorsSpecialityDetails() {
         setError(null);    // Clear any previous errors
 
         // Call our service to get doctor appointments
-        const appointmentsData = await doctorSpecialityService.getAllDoctorSpecialities();
+        const appointmentsData = await getAllDoctorSpecialities();
 
         // Update state with the fetched data
         setSpecialities(appointmentsData);
@@ -62,7 +67,7 @@ export default function DoctorsSpecialityDetails() {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         setError(errorMessage);
         console.error('Failed to fetch doctors:', err);
-        
+
       } finally {
         setLoading(false);  // Hide loading state
       }
@@ -99,14 +104,14 @@ export default function DoctorsSpecialityDetails() {
   return (
     <div className="space-y-6">
       <PageTitle title="Doctors' Specialities Details | MedSync" />
-      
+
       <div>
         <h2>All Doctor Specialities ({specialities.length})</h2>
 
         {specialities.length === 0 ? (
           <p>No doctor specialities found in database.</p>
         ) : (
-            <div className="space-y-4">
+          <div className="space-y-4">
             <Input
               placeholder="Search specialities..."
               value={globalFilter ?? ""}

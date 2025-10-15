@@ -1,77 +1,40 @@
-import pool from "../db/db.ts";
 import type { Request, Response } from 'express';
+import { addSpeciality, getAllSpecialities, type Speciality } from '../models/speciality.model.ts';
 
 export const getAllSpecialties = async (req: Request, res: Response) => {
-    try {
-        const query = `
-            SELECT speciality_id, speciality_name, description
-            FROM speciality
-            ORDER BY speciality_id ASC;
-        `;
-        const [rows] = await pool.execute(query);
-        
-        res.status(200).json({
-            success: true,
-            message: 'Specialties fetched successfully',
-            data: rows
-        });
-    } catch (error) {
-        console.error('Database error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch specialties',
-            data: []
-        });
+  try {
+    const rows: Speciality[] = await getAllSpecialities();
+    if (rows.length < 1) {
+      res.status(404).json({ error: "Specialties not found" });
+      return;
     }
+    res.status(200).json({
+      speciality_count: rows.length,
+      specialities: rows
+    });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
 
-export const addSpecialty = async (req: Request, res: Response) => {
-    try {
-        console.log('Received request body:', req.body);
-        const { speciality_name, description } = req.body;
+export const addNewSpecialty = async (req: Request, res: Response) => {
+  try {
+    console.log('Received request body:', req.body);
+    const { speciality_name, description } = req.body;
 
-        // Validate required fields
-        if (!speciality_name || !description) {
-            console.log('Validation failed - missing fields');
-            return res.status(400).json({
-                success: false,
-                message: 'Specialty name and description are required'
-            });
-        }
-
-        console.log('Inserting specialty:', { speciality_name, description });
-
-        // Get next available speciality_id
-        const [maxResult] = await pool.execute(
-            'SELECT COALESCE(MAX(speciality_id), 0) + 1 as next_id FROM speciality'
-        );
-        const nextId = (maxResult as any)[0].next_id;
-
-        // Insert new specialty with explicit ID
-        const query = `
-            INSERT INTO speciality (speciality_id, speciality_name, description)
-            VALUES (?, ?, ?)
-        `;
-        const [result] = await pool.execute(query, [nextId, speciality_name, description]);
-        
-        console.log('Insert result:', result);
-
-        res.status(201).json({
-            success: true,
-            message: 'Specialty added successfully',
-            data: {
-                speciality_id: nextId,
-                speciality_name,
-                description
-            }
-        });
-    } catch (error) {
-        console.error('Database error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to add specialty',
-            error: error instanceof Error ? error.message : 'Unknown error'
-        });
+    if (!speciality_name || !description) {
+      console.log('Validation failed - missing fields');
+      return res.status(400).json({ success: false, message: 'Specialty name and description are required' });
     }
+
+    console.log('Inserting specialty:', { speciality_name, description });
+    await addSpeciality(speciality_name, description);
+
+    res.status(200).json({ message: 'Specialty added successfully' });
+  } catch (error) {
+    console.error('Database error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 };
 

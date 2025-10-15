@@ -1,20 +1,34 @@
-import { getAllInactiveUsers, type User } from "@/services/userService";
 import { DataTable } from "../../components/data-table"
 import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
-import { createTimer, Role, toNormalTimestamp } from "@/services/utils";
-import { RotateCcw } from "lucide-react";
-import UndoDeleteUser from "./user-restore";
+import { createTimer, formatRole, toNormalTimestamp } from "@/services/utils";
+import { LOCAL_STORAGE__USER } from "@/services/authServices";
+import { Navigate } from "react-router-dom";
+import { getAllLogs, type Log } from "@/services/logsServices";
 
+const LogsTable: React.FC = () => {
+  const [Logs, setLogs] = useState<Array<Log>>([]);
+  const [logCount, setLogCount] = useState<number>(0);
+  const user = localStorage.getItem(LOCAL_STORAGE__USER)
+  if (!user) {
+    return <Navigate to="/staff/sign-in" replace />;
+  }
 
-const InactiveUsers: React.FC = () => {
-  const [Users, setUsers] = useState<Array<User>>([]);
-  const [userCount, setUserCount] = useState<number>(0);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [action, setAction] = useState<"undo" | null>(null);
-  const columns: ColumnDef<User>[] = [
+  const columns: ColumnDef<Log>[] = [
+    {
+      accessorKey: "log_id",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Log ID
+        </Button>
+      ),
+    },
     {
       accessorKey: "user_id",
       header: ({ column }) => (
@@ -40,66 +54,75 @@ const InactiveUsers: React.FC = () => {
       ),
     },
     {
-      accessorKey: "role",
+      accessorKey: "user_role",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0"
         >
-          Role
+          User Role
         </Button>
       ),
+      cell: ({ row }) => formatRole(row.original.user_role),
     },
     {
-      accessorKey: "branch_name",
+      accessorKey: "action",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0"
         >
-          Branch
+          Action Type
         </Button>
       ),
     },
     {
-      accessorKey: "created_at",
+      accessorKey: "table_name",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="px-0"
         >
-          Created At
+          Table
         </Button>
       ),
-      cell: ({ row }) => toNormalTimestamp(row.original.created_at),
     },
     {
-      accessorKey: "is_approved",
-      header: "Approved",
-      cell: ({ row }) => (row.original.is_approved ? "True" : "False"),
+      accessorKey: "record_id",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Record ID
+        </Button>
+      ),
     },
     {
-      header: "Action",
-      cell: ({ row }) => {
-        if (row.original.role === Role.SUPER_ADMIN) {
-          return <div className="text-muted-foreground mt-3 h-6">N/A</div>;
-        }
-        return (
-          <Button
-            size="icon"
-            variant="outline"
-            onClick={() => {
-              setSelectedUser(row.original);
-              setAction("undo");
-            }}
-          >
-            <RotateCcw />
-          </Button>
-        );
-      },
+      accessorKey: "time_stamp",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Time Stamp
+        </Button>
+      ),
+      cell: ({ row }) => toNormalTimestamp(row.original.time_stamp),
+    },
+    {
+      accessorKey: "details",
+      header: "Details",
+      cell: ({ row }) => (
+        <div className="flex flex-1 pl-2">
+          {row.original.details}
+        </div>
+      )
     },
   ]
 
@@ -111,7 +134,7 @@ const InactiveUsers: React.FC = () => {
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
-    data: Users,
+    data: Logs,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -133,17 +156,20 @@ const InactiveUsers: React.FC = () => {
     toast.loading("Loading...");
 
     return Promise.allSettled([
-      getAllInactiveUsers(itemsPerPage, (page - 1) * itemsPerPage),
+      getAllLogs(
+        itemsPerPage,
+        (page - 1) * itemsPerPage,
+      ),
       createTimer(500),
     ])
       .then((hu) => {
         if (hu[0].status === "rejected") {
           throw hu[0].reason;
         }
-        setUsers(hu[0].value.users);
-        setUserCount(hu[0].value.user_count);
+        setLogs(hu[0].value.logs);
+        setLogCount(hu[0].value.logs_count);
         console.log("set", hu[0].value, itemsPerPage);
-        setPageCount(Math.ceil(hu[0].value.user_count / itemsPerPage));
+        setPageCount(Math.ceil(hu[0].value.logs_count / itemsPerPage));
       })
       .catch((error) => {
         if (typeof error === "string") {
@@ -163,22 +189,13 @@ const InactiveUsers: React.FC = () => {
   return (
     <div className="space-y-6 p-4">
       <div>
-        <h2 className="text-lg font-medium">Deleted Users</h2>
-        <p className="text-sm text-muted-foreground">{userCount} items</p>
+        <h2 className="text-lg font-medium">All Logs</h2>
+        <p className="text-sm text-muted-foreground">{logCount} items</p>
       </div>
 
-      <UndoDeleteUser
-        isOpen={action === "undo" && selectedUser !== null}
-        selectedUser={selectedUser}
-        onFinished={fetchUsers}
-        onClose={() => {
-          setAction(null);
-          setSelectedUser(null);
-        }}
-      />
       <DataTable table={table} />
     </div>
   );
 };
 
-export default InactiveUsers;
+export default LogsTable;
