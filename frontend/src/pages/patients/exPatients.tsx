@@ -201,7 +201,7 @@ const ExPatients: React.FC = () => {
       if (error.response?.status === 404) {
         setErrorCode(404);
       } else {
-        toast.error("Failed to fetch staff");
+        toast.error("Failed to fetch patients");
       }
     } finally {
       toast.dismiss(loadingId);

@@ -145,7 +145,7 @@ const BranchManagerPage: React.FC = () => {
       if (error.response?.status === 404) {
         setErrorCode(404);
       } else {
-        toast.error("Failed to fetch staff");
+        toast.error("Failed to fetch branch managers");
       }
     } finally {
       toast.dismiss(loadingId);
