@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { restoreDeletedUser, type User } from "@/services/userService";
 
 interface UndoDeleteUserProps {
@@ -29,7 +29,7 @@ const UndoDeleteUser: React.FC<UndoDeleteUserProps> = ({
   const handleUndoDelete = async () => {
     if (!selectedUser) return;
     setIsRestoring(true);
-    toast.loading("Restoring user...");
+    const loadingId = toast.loading("Restoring user...");
 
     try {
       const response = await restoreDeletedUser(selectedUser.user_id)
@@ -39,7 +39,7 @@ const UndoDeleteUser: React.FC<UndoDeleteUserProps> = ({
     } catch (error) {
       toast.error("Failed to restore user.");
     } finally {
-      toast.dismiss();
+      toast.dismiss(loadingId);
       setIsRestoring(false);
     }
   };
@@ -51,7 +51,7 @@ const UndoDeleteUser: React.FC<UndoDeleteUserProps> = ({
           <DialogTitle>Restore User</DialogTitle>
           <DialogDescription>
             Are you sure you want to restore{" "}
-            <span className="font-semibold">{selectedUser?.username}</span>?  
+            <span className="font-semibold">{selectedUser?.username}</span>?
             This user will be moved back to the active users list.
           </DialogDescription>
         </DialogHeader>

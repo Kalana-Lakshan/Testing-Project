@@ -3,7 +3,7 @@ import { DataTable } from "../../components/data-table"
 import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { createTimer, Role, toNormalTimestamp } from "@/services/utils";
 import { RotateCcw } from "lucide-react";
 import UndoDeleteUser from "./user-restore";
@@ -130,7 +130,7 @@ const InactiveUsers: React.FC = () => {
     const tableState = table.getState();
     const page = tableState.pagination.pageIndex + 1;
     const itemsPerPage = tableState.pagination.pageSize;
-    toast.loading("Loading...");
+    const loadingId = toast.loading("Loading...");
 
     return Promise.allSettled([
       getAllInactiveUsers(itemsPerPage, (page - 1) * itemsPerPage),
@@ -153,7 +153,7 @@ const InactiveUsers: React.FC = () => {
         }
       })
       .finally(() => {
-        toast.dismiss();
+        toast.dismiss(loadingId);
       });
   }, [table]);
 

@@ -138,7 +138,7 @@ export const staffSignup = async (req: Request, res: Response) => {
 
     } catch (error) {
         console.error("Error in staff create handler:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({ error: error });
     }
 }
 
@@ -170,7 +170,7 @@ export const patientSignup = async (req: Request, res: Response) => {
         res.status(201).json({ message: "Patient account created successfully", user: usr });
         return;
     } catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({ error: error });
     }
 }
 

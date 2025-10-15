@@ -216,7 +216,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "Medical History",
-        url: "",
+        url: "/patients/medical-history",
         icon: BookOpen,
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
@@ -224,7 +224,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "Treatments details",
-        url: "",
+        url: "/patients/treatment",
         icon: FileClock,
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
@@ -232,7 +232,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "Medication details",
-        url: "",
+        url: "/patients/medication",
         icon: FileClock,
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),

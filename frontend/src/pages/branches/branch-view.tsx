@@ -16,7 +16,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import type { Branch } from "@/services/branchServices";
 import { deleteBranch } from "@/services/branchServices";
 

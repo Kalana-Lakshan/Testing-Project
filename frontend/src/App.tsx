@@ -8,6 +8,7 @@ import StaffSignUp from './pages/Authentication/staff-sign-up';
 import Users from './pages/users/activeUsers';
 import DoctorsDetails from './pages/doctors/doctorsDetails';
 import { ThemeProvider } from './components/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
 import DoctorSpeciality from './pages/doctors/doctorSpeciality';
 import AddDoctor from './pages/doctors/addDoctor';
 import Speciality from './pages/specialities/speciality';
@@ -21,6 +22,11 @@ import CurrentPatients from './pages/patients/currentPatients';
 import ExPatients from './pages/patients/exPatients';
 import Branches from './pages/branches/branches';
 import Home from './pages/Home';
+import MedicalHistory from './pages/patients/medicalhistory/medicalhistory';
+import TreatmentAdd from './pages/patients/treatment/treatment_add';
+import Treatments from './pages/patients/treatment/treatment';
+import Medications from './pages/patients/medication/medication';
+
 import { useNavigate } from "react-router-dom";
 import {
   LOCAL_STORAGE__ROLE,
@@ -74,6 +80,7 @@ function App() {
   ) : (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <>
+        <Toaster position="top-right" />
         <Routes>
 
           <Route
@@ -282,6 +289,45 @@ function App() {
                 </>
               }
             />
+
+            <Route path="/patients/treatment" element={
+              <>
+                <PageTitle title="Patient Treatments | MedSync" />
+                <Treatments />
+              </>
+            } />
+
+            <Route
+              path="/patients/treatment/add"
+              element={
+                <>
+                  <PageTitle title="Add Treatment | MedSync" />
+                  <TreatmentAdd />
+                </>
+              }
+            />
+
+            <Route
+              path="/patients/medical-history"
+              element={
+                <>
+                  <PageTitle title="Patient Medical History | MedSync" />
+                  <MedicalHistory />
+                </>
+              }
+            />
+
+
+            <Route
+              path="/patients/medication"
+              element={
+                <>
+                  <PageTitle title="Patient Medications | MedSync" />
+                  <Medications />
+                </>
+              }
+            />
+
 
           </Route>
         </Routes>

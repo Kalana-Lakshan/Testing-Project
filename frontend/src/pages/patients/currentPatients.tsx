@@ -5,7 +5,7 @@ import { DataTable } from "@/components/data-table";
 import { getAllBranches } from "@/services/branchServices";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import ViewPatient from "./patient-view";
 import { getPatients, type Patient } from "@/services/patientServices";
 import { Label } from "@/components/ui/label";
@@ -174,7 +174,7 @@ const CurrentPatients: React.FC = () => {
     const tableState = table.getState();
     const page = tableState.pagination.pageIndex + 1;
     const itemsPerPage = tableState.pagination.pageSize;
-    toast.loading("Loading...");
+    const loadingId = toast.loading("Loading...");
 
     try {
       const response = await Promise.allSettled([
@@ -201,10 +201,10 @@ const CurrentPatients: React.FC = () => {
       if (error.response?.status === 404) {
         setErrorCode(404);
       } else {
-        toast.error("Failed to fetch staff");
+        toast.error("Failed to fetch patients");
       }
     } finally {
-      toast.dismiss();
+      toast.dismiss(loadingId);
     }
   }, [table, selectedGender, selectedBloodType, selectedBranch]);
 

@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getAllSpecialities } from '@/services/specialityServices';
 import { addDoctor } from '@/services/doctorServices';
 import { getAllBranches } from '@/services/branchServices';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export default function AddDoctor() {
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ export default function AddDoctor() {
         if (data.speciality_count > 0) {
           setSpecialties(data.specialities);
         } else {
-          toast.error("No specialties found. Please add specialties first.");
+          toast.warning("No specialties found. Please add specialties first.");
         }
       } catch (error) {
         toast.error("Failed to load specialties");

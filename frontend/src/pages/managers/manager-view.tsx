@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import {
   Select,
   SelectContent,
@@ -61,7 +61,7 @@ const ViewBranchManager: React.FC<ViewManagerProps> = ({
 
   const handleUpdate = async () => {
     if (!selectedManager) return;
-    toast.loading("Updating branch manager...");
+    const loadingId = toast.loading("Updating branch manager...");
 
     try {
       const data = {
@@ -78,7 +78,7 @@ const ViewBranchManager: React.FC<ViewManagerProps> = ({
     } catch (error) {
       toast.error("Failed to update manager details.");
     } finally {
-      toast.dismiss();
+      toast.dismiss(loadingId);
     }
   };
 
