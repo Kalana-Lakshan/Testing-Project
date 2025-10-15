@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 import { createTreatment, isServiceCodeTaken, type TreatmentCreateInput } from "@/services/treatmentServices";
 
@@ -81,7 +81,7 @@ const TreatmentAdd: React.FC = () => {
       const payload = {
         service_code: form.service_code.trim(),
         name: form.name.trim(),
-        fee: Number(form.fee), 
+        fee: Number(form.fee),
         description: form.description.trim(),
         speciality_id: form.speciality_id.trim(),
       };

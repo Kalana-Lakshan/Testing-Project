@@ -8,6 +8,7 @@ import StaffSignUp from './pages/Authentication/staff-sign-up';
 import Users from './pages/users/activeUsers';
 import DoctorsDetails from './pages/doctors/doctorsDetails';
 import { ThemeProvider } from './components/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
 import DoctorSpeciality from './pages/doctors/doctorSpeciality';
 import AddDoctor from './pages/doctors/addDoctor';
 import Speciality from './pages/specialities/speciality';
@@ -79,6 +80,7 @@ function App() {
   ) : (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <>
+        <Toaster position="top-right" />
         <Routes>
 
           <Route

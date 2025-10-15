@@ -2,7 +2,7 @@ import { DataTable } from "../../../components/data-table";
 import { useEffect, useState } from "react";
 import { getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { getAllMedications, getMedicationsByPatientId, type medication } from "@/services/medicationServices";
 // import { Link } from "react-router-dom";
 const Medications: React.FC = () => {
@@ -121,14 +121,14 @@ const Medications: React.FC = () => {
   const handleSearch = async () => {
     const parsed = parseInt(patientIdInput.trim(), 10);
     if (Number.isNaN(parsed)) {
-      toast.error("Please enter a valid integer Patient ID");
+      toast.warning("Please enter a valid integer Patient ID");
       return;
     }
     const t = toast.loading(`Loading medications for patient ${parsed}...`);
     try {
       const data = await getMedicationsByPatientId(parsed);
       setMedications(data);
-      toast.success(`Loaded ${data.length} record(s)`);
+      toast.info(`Loaded ${data.length} record(s)`);
     } catch (e: any) {
       const msg =
         e?.response?.data?.message ??

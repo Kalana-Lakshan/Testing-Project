@@ -3,7 +3,6 @@ import { DataTable } from "../../components/data-table"
 import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
 import { createTimer, formatRole, Role, toNormalTimestamp } from "@/services/utils";
 import { Eye, Trash } from "lucide-react";
 import DeleteUser from "./user-delete";
@@ -14,6 +13,7 @@ import { getAllBranches } from "@/services/branchServices";
 import { Roles } from "../Authentication/staff-sign-up";
 import { LOCAL_STORAGE__ROLE, LOCAL_STORAGE__USER } from "@/services/authServices";
 import { Navigate } from "react-router-dom";
+import toast from "@/lib/toast";
 
 
 const Users: React.FC = () => {
@@ -156,7 +156,7 @@ const Users: React.FC = () => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [pageCount, setPageCount] = useState<number>(-1); // total pages
+  const [pageCount, setPageCount] = useState<number>(-1);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
@@ -179,7 +179,7 @@ const Users: React.FC = () => {
     const tableState = table.getState();
     const page = tableState.pagination.pageIndex + 1;
     const itemsPerPage = tableState.pagination.pageSize;
-    toast.loading("Loading...");
+    const loadingId = toast.loading("Loading...");
 
     return Promise.allSettled([
       getAllUsers(
@@ -209,7 +209,11 @@ const Users: React.FC = () => {
         }
       })
       .finally(() => {
-        toast.dismiss();
+        try {
+          toast.dismiss(loadingId);
+        } catch (e) {
+          console.log(e);
+        }
       });
   }, [table, selectedBranch, selectedRole]);
 

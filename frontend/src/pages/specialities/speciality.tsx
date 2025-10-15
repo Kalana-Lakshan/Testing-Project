@@ -28,7 +28,7 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export default function SpecialityPage() {
   const [specialities, setSpecialities] = useState<Speciality[]>([]);
@@ -70,7 +70,7 @@ export default function SpecialityPage() {
   const handleAdd = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!name.trim() || !description.trim()) {
-      toast.error("Please provide both name and description.");
+  toast.warning("Please provide both name and description.");
       return;
     }
     setSubmitting(true);

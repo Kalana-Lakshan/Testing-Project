@@ -2,7 +2,7 @@ import { DataTable } from "../../components/data-table"
 import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { createTimer, formatSalary } from "@/services/utils";
 import { Eye } from "lucide-react";
 import { Label } from "../../components/ui/label";
@@ -122,7 +122,7 @@ const BranchManagerPage: React.FC = () => {
   });
 
   const fetchStaff = useCallback(async () => {
-    toast.loading("Loading...");
+    const loadingId = toast.loading("Loading...");
 
     try {
       const response = await Promise.allSettled([
@@ -148,7 +148,7 @@ const BranchManagerPage: React.FC = () => {
         toast.error("Failed to fetch staff");
       }
     } finally {
-      toast.dismiss();
+      toast.dismiss(loadingId);
     }
   }, [table, selectedBranch]);
 

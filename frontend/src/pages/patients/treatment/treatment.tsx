@@ -3,13 +3,13 @@ import { DataTable } from "../../../components/data-table";
 import { useEffect, useState } from "react";
 import { getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { Link } from "react-router-dom";
 
 
 
 const Treatments: React.FC = () => {
-  
+
   const [treatments, setTreatments] = useState<Array<Treatment>>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -50,10 +50,10 @@ const Treatments: React.FC = () => {
         </Button>
       ),
       cell: ({ getValue }) => {
-      const v = getValue<number | string>();
-      const num = typeof v === "string" ? parseFloat(v) : v;
-      return "Rs. " + (num ?? 0).toFixed(2); // -> Rs. 500.00
-    },
+        const v = getValue<number | string>();
+        const num = typeof v === "string" ? parseFloat(v) : v;
+        return "Rs. " + (num ?? 0).toFixed(2); // -> Rs. 500.00
+      },
     },
     {
       accessorKey: "description",
@@ -72,8 +72,8 @@ const Treatments: React.FC = () => {
     //   header: "Speciality ID",
     // },
     {
-        accessorKey: "speciality_name",
-        header: "Speciality Name",
+      accessorKey: "speciality_name",
+      header: "Speciality Name",
     }
   ];
 
@@ -90,14 +90,14 @@ const Treatments: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      toast.loading("Loading treatments...");
+      const loadingId = toast.loading("Loading treatments...");
       try {
-        const data = await getAllTreatments(); 
+        const data = await getAllTreatments();
         setTreatments(data.treatments);
       } catch (error) {
         toast.error("Failed to fetch treatments");
       } finally {
-        toast.dismiss();
+        toast.dismiss(loadingId);
       }
     };
     fetchData();

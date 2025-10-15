@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { getAllBranches, type Branch } from "@/services/branchServices";
 import {
   Select,
@@ -61,7 +61,7 @@ const ViewPatient: React.FC<ViewPatientProps> = ({
 
   const handleUpdate = async () => {
     if (!selectedPatient) return;
-    toast.loading("Updating patient...");
+    const loadingId = toast.loading("Updating patient...");
 
     try {
       const data = {
@@ -78,7 +78,7 @@ const ViewPatient: React.FC<ViewPatientProps> = ({
     } catch (error) {
       toast.error("Failed to update patient.");
     } finally {
-      toast.dismiss();
+      toast.dismiss(loadingId);
     }
   };
 

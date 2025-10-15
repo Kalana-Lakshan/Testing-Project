@@ -1,15 +1,9 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { useEffect } from "react";
-import toast, { Toaster, useToasterStore } from "react-hot-toast";
 import { Outlet, useLocation } from "react-router-dom";
 
-const TOAST_LIMIT = 3;
-
-
 export default function DefaultLayout() {
-	const { toasts } = useToasterStore();
 	const location = useLocation();
 
 	const pathSegments = location.pathname.split("/").filter(Boolean);
@@ -23,16 +17,9 @@ export default function DefaultLayout() {
 			path: `/${pathSegments.slice(0, index + 1).join("/")}`,
 		})));
 
-	useEffect(() => {
-		toasts
-			.filter((t) => t.visible)
-			.filter((_, i) => i >= TOAST_LIMIT)
-			.forEach((t) => toast.dismiss(t.id));
-	}, [toasts]);
 
 	return (
 		<SidebarProvider>
-			<Toaster position="top-right" />
 			<AppSidebar />
 			<SidebarInset className="2xl:px-10">
 				<header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">

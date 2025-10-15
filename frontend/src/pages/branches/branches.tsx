@@ -12,7 +12,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { getBranchesForPagination, createBranch, type Branch } from "@/services/branchServices";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 
 const Branches: React.FC = () => {
   const [branches, setBranches] = useState<Array<Branch>>([]);
@@ -49,7 +49,7 @@ const Branches: React.FC = () => {
   const handleAdd = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!name.trim() || !location.trim()) {
-      toast.error("Please provide name and location");
+      toast.warning("Please provide name and location");
       return;
     }
     setSubmitting(true);

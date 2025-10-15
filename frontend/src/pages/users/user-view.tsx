@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { editUser, type User } from "@/services/userService";
 import {
   Select,
@@ -63,7 +63,7 @@ const ViewUser: React.FC<ViewUserProps> = ({
 
   const handleUpdate = async () => {
     if (!selectedUser) return;
-    toast.loading("Updating user...");
+    const loadingId = toast.loading("Updating user...");
 
     try {
       const data = {
@@ -79,7 +79,7 @@ const ViewUser: React.FC<ViewUserProps> = ({
     } catch (error) {
       toast.error("Failed to update user.");
     } finally {
-      toast.dismiss();
+      toast.dismiss(loadingId);
     }
   };
 
