@@ -4,16 +4,16 @@ import { getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type
 import { Button } from "@/components/ui/button";
 import { getPatientDashboardDetails, type PatientDashboardDetails, } from "@/services/patientDashboardServices";
 import { DataTable } from "../components/data-table";
-import toast from "react-hot-toast";
 import { type medicalHistory, getMedicalHistoriesByPatientId } from "@/services/medicalhistoryServices";
 import { getMedicationsByPatientId, type medication } from "@/services/medicationServices";
 import { getAppointmentsByPatientId, type appointment as Appointment } from "@/services/appoinmentServices"; // keep filename consistent
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Droplet, MapPin, Phone, User } from "lucide-react";
-import { calculateAge } from "@/lib/utils";
 import { CalendarDays, Clock } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import toast from "@/lib/toast";
+import { calculateAge } from "@/services/utils";
 
 
 export default function PatientDashboard() {
@@ -118,7 +118,7 @@ export default function PatientDashboard() {
               <p className="font-medium text-base text-white flex items-center gap-1">
                 <Calendar className="w-4 h-4 text-blue-500" /> Age:
               </p>
-              <p>{calculateAge(patientDetails.date_of_birth)}</p>
+              <p>{calculateAge(patientDetails.nic, patientDetails.date_of_birth)}</p>
             </div>
             <div>
               <p className="font-medium text-base text-white flex items-center gap-1">
