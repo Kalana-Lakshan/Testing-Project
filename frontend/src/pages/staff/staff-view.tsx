@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getAllBranches, type Branch } from "@/services/branchServices";
 import { StaffRoles } from "../Authentication/staff-sign-up";
@@ -47,7 +47,7 @@ const ViewStaff: React.FC<ViewStaffProps> = ({ isOpen, selectedStaff, onFinished
 
   const handleUpdate = async () => {
     if (!selectedStaff) return;
-    toast.loading("Updating staff...");
+    const loadingId = toast.loading("Updating staff...");
 
     try {
       const data = {
@@ -65,7 +65,7 @@ const ViewStaff: React.FC<ViewStaffProps> = ({ isOpen, selectedStaff, onFinished
     } catch (error) {
       toast.error("Failed to update staff.");
     } finally {
-      toast.dismiss();
+      toast.dismiss(loadingId);
     }
   };
 
@@ -85,7 +85,7 @@ const ViewStaff: React.FC<ViewStaffProps> = ({ isOpen, selectedStaff, onFinished
           {/* Name */}
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" value={name} disabled={!isEditing} onChange={(e) => setName(e.target.value)} className="md:w-[50%]" />
+            <Input id="name" value={name} disabled={!isEditing} onChange={(e) => setName(e.target.value)} className="md:w-full" />
           </div>
 
           <div className="grid md:grid-cols-2 gap-2">

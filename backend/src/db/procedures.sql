@@ -107,22 +107,51 @@ DROP PROCEDURE IF EXISTS get_all_logs;
 
 DROP PROCEDURE IF EXISTS get_logs_count;
 
--- Treatment model functions
-DROP PROCEDURE IF EXISTS `get_all_treatments`;
+-- Doctors model functions
+DROP PROCEDURE IF EXISTS create_doctor;
 
-DROP PROCEDURE IF EXISTS `check_service_code_exists`;
+DROP PROCEDURE IF EXISTS get_all_doctors;
 
-DROP PROCEDURE IF EXISTS `create_treatment`;
+DROP PROCEDURE IF EXISTS update_doctor_by_id;
 
--- Medical History model functions
-DROP PROCEDURE IF EXISTS `get_all_medical_histories`;
--- Medication model functions
-DROP PROCEDURE IF EXISTS `get_all_medications`;
+DROP PROCEDURE IF EXISTS get_all_doctors_count;
 
-DROP PROCEDURE IF EXISTS `get_medications_by_patient_id`;
+DROP PROCEDURE IF EXISTS get_doctor_by_id;
 
--- Appointment model functions
-DROP PROCEDURE IF EXISTS `get_appointments_by_patient_id`;
+-- speciality model functions
+DROP PROCEDURE IF EXISTS create_speciality;
+
+DROP PROCEDURE IF EXISTS update_speciality;
+
+DROP PROCEDURE IF EXISTS get_speciality_by_id;
+
+DROP PROCEDURE IF EXISTS get_all_specialities_pagination;
+
+DROP PROCEDURE IF EXISTS get_all_speciality;
+
+DROP PROCEDURE IF EXISTS get_speciality_count;
+
+DROP PROCEDURE IF EXISTS delete_speciality;
+
+-- doctor-speciality model functions
+DROP PROCEDURE IF EXISTS link_doctor_specialty;
+
+DROP PROCEDURE IF EXISTS get_all_doctor_speciality;
+
+-- treatment model functions
+DROP PROCEDURE IF EXISTS create_treatment;
+
+DROP PROCEDURE IF EXISTS get_all_treatments;
+
+DROP PROCEDURE IF EXISTS check_service_code_exists;
+
+-- medical history model functions
+DROP PROCEDURE IF EXISTS get_all_medical_histories;
+
+-- medication model functions
+DROP PROCEDURE IF EXISTS get_all_medications;
+
+DROP PROCEDURE IF EXISTS get_medications_by_patient_id;
 
 DELIMITER $$
 
@@ -640,11 +669,11 @@ CREATE PROCEDURE get_all_logs(
     IN log_offset INT
 )
 BEGIN
-    SELECT l.log_id, l.user_id, l.user_role, a.name, l.table_name, l.record_id, l.details
+    SELECT l.log_id, l.user_id, u.username, l.user_role, a.name AS action, l.table_name, l.record_id, l.time_stamp, l.details
     FROM `log` l
-    LEFT JOIN `action` a
-    ON l.action_id = a.action_id
-    ORDER BY l.log_id
+    LEFT JOIN `action` a ON l.action_id = a.action_id
+    LEFT JOIN `user` u ON u.user_id = l.user_id
+    ORDER BY l.log_id DESC
     LIMIT log_count OFFSET log_offset;
 END$$
 
@@ -654,29 +683,167 @@ BEGIN
     FROM `log`;
 END$$
 
--- treatment  functions
+-- doctor model functions
+CREATE PROCEDURE create_doctor(
+    IN p_user_id INT,
+    IN p_name VARCHAR(50),
+    IN p_gender VARCHAR(6),
+    IN p_fee_per_patient numeric(8,2),
+    IN p_monthly_salary numeric(8,2)
+)
+BEGIN
+    INSERT INTO `doctor` (user_id, name, gender, fee_per_patient, monthly_salary)
+    VALUES (p_user_id, p_name, p_gender, p_fee_per_patient, p_monthly_salary);
+END$$
 
--- CREATE PROCEDURE to get all treatments
+CREATE PROCEDURE update_doctor_by_id(
+    IN p_user_id INT,
+    IN p_name VARCHAR(50),
+    IN p_gender VARCHAR(6),
+    IN p_branch_id INT,
+    IN p_fee_per_patient numeric(8,2),
+    IN p_monthly_salary numeric(8,2)
+)
+BEGIN
+    UPDATE `doctor`
+    SET name = p_name,
+        gender = p_type,
+        gender = p_gender,
+        fee_per_patient = p_fee_per_patient,
+        basic_monthly_salary = p_monthly_salary
+    WHERE doctor_id = p_user_id;
 
-CREATE PROCEDURE `get_all_treatments`()
+    UPDATE `user`
+    SET branch_id = p_branch_id
+    WHERE user_id = p_staff_id;
+END$$
+
+CREATE PROCEDURE get_doctor_by_id(IN p_id INT)
+BEGIN
+    SELECT d.doctor_id, d.name, d.gender, b.branch_id, b.name AS branch_name, d.fee_per_patient, d.basic_monthly_salary
+    FROM `doctor` d
+    LEFT JOIN `user` u ON d.doctor_id = u.user_id
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE d.doctor_id = p_id;
+END$$
+
+CREATE PROCEDURE get_all_doctors(
+    IN doc_count INT, 
+    IN doc_offset INT,
+    IN doc_branch INT
+)
+BEGIN
+    SELECT d.doctor_id, d.name, d.gender, b.branch_id, b.name AS branch_name, d.fee_per_patient, d.basic_monthly_salary
+    FROM `doctor` d
+    LEFT JOIN `user` u ON d.doctor_id = u.user_id
+    LEFT JOIN `branch` b ON u.branch_id = b.branch_id
+    WHERE (doc_branch = -1 OR b.branch_id = doc_branch)
+    ORDER BY d.doctor_id
+    LIMIT doc_count OFFSET doc_offset;
+END$$
+
+CREATE PROCEDURE get_all_doctors_count(IN doc_branch INT)
+BEGIN
+    SELECT COUNT(*) AS doctor_count
+    FROM `user` u
+    WHERE u.role = 'Doctor'
+        AND (doc_branch = -1 OR u.branch_id = doc_branch);
+END$$
+
+-- Speciality model functions
+CREATE PROCEDURE create_speciality(
+    IN p_speciality_name VARCHAR(20),
+    IN p_description VARCHAR(255)
+)
+BEGIN
+    INSERT INTO `speciality` (speciality_name, description)
+    VALUES (p_speciality_name, p_description);
+    SELECT * FROM `speciality` WHERE speciality_id = LAST_INSERT_ID();
+END$$
+
+CREATE PROCEDURE update_speciality(
+    IN p_speciality_id INT,
+    IN p_speciality_name VARCHAR(20),
+    IN p_description VARCHAR(255)
+)
+BEGIN
+    UPDATE `speciality`
+    SET speciality_name = p_speciality_name,
+        description = p_description
+    WHERE speciality_id = p_speciality_id;
+END$$
+
+CREATE PROCEDURE get_speciality_by_id(IN p_speciality_id INT)
+BEGIN
+    SELECT speciality_id, speciality_name, description
+    FROM `speciality`
+    WHERE speciality_id = p_speciality_id;
+END$$
+
+CREATE PROCEDURE get_all_specialities_pagination(
+    IN speciality_count INT,
+    IN count_start INT
+)
+BEGIN
+    SELECT speciality_id, speciality_name, description
+    FROM `speciality`
+    ORDER BY speciality_id
+    LIMIT speciality_count OFFSET count_start;
+END$$
+
+CREATE PROCEDURE get_all_speciality()
+BEGIN
+    SELECT speciality_id, speciality_name, description
+    FROM `speciality`
+    ORDER BY speciality_id;
+END$$
+
+CREATE PROCEDURE get_speciality_count()
+BEGIN
+    SELECT COUNT(speciality_id) AS speciality_count
+    FROM `speciality`;
+END$$
+
+CREATE PROCEDURE delete_speciality(IN p_speciality_id INT)
+BEGIN
+    DELETE FROM `speciality` WHERE speciality_id = p_speciality_id;
+END$$
+
+-- Doctor-Speciality model functions
+CREATE PROCEDURE link_doctor_specialty(
+    IN p_doctor_id INT,
+    IN p_speciality_id INT
+)
+BEGIN
+    INSERT INTO `doctor_speciality` (doctor_id, speciality_id)
+    VALUES (p_doctor_id, p_speciality_id);
+END$$
+
+CREATE PROCEDURE get_all_doctor_speciality()
+BEGIN
+    SELECT d.doctor_id, d.name AS doctor_name, s.speciality_id, s.speciality_name, s.description, ds.added_at
+    FROM `doctor_speciality` ds
+    LEFT JOIN `doctor` d ON ds.doctor_id = d.doctor_id
+    LEFT JOIN `speciality` s ON ds.speciality_id = s.speciality_id
+    ORDER BY d.doctor_id, s.speciality_name;
+END$$
+
+-- treatment model functions
+CREATE PROCEDURE get_all_treatments()
 BEGIN
   select tc.service_code, tc.name, tc.fee , tc.description, tc.speciality_id, speciality_name 
 from treatment_catelogue as tc left outer join speciality as s on tc.speciality_id = s.speciality_id
   ORDER BY service_code;
 END$$
 
--- CREATE PROCEDURE to CHECK SERVICE CODE EXISTS
-
-CREATE PROCEDURE `check_service_code_exists`(IN p_code INT)
+CREATE PROCEDURE check_service_code_exists(IN p_code INT)
 BEGIN
   SELECT EXISTS(
     SELECT 1 FROM treatment_catelogue WHERE service_code = p_code
   ) AS exists_flag;
 END$$
 
--- CREATE PROCEDURE to CREATE A NEW TREATMENT
-
-CREATE PROCEDURE `create_treatment`(
+CREATE PROCEDURE create_treatment(
   IN p_service_code INT,
   IN p_name         VARCHAR(50),
   IN p_fee          DECIMAL(8,2),
@@ -694,28 +861,12 @@ BEGIN
 END$$
 
 -- medical history model functions
-
--- CREATE PROCEDURE to get all medical histories
-
 CREATE PROCEDURE get_all_medical_histories()
 BEGIN
     SELECT * FROM `medical_history`;
 END$$
 
--- CREATE PROCEDURE to get medical histories by patient id
-CREATE PROCEDURE get_medical_histories_by_patient_id(IN p_patient_id INT)
-BEGIN
-  SELECT pat.patient_id, mh.appointment_id, visit_date, diagnosis, symptoms, allergies, notes, follow_up_date, created_at, updated_at
-  FROM medical_history AS mh
-  JOIN appointment as a ON mh.appointment_id = a.appointment_id
-  JOIN patient      AS pat ON a.patient_id     = pat.patient_id
-  WHERE a.patient_id = p_patient_id
-  ORDER BY mh.created_at DESC;
-END$$
-
--- medication history of a patient
-
--- CREATE PROCEDURE to get medication history
+-- medication model functions
 CREATE PROCEDURE get_all_medications()
 BEGIN
     SELECT appointment_id, consultation_note, prescription_items_details, prescribed_at, is_active, patient_id, name
@@ -724,7 +875,6 @@ BEGIN
     NATURAL JOIN patient;
 END$$
 
--- create procedure to get medications by patient id
 CREATE PROCEDURE get_medications_by_patient_id(IN p_patient_id INT)
 BEGIN
   SELECT p.appointment_id, a.patient_id, pat.name AS name, p.consultation_note AS consultation_note, p.prescription_items_details, p.prescribed_at, p.is_active
@@ -734,17 +884,5 @@ BEGIN
   WHERE a.patient_id = p_patient_id
   ORDER BY p.prescribed_at DESC;
 END$$
-
--- CREATE PROCEDURE to GET APPOINTMENTS BY PATIENT ID
-CREATE PROCEDURE get_appointments_by_patient_id(IN p_patient_id INT)
-BEGIN
-	select ap.appointment_id , ap.doctor_id, ap.date, ap.time_slot, ap.status, d.name
-	from appointment as ap join doctor as d
-	on ap.doctor_id= d.doctor_id
-	where ap.patient_id = p_patient_id
-	ORDER BY ap.date DESC;
-END$$
-
-
 
 DELIMITER;

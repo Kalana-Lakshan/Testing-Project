@@ -15,7 +15,7 @@ import { patientSignup, type PatientData } from "@/services/authServices"
 import { getAllBranches } from "@/services/branchServices"
 import { toMySQLDate } from "@/services/utils"
 import { useEffect, useState } from "react"
-import toast from "react-hot-toast"
+import toast from "@/lib/toast"
 import { Link, useNavigate } from "react-router-dom"
 
 
@@ -103,7 +103,7 @@ const PatientSignUp: React.FC = () => {
       address === "" ||
       selectedBranch === ""
     ) {
-      toast.error("Please fill all the required details");
+      toast.warning("Please fill all the required details");
       setLoading(false);
     } else if (password !== confirmPassword) {
       toast.error("Passwords do not match")

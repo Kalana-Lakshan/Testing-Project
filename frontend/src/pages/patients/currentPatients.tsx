@@ -5,7 +5,7 @@ import { DataTable } from "@/components/data-table";
 import { getAllBranches } from "@/services/branchServices";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import ViewPatient from "./patient-view";
 import { getPatients, type Patient } from "@/services/patientServices";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,7 @@ import { createTimer, formatDate } from "@/services/utils";
 
 const CurrentPatients: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
+  const [patientCount, setPatientCount] = useState<number>(0);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [action, setAction] = useState<"edit" | null>(null);
   const [selectedGender, setSelectedGender] = useState<string>("All");
@@ -173,7 +174,7 @@ const CurrentPatients: React.FC = () => {
     const tableState = table.getState();
     const page = tableState.pagination.pageIndex + 1;
     const itemsPerPage = tableState.pagination.pageSize;
-    toast.loading("Loading...");
+    const loadingId = toast.loading("Loading...");
 
     try {
       const response = await Promise.allSettled([
@@ -193,16 +194,17 @@ const CurrentPatients: React.FC = () => {
       }
 
       setPatients(response[0].value.patients);
+      setPatientCount(response[0].value.patient_count)
       setPageCount(Math.ceil(response[0].value.patient_count / itemsPerPage));
       setErrorCode(null);
     } catch (error: any) {
       if (error.response?.status === 404) {
         setErrorCode(404);
       } else {
-        toast.error("Failed to fetch staff");
+        toast.error("Failed to fetch patients");
       }
     } finally {
-      toast.dismiss();
+      toast.dismiss(loadingId);
     }
   }, [table, selectedGender, selectedBloodType, selectedBranch]);
 
@@ -229,7 +231,13 @@ const CurrentPatients: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <div className="space-y-6 p-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h2 className="text-lg font-medium">Current Patients</h2>
+          <p className="text-sm text-muted-foreground">{patientCount} items</p>
+        </div>
+      </div>
       <div className="grid gap-4 grid-cols-8 mb-4">
         <div className="grid gap-2">
           <Label>Gender</Label>
@@ -295,7 +303,7 @@ const CurrentPatients: React.FC = () => {
           setSelectedPatient(null);
         }}
       />
-    </>
+    </div>
   );
 };
 

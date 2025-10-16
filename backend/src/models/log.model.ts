@@ -19,13 +19,14 @@ export const Actions = [
   },
   {
     action_id: 5,
-    action: "VIEW",
+    action: "LOGOUT",
   },
 ]
 
 export interface Log {
   log_id: number,
   user_id: number,
+  username: string,
   user_role: string,
   action: string,
   table_name: string,

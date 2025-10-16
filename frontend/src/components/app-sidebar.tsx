@@ -30,7 +30,9 @@ import {
   UsersRound,
   UserRoundX,
   UserRoundCheck,
-  MapPinHouse
+  MapPinHouse,
+  Logs,
+  UserPen
 } from "lucide-react"
 // billing and paments - Receipt
 // patient - Users
@@ -73,7 +75,6 @@ import {
 
 
 import { NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { LOCAL_STORAGE__ROLE, LOCAL_STORAGE__TOKEN, LOCAL_STORAGE__USER, LOCAL_STORAGE__USER_ID, LOCAL_STORAGE__USERNAME } from "@/services/authServices";
 import { formatRole, Role } from "@/services/utils";
 
@@ -119,7 +120,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
   {
     type: "child",
     title: "Dashboard",
-    url: "/",
+    url: "/dashboard",
     icon: Hospital,
     // hideIf: (role) => typeof role !== "string" ||
     //   ![ROLE_RECEPTIONIST, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
@@ -131,6 +132,22 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     icon: MapPinHouse,
     // hideIf: (role) => typeof role !== "string" ||
     //   ![ROLE_RECEPTIONIST, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+  },
+  {
+    type: "child",
+    title: "Reports",
+    url: "",
+    icon: ClipboardPenLine,
+    // hideIf: (role) => typeof role !== "string" ||
+    //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+  },
+  {
+    type: "child",
+    title: "Logs",
+    url: "/logs",
+    icon: Logs,
+    // hideIf: (role) => typeof role !== "string" ||
+    //   ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
   },
   {
     type: "parent",
@@ -159,7 +176,7 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       {
         type: "child",
         title: "All Managers",
-        url: "",
+        url: "/branch-managers",
         icon: UserSearch,
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_ADMIN_STAFF, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
@@ -172,14 +189,6 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_ADMIN_STAFF, ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
-      // {
-      //   type: "child",
-      //   title: "Reports",
-      //   url: "",
-      //   icon: ClipboardPenLine,
-      //   hideIf: (role) => typeof role !== "string" ||
-      //     ![ROLE_DOCTOR, ROLE_ADMIN_STAFF, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      // },
     ],
   },
   {
@@ -206,39 +215,6 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
       },
       {
         type: "child",
-        title: "Appointment details",
-        url: "/doctors-appointments",
-        icon: FileUser,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
-        title: "Patients' history",
-        url: "/doctors-patients-history",
-        icon: BookUser,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
-        title: "Doctors' specialities",
-        url: "/doctors-specialities",
-        icon: BookUser,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      {
-        type: "child",
-        title: "Speciality",
-        url: "/speciality",
-        icon: BookUser,
-        hideIf: (role) => typeof role !== "string" ||
-          ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
-      },
-      
-      {
-        type: "child",
         title: "Medical History",
         url: "/patients/medical-history",
         icon: BookOpen,
@@ -260,7 +236,23 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
         icon: FileClock,
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT, ROLE_RECEPTIONIST, ROLE_BILLING_STAFF].includes(role),
-      }
+      },
+      {
+        type: "child",
+        title: "**Appointment details",
+        url: "/doctors-appointments",
+        icon: FileUser,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
+        title: "**Patients' history",
+        url: "/doctors-patients-history",
+        icon: BookUser,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
     ],
   },
   // {
@@ -311,23 +303,31 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
     children: [
       {
         type: "child",
+        title: "Add Doctor",
+        url: "/doctors/add",
+        icon: UserPen,
+        // hideIf: (role) => typeof role !== "string" ||
+        //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
+      },
+      {
+        type: "child",
         title: "All Doctors",
-        url: "",
-        icon: HeartPulse,
+        url: "/doctors",
+        icon: UsersRound,
         // hideIf: (role) => typeof role !== "string" ||
         //   ![ROLE_DOCTOR, ROLE_BRANCH_MANAGER, ROLE_SUPER_ADMIN].includes(role),
       },
       {
         type: "child",
         title: "Doctors' Specialities",
-        url: "",
+        url: "/doctors/specialities",
         icon: FileUser,
-        hideIf: (role) => typeof role !== "string",
+        // hideIf: (role) => typeof role !== "string",
       },
       {
         type: "child",
         title: "All Specialities",
-        url: "",
+        url: "/speciality",
         icon: BookUser,
         // hideIf: (role) => typeof role !== "string" ||
         //   [ROLE_PATIENT, ROLE_INSURANCE_AGENT].includes(role),
@@ -458,7 +458,6 @@ const items: Array<SidebarItemLink | SidebarItemGroup> = [
 ]
 
 export function AppSidebar() {
-  const [loading, setLoading] = useState<boolean>(false);
   const { toggleSidebar, open } = useSidebar();
   const navigate = useNavigate();
   const userStringified = localStorage.getItem(LOCAL_STORAGE__USER);
@@ -475,15 +474,7 @@ export function AppSidebar() {
     navigate("/sign-in");
   };
 
-  return loading ? (
-    <SidebarMenu>
-      {Array.from({ length: 5 }).map((_, index) => (
-        <SidebarMenuItem key={index}>
-          <SidebarMenuSkeleton />
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
-  ) : (
+  return (
     <Sidebar
       collapsible="icon"
       onClick={!open ? toggleSidebar : undefined}

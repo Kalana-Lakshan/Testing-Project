@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { signin } from "@/services/authServices"
 import { useEffect, useState } from "react"
-import toast from "react-hot-toast"
+import toast from "@/lib/toast"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 
@@ -29,21 +29,21 @@ const StaffSignIn: React.FC = () => {
     if (username !== "" && password !== "") {
       await signin(username, password)
         .then(() => {
-          navigate("/");
+          navigate("/dashboard");
         })
         .catch((error) => {
           toast.error(error);
           setLoading(false);
         });
     } else if (username === "" || password === "") {
-      toast.error("Please enter your username and password");
+      toast.warning("Please enter your username and password");
       setLoading(false);
     }
   };
 
   useEffect(() => {
     if (token) {
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [token, navigate]);
 

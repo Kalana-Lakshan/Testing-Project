@@ -14,8 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { staffSignup, type StaffData } from "@/services/authServices"
 import { getAllBranches } from "@/services/branchServices"
 import { useEffect, useState } from "react"
-import toast from "react-hot-toast"
 import { Link, useNavigate } from "react-router-dom"
+import toast from "@/lib/toast"
 
 export const Roles = [
   {
@@ -150,7 +150,7 @@ const StaffSignUp: React.FC = () => {
       selectedRole === "" ||
       selectedBranch === ""
     ) {
-      toast.error("Please fill all the required details");
+      toast.warning("Please fill all the required details");
       setLoading(false);
     } else if (password !== confirmPassword) {
       toast.error("Passwords do not match")

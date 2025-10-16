@@ -3,7 +3,6 @@ import { DataTable } from "../../components/data-table"
 import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
 import { createTimer, formatRole, Role, toNormalTimestamp } from "@/services/utils";
 import { Eye, Trash } from "lucide-react";
 import DeleteUser from "./user-delete";
@@ -14,10 +13,12 @@ import { getAllBranches } from "@/services/branchServices";
 import { Roles } from "../Authentication/staff-sign-up";
 import { LOCAL_STORAGE__ROLE, LOCAL_STORAGE__USER } from "@/services/authServices";
 import { Navigate } from "react-router-dom";
+import toast from "@/lib/toast";
 
 
 const Users: React.FC = () => {
   const [Users, setUsers] = useState<Array<User>>([]);
+  const [userCount, setUserCount] = useState<number>(0);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [action, setAction] = useState<"edit" | "delete" | null>(null);
   const [selectedRole, setSelectedRole] = useState<string>("All");
@@ -109,8 +110,7 @@ const Users: React.FC = () => {
         }
         if (userRole === Role.SUPER_ADMIN) {
           return (
-            <div className="grid grid-cols-2 ">
-
+            <div className="flex gap-1 md:gap-2 lg:gap-5 place-content-center">
               <Button
                 size="icon"
                 variant="outline"
@@ -132,21 +132,20 @@ const Users: React.FC = () => {
               >
                 <Trash />
               </Button>
-
             </div>
           );
         } else if (userRole === Role.BRANCH_MANAGER) {
           return (
-              <Button
-                size="icon"
-                variant="outline"
-                onClick={() => {
-                  setSelectedUser(row.original);
-                  setAction("edit");
-                }}
-              >
-                <Eye />
-              </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                setSelectedUser(row.original);
+                setAction("edit");
+              }}
+            >
+              <Eye />
+            </Button>
           );
         }
       },
@@ -157,7 +156,7 @@ const Users: React.FC = () => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [pageCount, setPageCount] = useState<number>(-1); // total pages
+  const [pageCount, setPageCount] = useState<number>(-1);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
@@ -180,7 +179,7 @@ const Users: React.FC = () => {
     const tableState = table.getState();
     const page = tableState.pagination.pageIndex + 1;
     const itemsPerPage = tableState.pagination.pageSize;
-    toast.loading("Loading...");
+    const loadingId = toast.loading("Loading...");
 
     return Promise.allSettled([
       getAllUsers(
@@ -198,6 +197,7 @@ const Users: React.FC = () => {
           throw hu[0].reason;
         }
         setUsers(hu[0].value.users);
+        setUserCount(hu[0].value.user_count);
         console.log("set", hu[0].value, itemsPerPage);
         setPageCount(Math.ceil(hu[0].value.user_count / itemsPerPage));
       })
@@ -209,7 +209,11 @@ const Users: React.FC = () => {
         }
       })
       .finally(() => {
-        toast.dismiss();
+        try {
+          toast.dismiss(loadingId);
+        } catch (e) {
+          console.log(e);
+        }
       });
   }, [table, selectedBranch, selectedRole]);
 
@@ -236,7 +240,12 @@ const Users: React.FC = () => {
     fetchUsers();
   }, [fetchUsers, pagination, selectedRole, selectedBranch]);
   return (
-    <>
+    <div className="space-y-6 p-4">
+      <div>
+        <h2 className="text-lg font-medium">Active Users</h2>
+        <p className="text-sm text-muted-foreground">{userCount} items</p>
+      </div>
+
       <div className="grid gap-4 grid-cols-6 mb-4">
         <div className="grid gap-2">
           <Label>Role</Label>
@@ -298,7 +307,7 @@ const Users: React.FC = () => {
         }}
       />
       <DataTable table={table} />
-    </>
+    </div>
   );
 };
 

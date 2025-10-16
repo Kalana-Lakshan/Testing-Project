@@ -1,135 +1,265 @@
-import { useState, useEffect } from 'react';
-import PageTitle from "@/components/PageTitle";
-import { doctorService } from '@/services/doctorService';
-import type { Doctor } from '@/types/doctor.types';
-
-//adding a button to add new doctor
-import { Link } from 'react-router-dom';
+import { DataTable } from "../../components/data-table"
+import { useCallback, useEffect, useState } from "react";
+import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+import toast from "@/lib/toast";
+import { createTimer, formatSalary, Role } from "@/services/utils";
+import { Eye } from "lucide-react";
+import { Label } from "../../components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+import { getAllBranches } from "../../services/branchServices";
+import { LOCAL_STORAGE__ROLE, LOCAL_STORAGE__USER } from "@/services/authServices";
+import { Navigate } from "react-router-dom";
+import { getAllDoctors, type Doctor } from "@/services/doctorServices";
+import { Link } from "react-router-dom";
 
-//for table
-import { useReactTable, getCoreRowModel, getSortedRowModel, getFilteredRowModel, getPaginationRowModel, type ColumnDef, type SortingState, type ColumnFiltersState } from "@tanstack/react-table";
-import { DataTable } from "@/components/data-table";
-import { Input } from "@/components/ui/input";
 
 
-export default function DoctorsDetails() {
-  // State variables - like boxes that hold our data
-  const [doctors, setDoctors] = useState<Doctor[]>([]);  // Array of doctors
-  const [loading, setLoading] = useState<boolean>(true);  // Is data loading?
-  const [error, setError] = useState<string | null>(null);  // Any error message
+const DoctorsDetails: React.FC = () => {
+  const [Doctors, setDoctors] = useState<Array<Doctor>>([]);
+  const [doctorCount, setDoctorCount] = useState<number>(0);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [action, setAction] = useState<"edit" | null>(null);
+  const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
+  const [errorCode, setErrorCode] = useState<number | null>(null);
+  const user = localStorage.getItem(LOCAL_STORAGE__USER)
+  if (!user) {
+    return <Navigate to="/sign-in" replace />;
+  }
+  const userRole = localStorage.getItem(LOCAL_STORAGE__ROLE);
+  const userData = JSON.parse(user);
+  const userBranchId = String(userData.branch_id);
 
-  // Table state
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState<string>(
+    userRole === Role.BRANCH_MANAGER ? userBranchId : "All"
+  );
 
-  // Column definitions for DataTable
   const columns: ColumnDef<Doctor>[] = [
-    { accessorKey: "doctor_id", header: "ID" },
-    { accessorKey: "name", header: "Name" },
-    { accessorKey: "gender", header: "Gender" },
-    { accessorKey: "fee_per_patient", header: "Fee per Patient", cell: ({ row }) => `Rs.${row.getValue("fee_per_patient")}` },
-    { accessorKey: "basic_monthly_salary", header: "Monthly Salary", cell: ({ row }) => `Rs.${row.getValue("basic_monthly_salary")}` },
-  ];
+    {
+      accessorKey: "doctor_id",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Doctor ID
+        </Button>
+      ),
+    },
+    {
+      accessorKey: "name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Name
+        </Button>
+      ),
+    },
+    {
+      accessorKey: "branch_name",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Branch
+        </Button>
+      ),
+    },
+    {
+      accessorKey: "gender",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Gender
+        </Button>
+      ),
+    },
+    {
+      accessorKey: "fee_per_patient",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Fee Per Patient
+        </Button>
+      ),
+      cell: ({ row }) => formatSalary(Number(row.original.fee_per_patient)),
+    },
+    {
+      accessorKey: "basic_monthly_salary",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="px-0"
+        >
+          Monthly Salary
+        </Button>
+      ),
+      cell: ({ row }) => formatSalary(Number(row.original.basic_monthly_salary)),
+    },
+    {
+      header: "Actions",
+      cell: ({ row }) => {
+        return (
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => {
+              setSelectedDoctor(row.original);
+              setAction("edit");
+            }}
+          >
+            <Eye />
+          </Button>
+        );
+      },
+    },
+  ]
 
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+  const [pageCount, setPageCount] = useState<number>(-1);
+
+  const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
-    data: doctors,
+    data: Doctors,
     columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    state: { sorting, columnFilters, globalFilter },
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    pageCount,
+    state: {
+      sorting,
+      pagination,
+    },
+    manualPagination: true,
+    onPaginationChange: setPagination,
   });
 
-  //console.log("RENDERING DOCTORS DETAILS COMPONENT");
-  //console.log(doctors);
-  // useEffect runs when component first loads (mounts)
-  useEffect(() => {
-    // Function to fetch doctors data
-    const fetchDoctors = async () => {
-      try {
-        setLoading(true);  // Show loading state
-        setError(null);    // Clear any previous errors
-        
-        // Call our service to get doctors
-        const doctorsData = await doctorService.getAllDoctors();
-        
-        // Update state with the fetched data
-        setDoctors(doctorsData);
+  const fetchStaff = useCallback(async () => {
+    const tableState = table.getState();
+    const page = tableState.pagination.pageIndex + 1;
+    const itemsPerPage = tableState.pagination.pageSize;
+    const loadingId = toast.loading("Loading...");
 
-      } catch (err) {
-        // Handle any errors
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        setError(errorMessage);
-        console.error('Failed to fetch doctors:', err);
-        
-      } finally {
-        setLoading(false);  // Hide loading state
+    try {
+      const response = await Promise.allSettled([
+        getAllDoctors(
+          // itemsPerPage,
+          // (page - 1) * itemsPerPage,
+          userRole === Role.SUPER_ADMIN
+            ? (selectedBranch === "All" ? "-1" : selectedBranch)
+            : userBranchId
+        ),
+        createTimer(500),
+      ]);
+
+      if (response[0].status === "rejected") {
+        throw response[0].reason;
+      }
+
+      setDoctors(response[0].value.doctors);
+      setDoctorCount(response[0].value.doctor_count);
+      setPageCount(Math.ceil(response[0].value.doctor_count / itemsPerPage));
+      setErrorCode(null);
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        setErrorCode(404);
+      } else {
+        toast.error("Failed to fetch doctors");
+      }
+    } finally {
+      toast.dismiss(loadingId);
+    }
+  }, [table, selectedBranch]);
+
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const data = await getAllBranches();
+        const mappedBranches = data.branches.map((b: { branch_id: number; name: string }) => ({
+          value: String(b.branch_id),
+          label: b.name,
+        }));
+        setBranches(mappedBranches);
+      } catch {
+        toast.error("Failed to load branches");
       }
     };
 
-    // Actually call the function
-    fetchDoctors();
-  }, []);  // Empty array means "run once when component mounts"
+    fetchBranches();
+  }, []);
 
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <PageTitle title="Doctors' Details" />
-        <div>Loading doctors data...</div>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <PageTitle title="Doctors' Details" />
-        <div style={{ color: 'red' }}>Error: {error}</div>
-        <button onClick={() => window.location.reload()}>
-          Try Again
-        </button>
-      </div>
-    );
-  }
-
-  // Show actual data
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff, pagination, selectedBranch, errorCode]);
   return (
-    <div className="space-y-6">
-      <PageTitle title="Doctors' Details | Medsync" />
-
-      {/* adding button to add new doctor */}
+    <div className="space-y-6 p-4">
       <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2>All Doctors ({doctors.length})</h2> 
-        <Link to="/doctor-add">    
-          <Button className="bg-blue-600 hover:bg-blue-700"> 
-            + Add New Doctor
-          </Button>
-        </Link>
+        <h2 className="text-lg font-medium">All Doctors</h2>
+        <p className="text-sm text-muted-foreground">{doctorCount} items</p>
       </div>
-        
-        {doctors.length === 0 ? (
-          <p>No doctors found in the database.</p>
-        ) : (
-          <div className="space-y-4">
-            <Input
-              placeholder="Search doctors..."
-              value={globalFilter ?? ""}
-              onChange={(event) => setGlobalFilter(String(event.target.value))}
-              className="max-w-sm"
-            />
-            <DataTable table={table} />
-          </div>
-        )}
+
+
+      {/* <ViewDoctor
+        isOpen={action === "edit" && selectedDoctor !== null}
+        selectedDoctor={selectedDoctor}
+        onFinished={fetchStaff}
+        onClose={() => {
+          setAction(null);
+          setSelectedDoctor(null);
+        }}
+      /> */}
+
+      <div className="grid gap-4 grid-cols-6 mb-4">
+        <div className="grid gap-2">
+          <Label>Branch</Label>
+          <Select
+            value={selectedBranch}
+            onValueChange={setSelectedBranch}
+            disabled={userRole === Role.BRANCH_MANAGER}
+          >
+            <SelectTrigger id="branch" className="w-full">
+              <SelectValue placeholder="All Branches" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem key="All" value="All">
+                All
+              </SelectItem>
+              {branches.map((b) => (
+                <SelectItem key={b.value} value={b.value}>
+                  {b.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex justify-between items-center mb-4 place-self-end col-span-5">
+          <Link to="/doctors/add">
+            <Button className="bg-blue-600 hover:bg-blue-700">
+              + Add New Doctor
+            </Button>
+          </Link>
+        </div>
       </div>
-    </div>
+      <DataTable table={table} errorCode={errorCode} />
+    </div >
   );
-}
+};
+
+export default DoctorsDetails;

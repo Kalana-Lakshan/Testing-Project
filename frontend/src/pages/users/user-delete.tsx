@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
-import {  deleteUser, type User } from "@/services/userService";
+import toast from "@/lib/toast";
+import { deleteUser, type User } from "@/services/userService";
 
 interface DeleteUserProps {
   isOpen: boolean;
@@ -17,7 +17,7 @@ const DeleteUser: React.FC<DeleteUserProps> = ({ isOpen, selectedUser, onFinishe
   const handleDelete = async () => {
     if (!selectedUser) return;
     setIsDeleting(true);
-    toast.loading("Deleting user...");
+    const loadingId = toast.loading("Deleting user...");
 
     try {
       const response = await deleteUser(selectedUser.user_id)
@@ -27,7 +27,7 @@ const DeleteUser: React.FC<DeleteUserProps> = ({ isOpen, selectedUser, onFinishe
     } catch (error) {
       toast.error("Failed to delete user.");
     } finally {
-      toast.dismiss();
+      toast.dismiss(loadingId);
       setIsDeleting(false);
     }
   };
@@ -39,7 +39,7 @@ const DeleteUser: React.FC<DeleteUserProps> = ({ isOpen, selectedUser, onFinishe
           <DialogTitle>Delete User</DialogTitle>
           <DialogDescription>
             Are you sure you want to delete{" "}
-            <span className="font-semibold">{selectedUser?.username}</span>?  
+            <span className="font-semibold">{selectedUser?.username}</span>?
             This user data will move to deleted users table.
           </DialogDescription>
         </DialogHeader>

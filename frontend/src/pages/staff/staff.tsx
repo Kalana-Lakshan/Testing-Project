@@ -2,7 +2,7 @@ import { DataTable } from "../../components/data-table"
 import { useCallback, useEffect, useState } from "react";
 import { getCoreRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import toast from "react-hot-toast";
+import toast from "@/lib/toast";
 import { createTimer, formatRole, formatSalary, Role } from "@/services/utils";
 import { Eye } from "lucide-react";
 import { getStaffDataForPagination, type Staff } from "@/services/staffServices";
@@ -18,10 +18,10 @@ import { Navigate } from "react-router-dom";
 
 const StaffPage: React.FC = () => {
   const [Staff, setStaff] = useState<Array<Staff>>([]);
+  const [staffCount, setStaffCount] = useState<number>(0);
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const [action, setAction] = useState<"edit" | null>(null);
   const [branches, setBranches] = useState<{ value: string; label: string }[]>([]);
-  // const [selectedBranch, setSelectedBranch] = useState("All");
   const [selectedRole, setSelectedRole] = useState("All");
   const [errorCode, setErrorCode] = useState<number | null>(null);
   const user = localStorage.getItem(LOCAL_STORAGE__USER)
@@ -157,7 +157,7 @@ const StaffPage: React.FC = () => {
     const tableState = table.getState();
     const page = tableState.pagination.pageIndex + 1;
     const itemsPerPage = tableState.pagination.pageSize;
-    toast.loading("Loading...");
+    const loadingId = toast.loading("Loading...");
 
     try {
       const response = await Promise.allSettled([
@@ -177,6 +177,7 @@ const StaffPage: React.FC = () => {
       }
 
       setStaff(response[0].value.staff);
+      setStaffCount(response[0].value.staff_count);
       setPageCount(Math.ceil(response[0].value.staff_count / itemsPerPage));
       setErrorCode(null);
     } catch (error: any) {
@@ -186,7 +187,7 @@ const StaffPage: React.FC = () => {
         toast.error("Failed to fetch staff");
       }
     } finally {
-      toast.dismiss();
+      toast.dismiss(loadingId);
     }
   }, [table, selectedRole, selectedBranch]);
 
@@ -211,7 +212,12 @@ const StaffPage: React.FC = () => {
     fetchStaff();
   }, [fetchStaff, pagination, selectedRole, selectedBranch, errorCode]);
   return (
-    <>
+    <div className="space-y-6 p-4">
+      <div>
+        <h2 className="text-lg font-medium">All Staff</h2>
+        <p className="text-sm text-muted-foreground">{staffCount} items</p>
+      </div>
+
       <ViewStaff
         isOpen={action === "edit" && selectedStaff !== null}
         selectedStaff={selectedStaff}
@@ -221,6 +227,7 @@ const StaffPage: React.FC = () => {
           setSelectedStaff(null);
         }}
       />
+
       <div className="grid gap-4 grid-cols-6 mb-4">
         <div className="grid gap-2">
           <Label>Role</Label>
@@ -274,7 +281,7 @@ const StaffPage: React.FC = () => {
         </div>
       </div>
       <DataTable table={table} errorCode={errorCode} />
-    </>
+    </div >
   );
 };
 
