@@ -18,3 +18,13 @@ export const getAppointmentsbyPatientId = async (patientId: number): Promise<app
         throw error;
     }
 };
+
+export const getMonthlyAppointmentCounts = async (startDate: string, endDate: string, status: string): Promise<{ month: string; count: number }[]> => {
+    try {
+        const [rows] = await sql.query("CALL get_monthly_appointment_counts(?, ?, ?)", ['2025-01-01', '2025-12-31', null]);
+        return (rows as any)[0] as { month: string; count: number }[];
+    } catch (error) {
+        console.error("Error fetching monthly appointment counts:", error);
+        throw error;
+    }
+};

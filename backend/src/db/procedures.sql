@@ -1028,4 +1028,97 @@ BEGIN
     SELECT * FROM `billing_payment`;
 END$$
 
-DELIMITER;
+-- get total patients count
+CREATE PROCEDURE get_total_patients_count()
+BEGIN
+    SELECT COUNT(*) INTO total_count FROM patient;
+END$$
+
+-- get total staff count
+CREATE PROCEDURE get_total_staffs_count()
+BEGIN
+    SELECT COUNT(*) INTO staffs_count FROM staff;
+END$$
+
+
+-- proc for getting appointments based on month
+DROP PROCEDURE IF EXISTS get_monthly_appointment_counts;
+
+
+CREATE PROCEDURE get_monthly_appointment_counts(
+  IN in_start DATE,                 -- e.g. '2025-01-01'
+  IN in_end   DATE,                 -- e.g. '2025-12-31'
+  IN in_status VARCHAR(50)          -- NULL to ignore, or 'Completed'
+)
+BEGIN
+  -- Normalize to month starts
+  SET in_start = DATE_FORMAT(in_start, '%Y-%m-01');
+  SET in_end   = DATE_FORMAT(in_end,   '%Y-%m-01');
+
+  WITH RECURSIVE months AS (
+    SELECT in_start AS month_start
+    UNION ALL
+    SELECT DATE_ADD(month_start, INTERVAL 1 MONTH)
+    FROM months
+    WHERE month_start < in_end
+  ),
+  agg AS (
+    SELECT
+      DATE_FORMAT(`date`, '%Y-%m-01') AS month_start,
+      COUNT(*) AS cnt
+    FROM appointment
+    WHERE `date` >= in_start
+      AND `date` < DATE_ADD(in_end, INTERVAL 1 MONTH)  -- inclusive end month
+      AND (in_status IS NULL OR status = in_status)
+    GROUP BY month_start
+  )
+  SELECT
+    DATE_FORMAT(m.month_start, '%Y-%m') AS month,
+    COALESCE(a.cnt, 0) AS count
+  FROM months m
+  LEFT JOIN agg a USING (month_start)
+  ORDER BY m.month_start;
+END$$
+
+-- proc for getiing monthy revenue
+CREATE PROCEDURE get_monthly_revenue(
+  IN in_start DATE,                 -- e.g. '2025-01-01'
+  IN in_end   DATE                  -- e.g. '2025-12-31'
+)
+BEGIN
+  -- Normalize to month starts
+  SET in_start = DATE_FORMAT(in_start, '%Y-%m-01');
+  SET in_end   = DATE_FORMAT(in_end,   '%Y-%m-01');
+
+  WITH RECURSIVE months AS (
+  SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 12 MONTH), '%Y-%m-01') AS month_start
+  UNION ALL
+  SELECT DATE_FORMAT(DATE_ADD(month_start, INTERVAL 1 MONTH), '%Y-%m-01')
+  FROM months
+  WHERE month_start < DATE_FORMAT(CURDATE(), '%Y-%m-01')
+),
+agg AS (
+  SELECT DATE_FORMAT(`time_stamp`, '%Y-%m-01') AS month_start, sum(paid_amount) AS rev
+  FROM billing_payment
+  --   AND `date` >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+  GROUP BY DATE_FORMAT(`time_stamp`, '%Y-%m-01')
+)
+SELECT
+  DATE_FORMAT(m.month_start, '%Y-%m') AS month,
+  COALESCE(a.rev, 0) AS revenue
+FROM months m
+LEFT JOIN agg a USING (month_start)
+ORDER BY m.month_start;
+
+END$$
+
+
+
+
+
+
+
+
+
+
+DELIMITER ;

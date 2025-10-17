@@ -120,3 +120,13 @@ export const getPatientsCount = async (
     throw error;
   }
 };
+
+export const getTotalPatientsCount = async (): Promise<Number> => {
+  try {
+    const [rows]: any = await sql.query("CALL get_total_patients_count()");
+    return rows[0][0].patient_count;
+  } catch (error) {
+    console.error("Error fetching total count of patients:", error);
+    throw error;
+  }
+};
