@@ -1112,7 +1112,17 @@ ORDER BY m.month_start;
 
 END$$
 
+-- proC FOR patients count per branch
+CREATE PROCEDURE patients_count_per_branch()
 
+BEGIN
+SELECT b.name AS branch, COUNT(u.user_id) AS total_patients
+FROM user AS u
+JOIN branch AS b ON u.branch_id = b.branch_id
+WHERE u.role = 'Patient'
+GROUP BY b.name;
+
+END$$
 
 
 

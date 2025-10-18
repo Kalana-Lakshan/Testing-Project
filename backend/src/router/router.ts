@@ -5,7 +5,7 @@ import { deleteUser, getDeletedUsers, getUsers, restoreUser, updateUser } from "
 import { patientSignup, staffSignup, userLogin, validateUser } from "../handlers/auth.handler.ts";
 import { createNewBranch, fetchTotalBranchesCount, getAllBranchNames, getBranches, updateBranchByID } from "../handlers/branch.handler.ts";
 import { getLogsForPagination } from "../handlers/log.handler.ts";
-import { dischargePatientByID, fetchTotalPatientsCount, getPatientDetailsByID, getPatients, updateCurrentPatientDetails } from "../handlers/patient.handler.ts";
+import { dischargePatientByID, fetchTotalPatientsCount, getPatientDetailsByID, getPatients, getPatientsCountPerBranchHandler, updateCurrentPatientDetails } from "../handlers/patient.handler.ts";
 import { fetchTotalStaffsCount, getAllStaff, updateStaffByID } from "../handlers/staff.handler.ts";
 import { addNewSpecialty, getAllSpecialties } from "../handlers/speciality.handler.ts";
 
@@ -84,6 +84,7 @@ var routes: Route[] = [
 	{ path: "/patient/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: updateCurrentPatientDetails },
 	{ path: "/patient/discharge/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.PUT, handler: dischargePatientByID },
 	{ path: "/patient/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatientDetailsByID },
+	{ path: "/patient/count/per-branch", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatientsCountPerBranchHandler },
 
 	// staff router
 	{ path: "/staff", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllStaff },

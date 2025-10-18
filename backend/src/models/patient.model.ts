@@ -130,3 +130,13 @@ export const getTotalPatientsCount = async (): Promise<Number> => {
     throw error;
   }
 };
+
+export const getPatientsCountPerBranch = async (): Promise<{ branch_name: string; total_count: number }[]> => {
+  try {
+    const [rows] = await sql.query("CALL patients_count_per_branch()");
+    return (rows as any)[0] as { branch_name: string; total_count: number }[];
+  } catch (error) {
+    console.error("Error fetching patients count per branch:", error);
+    throw error;
+  }
+};

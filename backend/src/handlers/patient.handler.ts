@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { createPatient, dischargePatient, getAllPatients, getPatientByID, getPatientsCount, getTotalPatientsCount, UpdatePatientByID, type Patient } from "../models/patient.model.ts";
+import { createPatient, dischargePatient, getAllPatients, getPatientByID, getPatientsCount, getPatientsCountPerBranch, getTotalPatientsCount, UpdatePatientByID, type Patient } from "../models/patient.model.ts";
 import e from "express";
 
 
@@ -117,6 +117,16 @@ export const fetchTotalPatientsCount = async (req: Request, res: Response) => {
     res.status(200).json({ total_count });
   } catch (error) {
     console.error("Error in getTotalPatientsCount handler:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getPatientsCountPerBranchHandler = async (req: Request, res: Response) => {
+  try {
+    const counts = await getPatientsCountPerBranch();
+    res.status(200).json({ counts });
+  } catch (error) {
+    console.error("Error in getPatientsCountPerBranchHandler:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
