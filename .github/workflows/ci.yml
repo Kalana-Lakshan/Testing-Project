@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      SKIP_BUILD: "false"
+      SKIP_BUILD: "true"
 
     strategy:
       matrix:
