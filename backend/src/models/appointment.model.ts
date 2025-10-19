@@ -1,12 +1,23 @@
+import e from "express";
 import sql from "../db/db.ts";
 
-export interface appointment{
-    appointment_id:number;
-    patient_id:number;
-    doctor_id:number;
-    date:string;
-    time_slot:string;
-    name?:string; // doctor's name
+export interface appointment {
+    appointment_id: number;
+    patient_id: number;
+    doctor_id: number;
+    date: string;
+    time_slot: string;
+    name: string;
+    status: string;
+}
+
+export interface DoctorAppointment {
+    appointment_id: number;
+    doctor_id: number;
+    name: string;           // doctor name
+    date: string;
+    time_slot: string;
+    status: string;
 }
 
 export const getAppointmentsbyPatientId = async (patientId: number): Promise<appointment[]> => {
@@ -25,6 +36,28 @@ export const getMonthlyAppointmentCounts = async (startDate: string, endDate: st
         return (rows as any)[0] as { month: string; count: number }[];
     } catch (error) {
         console.error("Error fetching monthly appointment counts:", error);
+        throw error;
+    }
+};
+
+export const getDoctorsAppointments = async (count: number,
+    offset: number): Promise<DoctorAppointment[]> => {
+    try {
+        const [rows] = await sql.query("CALL get_doctors_appointments(?, ?)", [count, offset]);
+        return (rows as any)[0] as DoctorAppointment[];
+    } catch (error) {
+        console.error("Error fetching doctor's appointments:", error);
+        throw error;
+    }
+
+};
+
+export const getDoctorsAppointmentsCount = async (): Promise<number> => {
+    try {
+        const [rows]: any = await sql.query("CALL get_appointments_count()");
+        return rows[0][0].total_count;
+    } catch (error) {
+        console.error("Error fetching doctor's appointments count:", error);
         throw error;
     }
 };

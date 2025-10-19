@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
 import { getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState, } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { DataTable } from "../components/data-table";
+import { DataTable } from "../../components/data-table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Droplet, MapPin, Phone, User, UserCheck, Building2, Users, DollarSign } from "lucide-react";
 import { CalendarDays, Clock } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import toast from "@/lib/toast";
-import { fetchTotalBranchesCount, fetchTotalPatientsCount, fetchTotalStaffsCount, type fetchMonthlyAppointmentsCountResponse } from "@/services/adminDashboardServices";
+import { doctorDashboardDetails, fetchTotalBranchesCount, fetchTotalPatientsCount, fetchTotalStaffsCount, type DoctorDashboardDetails, type fetchMonthlyAppointmentsCountResponse } from "@/services/adminDashboardServices";
 import { MonthlyAppointmentsChart } from "./monthlyappoinmenttable";
 import { MonthlyRevenueChart } from "./monthlyrevenuetable";
 import { fetchMonthlyRevenueForYear } from "@/services/adminDashboardServices";
 import { getPatientsCountPerBranch } from "@/services/patientServices";
 import { BranchPatientsPieChart } from "./piechartbranchesandpatients";
+import DoctorsAppointment from "./doctorsAppointment";
 
 
 
@@ -25,6 +26,7 @@ const AdminDashboard: React.FC = () => {
   const [totalBranches, setTotalBranches] = useState<number | null>(null);
   const [revenue, setRevenue] = useState<number | null>(null);
   const [patientsCountPerBranch, setPatientsCountPerBranch] = useState<{ branch_name: string; patient_count: number }[]>([]);
+  const [doctorDetails, setDoctorDetails] = useState<DoctorDashboardDetails | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,6 +71,12 @@ const AdminDashboard: React.FC = () => {
         console.error("Error fetching patients count per branch:", error);
       }
 
+      try {
+        const details = await doctorDashboardDetails();
+        setDoctorDetails(details);
+      } catch (error) {
+        console.error("Error fetching doctor dashboard details:", error);
+      }
     };
 
     fetchData();
@@ -192,9 +200,21 @@ const AdminDashboard: React.FC = () => {
         </Tabs>
       </div>
       <br />
-      <div className="w-[400px] mx-left">
-        <BranchPatientsPieChart />
+      <div className="flex w-full items-start gap-6">
+        {/* Left side: chart */}
+        <div className="w-[400px] self-start pt-20">
+          <BranchPatientsPieChart />
+        </div>
+
+        {/* Right side: table */}
+        <div className="flex-1 self-start">
+          <DoctorsAppointment />
+        </div>
       </div>
+      
+      <h2 className="text-lg font-medium">Doctors view {doctorDetails?.name}</h2>
+
+      
 
 
 

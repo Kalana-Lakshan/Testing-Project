@@ -1125,6 +1125,28 @@ GROUP BY b.name;
 END$$
 
 
+-- doctors  appointment
+CREATE PROCEDURE get_doctors_appointments(IN appt_count INT,
+    IN count_start INT)
+
+BEGIN
+	SELECT d.name, a.appointment_id, a.doctor_id, a.date, a.time_slot, a.status
+    from appointment as a natural join doctor as d
+    where a.doctor_id =  d.doctor_id
+    order by a.date desc
+    limit appt_count OFFSET count_start;
+END$$
+
+-- proc for getting doctors appointments count
+CREATE PROCEDURE get_appointments_count()
+
+BEGIN
+	SELECT count(*) AS total_count
+    from appointment ;
+    
+END$$
+
+
 
 
 

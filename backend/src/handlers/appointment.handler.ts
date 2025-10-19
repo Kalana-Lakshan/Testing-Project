@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
-import { getAppointmentsbyPatientId, getMonthlyAppointmentCounts } from "../models/appointment.model.ts";
-
+import { getAppointmentsbyPatientId, getDoctorsAppointments, getDoctorsAppointmentsCount, getMonthlyAppointmentCounts } from "../models/appointment.model.ts";
+import { type DoctorAppointment } from "../models/appointment.model.ts";
 export const getAppointmentsbyPatientIdHandler = async (req: Request, res: Response) => {
     try {
         // /patients/appointments/:patientId
@@ -22,4 +22,32 @@ export const getAppointmentsCountByMonthHandler = async (req: Request, res: Resp
         console.error("Error in getAppointmentsCountByMonthHandler:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
+};
+
+
+export const getDoctorsAppointmentsForPagination = async (req: Request, res: Response) => {
+  const { count, offset } = req.query;
+
+  try {
+    const appointments: DoctorAppointment[] = await getDoctorsAppointments(Number(count), Number(offset));
+    if (appointments.length < 1) {
+      res.status(404).json({ error: "Appointments not found" });
+      return;
+    }
+
+    const appointments_count: number = await getDoctorsAppointmentsCount();
+    if (appointments_count == undefined) {
+      console.log("error in finding the appointments count, count = " + appointments_count);
+      res.status(500).json({ error: "Internal Server Error" });
+      return;
+    }
+
+    res.status(200).json({
+      appointments_count: appointments_count,
+      appointments: appointments,
+    });
+  } catch (error) {
+    console.log("Error in getDoctorsAppointmentsForPagination handler: ", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 };

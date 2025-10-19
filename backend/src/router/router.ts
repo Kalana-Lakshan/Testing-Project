@@ -12,7 +12,7 @@ import { addNewSpecialty, getAllSpecialties } from "../handlers/speciality.handl
 import { checkServiceCodeHandler, createTreatmentHandler, getAllTreatmentsHandler } from "../handlers/treatment.handler.ts";
 import { getMedicalHistoriesByPatientHandler, getMedicalHistoryHandler } from "../handlers/medicalhistory.handler.ts";
 import { getAllMedicationsHandler, getMedicationsByPatientHandler } from "../handlers/medication.handlers.ts";
-import { getAppointmentsbyPatientIdHandler, getAppointmentsCountByMonthHandler } from "../handlers/appointment.handler.ts";
+import {  getAppointmentsbyPatientIdHandler, getAppointmentsCountByMonthHandler, getDoctorsAppointmentsForPagination } from "../handlers/appointment.handler.ts";
 import { getPatientsCount } from "../models/patient.model.ts";
 import { getMonthlyRevenueHandler } from "../handlers/billingpayment.handlers.ts";
 
@@ -63,6 +63,7 @@ var routes: Route[] = [
 
 	//doctors router
 	{ path: "/doctors", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorsForPagination },
+	{ path: "/doctors/appointments", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDoctorsAppointmentsForPagination },
 	{ path: "/doctors/:id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getDoctorDetailsByID },
 	{ path: "/doctors/add", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.POST, handler: addNewDoctor },
 	{ path: "/doctors/specialities", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllDoctorSpecialities },

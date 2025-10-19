@@ -1,4 +1,8 @@
 import axiosInstance from "../axiosConfig";
+import {
+  LOCAL_STORAGE__USER,
+  LOCAL_STORAGE__TOKEN,
+} from "@/services/authServices";
 
 export interface fetchTotalPatientsCountResponse {
   total_count: number;
@@ -19,6 +23,50 @@ export interface FetchMonthlyRevenueResponse {
   revenue: string;  // e.g. "5200.00"
 }
 
+export interface DoctorDashboardDetails {
+  doctor_id: number;
+  name: string;
+  gender: string;
+  branch_id: number;
+  branch_name: string;
+  fee_per_patient: number;
+  basic_monthly_salary: number;
+}
+
+type ApiResponse = {
+  doctor: {
+    doctor_id: number;
+    name: string;
+    gender: string;
+    branch_id: number;
+    branch_name: string;
+    fee_per_patient: string | number;
+    basic_monthly_salary: string | number;
+  };
+};
+
+export const doctorDashboardDetails = async (): Promise<DoctorDashboardDetails> => {
+  const userStr = localStorage.getItem(LOCAL_STORAGE__USER);
+  if (!userStr) throw new Error("Not signed in");
+  const user = JSON.parse(userStr) as { user_id: number };
+  const token = localStorage.getItem(LOCAL_STORAGE__TOKEN) ?? "";
+  const resp = await axiosInstance.get<ApiResponse>(`/doctors/${user.user_id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  const record = resp.data?.doctor;
+  if (!record) throw new Error("No doctor record found");
+
+  return {
+    ...record,
+    fee_per_patient: typeof record.fee_per_patient === "string"
+      ? Number(record.fee_per_patient)
+      : record.fee_per_patient,
+    basic_monthly_salary: typeof record.basic_monthly_salary === "string"
+      ? Number(record.basic_monthly_salary)
+      : record.basic_monthly_salary,
+  };
+};
 
 export const fetchTotalPatientsCount = async () => {
   try {
