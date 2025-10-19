@@ -223,7 +223,7 @@ END$$
 CREATE PROCEDURE update_user(
     IN p_id INT,
     IN p_username VARCHAR(20),
-    IN p_password_hash VARCHAR(50),
+    IN p_password_hash VARCHAR(255),
     IN p_role ENUM('Super_Admin','Branch_Manager','Doctor','Admin_Staff','Nurse','Receptionist','Billing_Staff','Insurance_Agent','Patient'),
     IN p_branch_id INT,
     IN p_is_approved TINYINT(1)
