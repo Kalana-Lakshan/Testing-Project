@@ -14,7 +14,7 @@ import {
 import { fetchMonthlyAppointmentsForYear } from "@/services/adminDashboardServices";
 
 type ChartRow = {
-  date: string;        // "YYYY-MM-01" for XAxis
+  date: string;       
   appointments: number;
 };
 
@@ -33,7 +33,6 @@ export function MonthlyAppointmentsChart({ year = new Date().getFullYear() }: { 
     (async () => {
       try {
         const rows = await fetchMonthlyAppointmentsForYear(year);
-        // Map backend {month:"YYYY-MM", count} -> {date:"YYYY-MM-01", appointments}
         const mapped: ChartRow[] = rows.map((r) => ({
           date: `${r.month}-01`,
           appointments: r.count,

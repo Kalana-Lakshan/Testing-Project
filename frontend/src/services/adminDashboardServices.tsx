@@ -19,8 +19,8 @@ export interface fetchMonthlyAppointmentsCountResponse {
   count: number;
 }
 export interface FetchMonthlyRevenueResponse {
-  month: string;    // "YYYY-MM"
-  revenue: string;  // e.g. "5200.00"
+  month: string;    
+  revenue: string;  
 }
 
 export interface DoctorDashboardDetails {
@@ -115,7 +115,7 @@ export const fetchMonthlyAppointments = async (
     "/appointments/monthly-counts",
     { params: { start, end } }
   );
-  return data; // backend returns the array directly
+  return data; 
 };
 
 // Helper for a whole year
@@ -131,7 +131,7 @@ export const fetchMonthlyRevenue = async (
   end: string
 ): Promise<FetchMonthlyRevenueResponse[]> => {
   const { data } = await axiosInstance.get<FetchMonthlyRevenueResponse[]>(
-    "/billing/monthly-revenue",      // ← adjust if your endpoint differs
+    "/billing/monthly-revenue",     
     { params: { start, end } }
   );
   return data;
@@ -142,3 +142,4 @@ export const fetchMonthlyRevenueForYear = async (year: number) => {
   const end = `${year}-12-31`;
   return fetchMonthlyRevenue(start, end);
 };
+

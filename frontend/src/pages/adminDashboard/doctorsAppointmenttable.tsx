@@ -162,8 +162,10 @@ const DoctorsAppointmentsTable: React.FC = () => {
   return (
     <div className="space-y-6 p-4">
       <div>
+        <h2 className="text-lg font-medium">Appointments</h2>
+        <p className="text-sm text-muted-foreground">{appointmentsCount} items</p>
       </div>
-
+      
       <DataTable table={table} />
     </div>
   );

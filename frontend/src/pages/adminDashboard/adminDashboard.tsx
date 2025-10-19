@@ -1,64 +1,66 @@
 import { useEffect, useState } from "react";
-import { getCoreRowModel, getSortedRowModel, useReactTable, type ColumnDef, type SortingState, } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { DataTable } from "../../components/data-table";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Droplet, MapPin, Phone, User, UserCheck, Building2, Users, DollarSign } from "lucide-react";
-import { CalendarDays, Clock } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import toast from "@/lib/toast";
-import { doctorDashboardDetails, fetchTotalBranchesCount, fetchTotalPatientsCount, fetchTotalStaffsCount, type DoctorDashboardDetails, type fetchMonthlyAppointmentsCountResponse } from "@/services/adminDashboardServices";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Users, UserCheck, Building2, DollarSign } from "lucide-react";
+import {
+  doctorDashboardDetails,
+  fetchTotalBranchesCount,
+  fetchTotalPatientsCount,
+  fetchTotalStaffsCount,
+  type DoctorDashboardDetails,
+} from "@/services/adminDashboardServices";
 import { MonthlyAppointmentsChart } from "./monthlyappoinmenttable";
 import { MonthlyRevenueChart } from "./monthlyrevenuetable";
 import { fetchMonthlyRevenueForYear } from "@/services/adminDashboardServices";
 import { getPatientsCountPerBranch } from "@/services/patientServices";
 import { BranchPatientsPieChart } from "./piechartbranchesandpatients";
-import DoctorsAppointment from "./doctorsAppointment";
-
-
-
-
+import DoctorsAppointment from "./doctorsAppointmenttable";
+import DoctorsAppointmentsByDoctorId from "./doctorsAppointmentByDcotor_id";
+import { getAppointmentsByDoctorIdCount} from "@/services/appoinmentServices";
 
 const AdminDashboard: React.FC = () => {
-  const [totalPatients, setTotalPatients] = useState<number | null>(null);
-  const [totalStaffs, setTotalStaffs] = useState<number | null>(null);
-  const [totalBranches, setTotalBranches] = useState<number | null>(null);
-  const [revenue, setRevenue] = useState<number | null>(null);
-  const [patientsCountPerBranch, setPatientsCountPerBranch] = useState<{ branch_name: string; patient_count: number }[]>([]);
+  const [totalPatients, setTotalPatients] = useState<number>(0);
+  const [totalStaffs, setTotalStaffs] = useState<number>(0);
+  const [totalBranches, setTotalBranches] = useState<number>(0);
+  const [revenue, setRevenue] = useState<number>(0);
+  const [patientsCountPerBranch, setPatientsCountPerBranch] = useState<
+    { branch_name: string; patient_count: number }[]
+  >([]);
   const [doctorDetails, setDoctorDetails] = useState<DoctorDashboardDetails | null>(null);
+  const [appointmentsCount, setAppointmentsCount] = useState<number>(0);
 
   useEffect(() => {
-    const fetchData = async () => {
+    (async () => {
       try {
-        const data = await fetchTotalPatientsCount();
-        setTotalPatients(data.total_count);
+        const [
+          patientsRes,
+          staffsRes,
+          branchesRes,
+        ] = await Promise.all([
+          fetchTotalPatientsCount(),
+          fetchTotalStaffsCount(),
+          fetchTotalBranchesCount(),
+        ]);
+
+        setTotalPatients(Number(patientsRes?.total_count ?? 0));
+        setTotalStaffs(Number(staffsRes?.total_count ?? 0));
+        setTotalBranches(Number(branchesRes?.total_count ?? 0));
       } catch (error) {
-        console.error("Error fetching total patients count:", error);
+        console.error("Error fetching counts:", error);
       }
 
       try {
-        const staffData = await fetchTotalStaffsCount();
-        setTotalStaffs(staffData.total_count);
-      } catch (error) {
-        console.error("Error fetching total staffs count:", error);
-      }
-
-      try {
-        const branchData = await fetchTotalBranchesCount();
-        setTotalBranches(branchData.total_count);
-      } catch (error) {
-        console.error("Error fetching total branches count:", error);
-      }
-
-      try {
+        // Revenue for current month
         const year = new Date().getFullYear();
         const rows = await fetchMonthlyRevenueForYear(year);
-
-        // Get current month (format: YYYY-MM)
-        const currentMonth = new Date().toISOString().slice(0, 7);
-        const current = rows.find((r) => r.month === currentMonth);
-
+        const currentMonth = new Date().toISOString().slice(0, 7); 
+        const current = rows?.find((r: { month: string }) => r.month === currentMonth);
         setRevenue(Number(current?.revenue ?? 0));
       } catch (err) {
         console.error("Failed to fetch current month revenue:", err);
@@ -66,37 +68,34 @@ const AdminDashboard: React.FC = () => {
 
       try {
         const counts = await getPatientsCountPerBranch();
-        setPatientsCountPerBranch(counts);
+        setPatientsCountPerBranch(Array.isArray(counts) ? counts : []);
       } catch (error) {
         console.error("Error fetching patients count per branch:", error);
       }
 
       try {
         const details = await doctorDashboardDetails();
-        setDoctorDetails(details);
+        setDoctorDetails(details ?? null);
       } catch (error) {
         console.error("Error fetching doctor dashboard details:", error);
       }
-    };
-
-    fetchData();
+    })();
   }, []);
+
+  useEffect(() => {
+    if (!doctorDetails?.doctor_id) return;
+    (async () => {
+      try {
+        const res = await getAppointmentsByDoctorIdCount(doctorDetails.doctor_id);
+        setAppointmentsCount(res ?? 0);
+      } catch (error) {
+        console.error("Error fetching doctor's appointments count:", error);
+      }
+    })();
+  }, [doctorDetails?.doctor_id]);
 
   return (
     <>
-      {/* <h1>
-        hiii this is admin Dashboard
-        <br />
-        total patients are: {totalPatients}
-        <br />
-        total staffs are: {totalStaffs}
-        <br />
-        total branches are: {totalBranches}
-      </h1>
-
-      <div>
-        <h2> appointments by date</h2>
-      </div> */}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {/* Total Patients */}
         <Card className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-500/30 transition-all duration-300">
@@ -109,13 +108,16 @@ const AdminDashboard: React.FC = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-semibold text-gray-100">{totalPatients}</p>
+            <p className="text-4xl font-semibold text-gray-100">
+              {totalPatients}
+            </p>
           </CardContent>
           <CardFooter>
             <p className="text-sm text-gray-400">Active and discharged patients</p>
           </CardFooter>
         </Card>
 
+        {/* Total Staffs */}
         <Card className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-sm hover:shadow-md hover:border-green-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-gray-100 text-base font-medium flex items-center gap-2">
@@ -133,6 +135,7 @@ const AdminDashboard: React.FC = () => {
           </CardFooter>
         </Card>
 
+        {/* Total Branches */}
         <Card className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-sm hover:shadow-md hover:border-purple-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-gray-100 text-base font-medium flex items-center gap-2">
@@ -150,6 +153,7 @@ const AdminDashboard: React.FC = () => {
           </CardFooter>
         </Card>
 
+        {/* Current Month Revenue */}
         <Card className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-sm hover:shadow-md hover:border-green-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base font-medium text-gray-100 flex items-center gap-2">
@@ -157,29 +161,32 @@ const AdminDashboard: React.FC = () => {
               Current Month Revenue
             </CardTitle>
           </CardHeader>
-
           <CardContent>
             <p className="text-4xl font-semibold text-gray-100">
               {new Intl.NumberFormat("en-US", {
                 style: "currency",
-                currency: "LKR", // change to your currency
+                currency: "LKR",
                 minimumFractionDigits: 2,
               }).format(revenue ?? 0)}
             </p>
           </CardContent>
-
           <CardFooter>
             <p className="text-sm text-gray-400">
-              {new Date().toLocaleString("default", { month: "long", year: "numeric" })}
+              {new Date().toLocaleString("default", {
+                month: "long",
+                year: "numeric",
+              })}
             </p>
           </CardFooter>
         </Card>
       </div>
+
       <br />
+
+      {/* Charts */}
       <div className="flex flex-col w-full">
         <Tabs defaultValue="Appointments" className="w-full">
-          {/* Tab buttons */}
-          <div className="flex justify-center ">
+          <div className="flex justify-center">
             <TabsList className="rounded-full">
               <TabsTrigger value="Appointments" className="rounded-full">
                 Monthly Appointments
@@ -199,25 +206,48 @@ const AdminDashboard: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
+
       <br />
+
       <div className="flex w-full items-start gap-6">
-        {/* Left side: chart */}
         <div className="w-[400px] self-start pt-20">
           <BranchPatientsPieChart />
         </div>
 
-        {/* Right side: table */}
         <div className="flex-1 self-start">
           <DoctorsAppointment />
         </div>
       </div>
-      
-      <h2 className="text-lg font-medium">Doctors view {doctorDetails?.name}</h2>
 
-      
+      <h2 className="text-lg font-medium">
+        Doctors view {doctorDetails?.name ?? ""}
+      </h2>
 
+      <div>
+        <DoctorsAppointmentsByDoctorId />
+      </div>
 
-
+      {/* Appointments count card */}
+      <div className="mt-6 w-[400px]">
+        <Card className="bg-neutral-900 border border-neutral-800 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-500/30 transition-all duration-300">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-gray-100 text-base font-medium flex items-center gap-2">
+              Appointments
+            </CardTitle>
+            <div className="p-2 rounded-full bg-neutral-800">
+              <Users className="h-5 w-5 text-blue-400" />
+            </div>
+          </CardHeader>
+          <CardContent>
+            <p className="text-4xl font-semibold text-gray-100">
+              {appointmentsCount}
+            </p>
+          </CardContent>
+          <CardFooter>
+            <p className="text-sm text-gray-400">Appointments</p>
+          </CardFooter>
+        </Card>
+      </div>
     </>
   );
 };

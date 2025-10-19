@@ -40,7 +40,7 @@ export function BranchPatientsPieChart() {
     React.useEffect(() => {
         (async () => {
             try {
-                const counts = await getPatientsCountPerBranch(); // now normalized
+                const counts = await getPatientsCountPerBranch(); 
                 const colors = [
                     "#003A6B", // Ateneo Blue
                     "#1B5886", // Blue Sapphire
@@ -72,8 +72,7 @@ export function BranchPatientsPieChart() {
         () => branchData.findIndex((item) => item.branch_name === activeBranch),
         [activeBranch, branchData]
     );
-    const activeIndex = activeIndexRaw >= 0 ? activeIndexRaw : 0; // ✅ guard
-
+    const activeIndex = activeIndexRaw >= 0 ? activeIndexRaw : 0; 
     const chartConfig: ChartConfig = React.useMemo(
         () =>
             branchData.reduce(
@@ -133,8 +132,8 @@ export function BranchPatientsPieChart() {
                         <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                         <Pie
                             data={branchData}
-                            dataKey="patient_count"   // ✅ now matches normalized data
-                            nameKey="branch_name"     // ✅ now matches normalized data
+                            dataKey="patient_count"  
+                            nameKey="branch_name"  
                             innerRadius={60}
                             strokeWidth={5}
                             activeIndex={activeIndex}

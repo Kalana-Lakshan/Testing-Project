@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { getAppointmentsbyPatientId, getDoctorsAppointments, getDoctorsAppointmentsCount, getMonthlyAppointmentCounts } from "../models/appointment.model.ts";
+import { getAppointmentsByDoctorId, getAppointmentsByDoctorIdCount, getAppointmentsbyPatientId, getDoctorsAppointments, getDoctorsAppointmentsCount, getMonthlyAppointmentCounts } from "../models/appointment.model.ts";
 import { type DoctorAppointment } from "../models/appointment.model.ts";
 export const getAppointmentsbyPatientIdHandler = async (req: Request, res: Response) => {
     try {
@@ -48,6 +48,30 @@ export const getDoctorsAppointmentsForPagination = async (req: Request, res: Res
     });
   } catch (error) {
     console.log("Error in getDoctorsAppointmentsForPagination handler: ", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getAppointmentsByDoctorIdHandler = async (req: Request, res: Response) => {
+  try {
+        // /patients/appointments/:patientId
+        const { doctorId } = req.params;
+        const appointments = await getAppointmentsByDoctorId(Number(doctorId));
+        res.status(200).json(appointments);
+    } catch (error) {
+        console.error("Error in getAppointmentsByDoctorIdHandler:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+export const getAppointmentsByDoctorIdCountHandler = async (req: Request, res: Response) => {
+  try {
+    // /patients/appointments/:patientId
+    const { doctorId } = req.params;
+    const count = await getAppointmentsByDoctorIdCount(Number(doctorId));
+    res.status(200).json(count);
+  } catch (error) {
+    console.error("Error in getAppointmentsByDoctorIdCountHandler:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

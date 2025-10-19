@@ -182,6 +182,25 @@ DROP PROCEDURE IF EXISTS get_billing_payments_by_invoice_id;
 
 DROP PROCEDURE IF EXISTS get_all_billing_payments;
 
+-- Drop procedure for monthly revenue
+DROP PROCEDURE IF EXISTS get_monthly_revenue;
+
+-- Drop procedure for patients count per branch
+DROP PROCEDURE IF EXISTS patients_count_per_branch;
+
+-- Drop procedure for doctors appointments (paginated)
+DROP PROCEDURE IF EXISTS get_doctors_appointments;
+
+-- Drop procedure for total appointments count (all doctors)
+DROP PROCEDURE IF EXISTS get_appointments_count;
+
+-- Drop procedure for appointments by doctor id
+DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id;
+
+-- Drop procedure for appointments by doctor id count
+DROP PROCEDURE IF EXISTS get_appointments_by_doctor_id_count;
+
+
 DELIMITER $$
 
 -- User model functions
@@ -1075,10 +1094,10 @@ BEGIN
   SELECT
     DATE_FORMAT(m.month_start, '%Y-%m') AS month,
     COALESCE(a.cnt, 0) AS count
-  FROM months m
-  LEFT JOIN agg a USING (month_start)
-  ORDER BY m.month_start;
-END$$
+    FROM months m
+    LEFT JOIN agg a USING (month_start)
+    ORDER BY m.month_start;
+    END$$
 
 -- proc for getiing monthy revenue
 CREATE PROCEDURE get_monthly_revenue(
@@ -1106,21 +1125,21 @@ agg AS (
 SELECT
   DATE_FORMAT(m.month_start, '%Y-%m') AS month,
   COALESCE(a.rev, 0) AS revenue
-FROM months m
-LEFT JOIN agg a USING (month_start)
-ORDER BY m.month_start;
+    FROM months m
+    LEFT JOIN agg a USING (month_start)
+    ORDER BY m.month_start;
 
 END$$
 
 -- proC FOR patients count per branch
 CREATE PROCEDURE patients_count_per_branch()
 
-BEGIN
-SELECT b.name AS branch, COUNT(u.user_id) AS total_patients
-FROM user AS u
-JOIN branch AS b ON u.branch_id = b.branch_id
-WHERE u.role = 'Patient'
-GROUP BY b.name;
+    BEGIN
+    SELECT b.name AS branch, COUNT(u.user_id) AS total_patients
+    FROM user AS u
+    JOIN branch AS b ON u.branch_id = b.branch_id
+    WHERE u.role = 'Patient'
+    GROUP BY b.name;
 
 END$$
 
@@ -1146,11 +1165,22 @@ BEGIN
     
 END$$
 
+-- proc for getting doctors appointments by doctor id
+create procedure get_appointments_by_doctor_id( IN p_id INT)
+begin 
+	select appointment_id,patient.name, patient_note, date, time_slot, status, count(*) as total from
+	doctor natural join appointment join patient on appointment.patient_id = patient.patient_id
+	where doctor.doctor_id=p_id and doctor.doctor_id = appointment.doctor_id;
+end $$
 
+-- proc for getting doctors appointments by doctor id count
+create procedure get_appointments_by_doctor_id_count( IN p_id INT)
+begin 
+	   SELECT COUNT(*) AS total_appointments
+  FROM appointment
+  WHERE doctor_id = p_id;
 
-
-
-
+end $$
 
 
 DELIMITER ;

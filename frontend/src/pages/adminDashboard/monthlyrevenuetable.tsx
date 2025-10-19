@@ -13,7 +13,7 @@ import {
 import { fetchMonthlyRevenueForYear } from "@/services/adminDashboardServices";
 
 type ChartRow = {
-  date: string; // "YYYY-MM-01"
+  date: string; 
   revenue: number;
 };
 
