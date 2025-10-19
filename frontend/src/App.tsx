@@ -27,6 +27,7 @@ import TreatmentAdd from './pages/patients/treatment/treatment_add';
 import Treatments from './pages/patients/treatment/treatment';
 import Medications from './pages/patients/medication/medication';
 
+
 import { useNavigate } from "react-router-dom";
 import {
   LOCAL_STORAGE__ROLE,

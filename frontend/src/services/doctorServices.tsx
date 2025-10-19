@@ -164,26 +164,26 @@ export const getAllDoctorSpecialities = async (): Promise<DoctorDataWithSpeciali
   }
 };
 
-export const getAllDoctorAppointments = async () => {
-  try {
-    const response = await axiosInstance.get
-      // <{
-      //   doctor_appointment_count: number;
-      //   doctor_appointments: Array<DoctorAppointment>;
-      // }>
-      (`/doctors-appointments`);
-    return response.data;
-  } catch (error: unknown) {
-    console.error("Error getting all doctors' appointments data:", error);
-    if (error instanceof AxiosError) {
-      if (error.response?.data?.error) {
-        throw error.response.data.error;
-      }
-      throw error.message;
-    }
-    throw "Unknown error occurred";
-  }
-};
+// export const getAllDoctorAppointments = async () => {
+//   try {
+//     const response = await axiosInstance.get
+//       // <{
+//       //   doctor_appointment_count: number;
+//       //   doctor_appointments: Array<DoctorAppointment>;
+//       // }>
+//       (`/doctors-appointments`);
+//     return response.data;
+//   } catch (error: unknown) {
+//     console.error("Error getting all doctors' appointments data:", error);
+//     if (error instanceof AxiosError) {
+//       if (error.response?.data?.error) {
+//         throw error.response.data.error;
+//       }
+//       throw error.message;
+//     }
+//     throw "Unknown error occurred";
+//   }
+// };
 
 export const getAllDoctorPatientsHistory = async () => {
   try {
