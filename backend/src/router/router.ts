@@ -16,6 +16,45 @@ import {  getAppointmentsByDoctorIdCountHandler, getAppointmentsByDoctorIdHandle
 import { getPatientsCount } from "../models/patient.model.ts";
 import { getMonthlyRevenueHandler } from "../handlers/billingpayment.handlers.ts";
 
+// New imports for extended functionality
+import { 
+  createAppointmentHandler, 
+  updateAppointmentStatusHandler, 
+  rescheduleAppointmentHandler, 
+  getAppointmentByIdHandler, 
+  getAvailableTimeSlotsHandler, 
+  createWalkInAppointmentHandler, 
+  getBranchAppointmentsByDateHandler 
+} from "../handlers/appointment_extended.handler.ts";
+import { 
+  createInvoiceHandler, 
+  recordPaymentHandler, 
+  getInvoiceHandler, 
+  getPaymentsHandler, 
+  getPatientOutstandingHandler 
+} from "../handlers/invoice.handler.ts";
+import { 
+  createInsuranceHandler, 
+  linkPatientInsuranceHandler, 
+  getPatientInsuranceHandler, 
+  createInsuranceClaimHandler, 
+  getPatientInsuranceClaimsHandler, 
+  getAllInsuranceHandler 
+} from "../handlers/insurance.handler.ts";
+import { 
+  createPrescriptionHandler, 
+  getPrescriptionHandler, 
+  recordTreatmentHandler, 
+  getTreatmentsHandler 
+} from "../handlers/prescription.handler.ts";
+import { 
+  getBranchAppointmentsSummaryHandler, 
+  getDoctorRevenueReportHandler, 
+  getPatientsWithOutstandingBalancesHandler, 
+  getTreatmentsByCategoryHandler, 
+  getInsuranceVsOutOfPocketHandler 
+} from "../handlers/reports.handler.ts";
+
 export const HttpMethod = {
 	GET: "GET",
 	POST: "POST",
@@ -114,7 +153,44 @@ var routes: Route[] = [
 	{ path: "/doctors/appointments/:doctorId/count", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentsByDoctorIdCountHandler },
 	
 	//billing and payment router
-	{ path: "/billing/monthly-revenue", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMonthlyRevenueHandler }
+	{ path: "/billing/monthly-revenue", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getMonthlyRevenueHandler },
+
+	// Extended appointment management routes
+	{ path: "/appointments/create", AccessibleBy: availableForRoles([Role.MEDICAL_STAFF]), method: HttpMethod.POST, handler: createAppointmentHandler },
+	{ path: "/appointments/:appointment_id/status", AccessibleBy: availableForRoles([Role.MEDICAL_STAFF]), method: HttpMethod.PUT, handler: updateAppointmentStatusHandler },
+	{ path: "/appointments/:appointment_id/reschedule", AccessibleBy: availableForRoles([Role.MEDICAL_STAFF]), method: HttpMethod.PUT, handler: rescheduleAppointmentHandler },
+	{ path: "/appointments/:appointment_id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAppointmentByIdHandler },
+	{ path: "/appointments/available-slots", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAvailableTimeSlotsHandler },
+	{ path: "/appointments/walk-in", AccessibleBy: availableForRoles([Role.MEDICAL_STAFF]), method: HttpMethod.POST, handler: createWalkInAppointmentHandler },
+	{ path: "/appointments/branch/by-date", AccessibleBy: availableForRoles([Role.MEDICAL_STAFF]), method: HttpMethod.GET, handler: getBranchAppointmentsByDateHandler },
+
+	// Invoice and payment routes
+	{ path: "/invoices/create", AccessibleBy: availableForRoles([Role.BILLING_STAFF]), method: HttpMethod.POST, handler: createInvoiceHandler },
+	{ path: "/invoices/:appointment_id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getInvoiceHandler },
+	{ path: "/payments/record", AccessibleBy: availableForRoles([Role.BILLING_STAFF]), method: HttpMethod.POST, handler: recordPaymentHandler },
+	{ path: "/payments/invoice/:invoice_id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPaymentsHandler },
+	{ path: "/patients/:patient_id/outstanding", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatientOutstandingHandler },
+
+	// Insurance routes
+	{ path: "/insurance/create", AccessibleBy: availableForRoles([Role.SUPER_ADMIN]), method: HttpMethod.POST, handler: createInsuranceHandler },
+	{ path: "/insurance/all", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getAllInsuranceHandler },
+	{ path: "/insurance/link-patient", AccessibleBy: availableForRoles([Role.INSURANCE_AGENT]), method: HttpMethod.POST, handler: linkPatientInsuranceHandler },
+	{ path: "/insurance/patient/:patient_id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatientInsuranceHandler },
+	{ path: "/insurance/claims/create", AccessibleBy: availableForRoles([Role.INSURANCE_AGENT]), method: HttpMethod.POST, handler: createInsuranceClaimHandler },
+	{ path: "/insurance/claims/patient/:patient_id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPatientInsuranceClaimsHandler },
+
+	// Prescription and treatment routes
+	{ path: "/prescriptions/create", AccessibleBy: availableForRoles([Role.DOCTOR]), method: HttpMethod.POST, handler: createPrescriptionHandler },
+	{ path: "/prescriptions/:appointment_id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getPrescriptionHandler },
+	{ path: "/treatments/record", AccessibleBy: availableForRoles([Role.DOCTOR]), method: HttpMethod.POST, handler: recordTreatmentHandler },
+	{ path: "/treatments/appointment/:appointment_id", AccessibleBy: availableForRoles([Role.PUBLIC]), method: HttpMethod.GET, handler: getTreatmentsHandler },
+
+	// Management reports routes
+	{ path: "/reports/branch-appointments", AccessibleBy: availableForRoles([Role.BRANCH_MANAGER]), method: HttpMethod.GET, handler: getBranchAppointmentsSummaryHandler },
+	{ path: "/reports/doctor-revenue", AccessibleBy: availableForRoles([Role.BRANCH_MANAGER]), method: HttpMethod.GET, handler: getDoctorRevenueReportHandler },
+	{ path: "/reports/outstanding-balances", AccessibleBy: availableForRoles([Role.BRANCH_MANAGER]), method: HttpMethod.GET, handler: getPatientsWithOutstandingBalancesHandler },
+	{ path: "/reports/treatments-by-category", AccessibleBy: availableForRoles([Role.BRANCH_MANAGER]), method: HttpMethod.GET, handler: getTreatmentsByCategoryHandler },
+	{ path: "/reports/insurance-vs-outofpocket", AccessibleBy: availableForRoles([Role.BRANCH_MANAGER]), method: HttpMethod.GET, handler: getInsuranceVsOutOfPocketHandler }
 ];
 
 

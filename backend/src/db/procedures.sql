@@ -1187,4 +1187,638 @@ begin
 end $$
 
 
+-- ============================================================================
+-- APPOINTMENT MANAGEMENT PROCEDURES
+-- ============================================================================
+
+-- Create new appointment (for scheduling)
+DROP PROCEDURE IF EXISTS create_appointment$$
+CREATE PROCEDURE create_appointment(
+    IN p_appointment_id INT,
+    IN p_patient_id INT,
+    IN p_doctor_id INT,
+    IN p_patient_note VARCHAR(255),
+    IN p_date DATE,
+    IN p_time_slot VARCHAR(13),
+    IN p_status VARCHAR(10)
+)
+BEGIN
+    -- Check if doctor has overlapping appointment
+    DECLARE overlap_count INT;
+    
+    SELECT COUNT(*) INTO overlap_count
+    FROM appointment
+    WHERE doctor_id = p_doctor_id
+      AND date = p_date
+      AND time_slot = p_time_slot
+      AND status IN ('Scheduled', 'Completed');
+    
+    IF overlap_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Doctor already has an appointment in this time slot';
+    END IF;
+    
+    INSERT INTO appointment (
+        appointment_id, patient_id, doctor_id, patient_note, 
+        date, time_slot, status, time_stamp
+    )
+    VALUES (
+        p_appointment_id, p_patient_id, p_doctor_id, p_patient_note,
+        p_date, p_time_slot, p_status, NOW()
+    );
+    
+    SELECT * FROM appointment WHERE appointment_id = p_appointment_id;
+END$$
+
+-- Update appointment status (for completing/cancelling)
+DROP PROCEDURE IF EXISTS update_appointment_status$$
+CREATE PROCEDURE update_appointment_status(
+    IN p_appointment_id INT,
+    IN p_status VARCHAR(10)
+)
+BEGIN
+    UPDATE appointment
+    SET status = p_status
+    WHERE appointment_id = p_appointment_id;
+    
+    SELECT * FROM appointment WHERE appointment_id = p_appointment_id;
+END$$
+
+-- Reschedule appointment
+DROP PROCEDURE IF EXISTS reschedule_appointment$$
+CREATE PROCEDURE reschedule_appointment(
+    IN p_appointment_id INT,
+    IN p_new_date DATE,
+    IN p_new_time_slot VARCHAR(13)
+)
+BEGIN
+    DECLARE v_doctor_id INT;
+    DECLARE overlap_count INT;
+    
+    -- Get doctor_id for the appointment
+    SELECT doctor_id INTO v_doctor_id
+    FROM appointment
+    WHERE appointment_id = p_appointment_id;
+    
+    -- Check for overlapping appointments
+    SELECT COUNT(*) INTO overlap_count
+    FROM appointment
+    WHERE doctor_id = v_doctor_id
+      AND date = p_new_date
+      AND time_slot = p_new_time_slot
+      AND appointment_id != p_appointment_id
+      AND status IN ('Scheduled', 'Completed');
+    
+    IF overlap_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Doctor already has an appointment in this time slot';
+    END IF;
+    
+    UPDATE appointment
+    SET date = p_new_date,
+        time_slot = p_new_time_slot,
+        time_stamp = NOW()
+    WHERE appointment_id = p_appointment_id;
+    
+    SELECT * FROM appointment WHERE appointment_id = p_appointment_id;
+END$$
+
+-- Get appointment by ID
+DROP PROCEDURE IF EXISTS get_appointment_by_id$$
+CREATE PROCEDURE get_appointment_by_id(IN p_appointment_id INT)
+BEGIN
+    SELECT 
+        a.*,
+        p.name as patient_name,
+        d.name as doctor_name,
+        b.name as branch_name
+    FROM appointment a
+    JOIN patient p ON a.patient_id = p.patient_id
+    JOIN doctor d ON a.doctor_id = d.doctor_id
+    JOIN user u ON d.doctor_id = u.user_id
+    JOIN branch b ON u.branch_id = b.branch_id
+    WHERE a.appointment_id = p_appointment_id;
+END$$
+
+-- Get available time slots for a doctor on a specific date
+DROP PROCEDURE IF EXISTS get_available_time_slots$$
+CREATE PROCEDURE get_available_time_slots(
+    IN p_doctor_id INT,
+    IN p_date DATE
+)
+BEGIN
+    -- Return booked time slots
+    SELECT time_slot
+    FROM appointment
+    WHERE doctor_id = p_doctor_id
+      AND date = p_date
+      AND status IN ('Scheduled', 'Completed');
+END$$
+
+-- ============================================================================
+-- TREATMENT AND CONSULTATION PROCEDURES
+-- ============================================================================
+
+-- Record treatment for completed appointment
+DROP PROCEDURE IF EXISTS record_treatment$$
+CREATE PROCEDURE record_treatment(
+    IN p_appointment_id INT,
+    IN p_service_code INT
+)
+BEGIN
+    INSERT INTO treatment (service_code, appointment_id)
+    VALUES (p_service_code, p_appointment_id);
+END$$
+
+-- Get treatments for an appointment
+DROP PROCEDURE IF EXISTS get_treatments_by_appointment$$
+CREATE PROCEDURE get_treatments_by_appointment(IN p_appointment_id INT)
+BEGIN
+    SELECT 
+        t.service_code,
+        tc.name,
+        tc.fee,
+        tc.description
+    FROM treatment t
+    JOIN treatment_catelogue tc ON t.service_code = tc.service_code
+    WHERE t.appointment_id = p_appointment_id;
+END$$
+
+-- Create prescription
+DROP PROCEDURE IF EXISTS create_prescription$$
+CREATE PROCEDURE create_prescription(
+    IN p_appointment_id INT,
+    IN p_consultation_note VARCHAR(255),
+    IN p_prescription_items VARCHAR(255)
+)
+BEGIN
+    INSERT INTO prescription (
+        appointment_id, consultation_note, 
+        prescription_items_details, prescribed_at, is_active
+    )
+    VALUES (
+        p_appointment_id, p_consultation_note,
+        p_prescription_items, NOW(), TRUE
+    )
+    ON DUPLICATE KEY UPDATE
+        consultation_note = p_consultation_note,
+        prescription_items_details = p_prescription_items,
+        prescribed_at = NOW();
+    
+    SELECT * FROM prescription WHERE appointment_id = p_appointment_id;
+END$$
+
+-- Get prescription by appointment
+DROP PROCEDURE IF EXISTS get_prescription_by_appointment$$
+CREATE PROCEDURE get_prescription_by_appointment(IN p_appointment_id INT)
+BEGIN
+    SELECT * FROM prescription WHERE appointment_id = p_appointment_id;
+END$$
+
+-- ============================================================================
+-- BILLING AND INVOICE PROCEDURES
+-- ============================================================================
+
+-- Create billing invoice
+DROP PROCEDURE IF EXISTS create_invoice$$
+CREATE PROCEDURE create_invoice(
+    IN p_appointment_id INT,
+    IN p_additional_fee DECIMAL(8,2),
+    IN p_claim_id INT
+)
+BEGIN
+    DECLARE v_total_fee DECIMAL(8,2);
+    DECLARE v_claimed_amount DECIMAL(8,2);
+    DECLARE v_net_amount DECIMAL(8,2);
+    
+    -- Calculate total fee from treatments
+    SELECT COALESCE(SUM(tc.fee), 0) INTO v_total_fee
+    FROM treatment t
+    JOIN treatment_catelogue tc ON t.service_code = tc.service_code
+    WHERE t.appointment_id = p_appointment_id;
+    
+    -- Add additional fee
+    SET v_total_fee = v_total_fee + COALESCE(p_additional_fee, 0);
+    
+    -- Get claimed amount if insurance claim exists
+    IF p_claim_id IS NOT NULL THEN
+        SELECT COALESCE(claimed_amount, 0) INTO v_claimed_amount
+        FROM insurance_claim
+        WHERE claim_id = p_claim_id;
+    ELSE
+        SET v_claimed_amount = 0;
+    END IF;
+    
+    -- Calculate net amount
+    SET v_net_amount = v_total_fee - v_claimed_amount;
+    
+    INSERT INTO billing_invoice (
+        appointment_id, additional_fee, total_fee, 
+        claim_id, net_amount, remaining_payment_amount, time_stamp
+    )
+    VALUES (
+        p_appointment_id, p_additional_fee, v_total_fee,
+        p_claim_id, v_net_amount, v_net_amount, NOW()
+    );
+    
+    SELECT * FROM billing_invoice WHERE appointment_id = p_appointment_id;
+END$$
+
+-- Record payment (full or partial)
+DROP PROCEDURE IF EXISTS record_payment$$
+CREATE PROCEDURE record_payment(
+    IN p_payment_id INT,
+    IN p_invoice_id INT,
+    IN p_branch_id INT,
+    IN p_paid_amount DECIMAL(8,2),
+    IN p_cashier_id INT
+)
+BEGIN
+    DECLARE v_remaining DECIMAL(8,2);
+    
+    -- Insert payment
+    INSERT INTO billing_payment (
+        payment_id, invoice_id, branch_id, 
+        paid_amount, time_stamp, cashier_id
+    )
+    VALUES (
+        p_payment_id, p_invoice_id, p_branch_id,
+        p_paid_amount, NOW(), p_cashier_id
+    );
+    
+    -- Update remaining amount in invoice
+    SELECT remaining_payment_amount - p_paid_amount INTO v_remaining
+    FROM billing_invoice
+    WHERE appointment_id = p_invoice_id;
+    
+    UPDATE billing_invoice
+    SET remaining_payment_amount = v_remaining
+    WHERE appointment_id = p_invoice_id;
+    
+    SELECT * FROM billing_payment WHERE payment_id = p_payment_id;
+END$$
+
+-- Get invoice by appointment
+DROP PROCEDURE IF EXISTS get_invoice_by_appointment$$
+CREATE PROCEDURE get_invoice_by_appointment(IN p_appointment_id INT)
+BEGIN
+    SELECT 
+        bi.*,
+        a.patient_id,
+        p.name as patient_name,
+        a.doctor_id,
+        d.name as doctor_name,
+        a.date as appointment_date
+    FROM billing_invoice bi
+    JOIN appointment a ON bi.appointment_id = a.appointment_id
+    JOIN patient p ON a.patient_id = p.patient_id
+    JOIN doctor d ON a.doctor_id = d.doctor_id
+    WHERE bi.appointment_id = p_appointment_id;
+END$$
+
+-- Get payments for an invoice
+DROP PROCEDURE IF EXISTS get_payments_by_invoice$$
+CREATE PROCEDURE get_payments_by_invoice(IN p_invoice_id INT)
+BEGIN
+    SELECT 
+        bp.*,
+        s.name as cashier_name,
+        b.name as branch_name
+    FROM billing_payment bp
+    JOIN staff s ON bp.cashier_id = s.staff_id
+    JOIN branch b ON bp.branch_id = b.branch_id
+    WHERE bp.invoice_id = p_invoice_id
+    ORDER BY bp.time_stamp DESC;
+END$$
+
+-- Get outstanding balance for a patient
+DROP PROCEDURE IF EXISTS get_patient_outstanding_balance$$
+CREATE PROCEDURE get_patient_outstanding_balance(IN p_patient_id INT)
+BEGIN
+    SELECT 
+        SUM(bi.remaining_payment_amount) as total_outstanding
+    FROM billing_invoice bi
+    JOIN appointment a ON bi.appointment_id = a.appointment_id
+    WHERE a.patient_id = p_patient_id
+      AND bi.remaining_payment_amount > 0;
+END$$
+
+-- ============================================================================
+-- INSURANCE PROCEDURES
+-- ============================================================================
+
+-- Create insurance policy
+DROP PROCEDURE IF EXISTS create_insurance$$
+CREATE PROCEDURE create_insurance(
+    IN p_insurance_id INT,
+    IN p_insurance_type VARCHAR(20),
+    IN p_insurance_period VARCHAR(20),
+    IN p_claim_percentage DECIMAL(2,2)
+)
+BEGIN
+    INSERT INTO insurance (
+        insurance_id, insurance_type, insurance_period,
+        claim_percentage, created_at
+    )
+    VALUES (
+        p_insurance_id, p_insurance_type, p_insurance_period,
+        p_claim_percentage, NOW()
+    );
+    
+    SELECT * FROM insurance WHERE insurance_id = p_insurance_id;
+END$$
+
+-- Link patient to insurance
+DROP PROCEDURE IF EXISTS link_patient_insurance$$
+CREATE PROCEDURE link_patient_insurance(
+    IN p_patient_id INT,
+    IN p_insurance_id INT
+)
+BEGIN
+    INSERT INTO patient_insurance (patient_id, insurance_id, created_at, is_expired)
+    VALUES (p_patient_id, p_insurance_id, NOW(), FALSE);
+END$$
+
+-- Get patient insurance policies
+DROP PROCEDURE IF EXISTS get_patient_insurance$$
+CREATE PROCEDURE get_patient_insurance(IN p_patient_id INT)
+BEGIN
+    SELECT 
+        i.*,
+        pi.created_at as policy_start_date,
+        pi.is_expired
+    FROM patient_insurance pi
+    JOIN insurance i ON pi.insurance_id = i.insurance_id
+    WHERE pi.patient_id = p_patient_id;
+END$$
+
+-- Create insurance claim
+DROP PROCEDURE IF EXISTS create_insurance_claim$$
+CREATE PROCEDURE create_insurance_claim(
+    IN p_claim_id INT,
+    IN p_service_code INT,
+    IN p_patient_id INT,
+    IN p_approved_by INT,
+    IN p_insurance_id INT
+)
+BEGIN
+    DECLARE v_service_fee DECIMAL(8,2);
+    DECLARE v_claim_percentage DECIMAL(2,2);
+    DECLARE v_claimed_amount DECIMAL(8,2);
+    
+    -- Get service fee
+    SELECT fee INTO v_service_fee
+    FROM treatment_catelogue
+    WHERE service_code = p_service_code;
+    
+    -- Get claim percentage
+    SELECT claim_percentage INTO v_claim_percentage
+    FROM insurance
+    WHERE insurance_id = p_insurance_id;
+    
+    -- Calculate claimed amount
+    SET v_claimed_amount = v_service_fee * v_claim_percentage;
+    
+    INSERT INTO insurance_claim (
+        claim_id, service_code, patient_id, approved_by,
+        claimed_amount, claimed_at, insurance_id
+    )
+    VALUES (
+        p_claim_id, p_service_code, p_patient_id, p_approved_by,
+        v_claimed_amount, NOW(), p_insurance_id
+    );
+    
+    SELECT * FROM insurance_claim WHERE claim_id = p_claim_id;
+END$$
+
+-- Get insurance claims for patient
+DROP PROCEDURE IF EXISTS get_patient_insurance_claims$$
+CREATE PROCEDURE get_patient_insurance_claims(IN p_patient_id INT)
+BEGIN
+    SELECT 
+        ic.*,
+        tc.name as treatment_name,
+        i.insurance_type,
+        s.name as approved_by_name
+    FROM insurance_claim ic
+    JOIN treatment_catelogue tc ON ic.service_code = tc.service_code
+    JOIN insurance i ON ic.insurance_id = i.insurance_id
+    JOIN staff s ON ic.approved_by = s.staff_id
+    WHERE ic.patient_id = p_patient_id
+    ORDER BY ic.claimed_at DESC;
+END$$
+
+-- ============================================================================
+-- MANAGEMENT REPORTS PROCEDURES
+-- ============================================================================
+
+-- Report 1: Branch-wise appointment summary per day
+DROP PROCEDURE IF EXISTS report_branch_appointments_daily$$
+CREATE PROCEDURE report_branch_appointments_daily(
+    IN p_date DATE,
+    IN p_branch_id INT
+)
+BEGIN
+    SELECT 
+        b.name as branch_name,
+        a.date,
+        a.status,
+        COUNT(*) as appointment_count
+    FROM appointment a
+    JOIN doctor d ON a.doctor_id = d.doctor_id
+    JOIN user u ON d.doctor_id = u.user_id
+    JOIN branch b ON u.branch_id = b.branch_id
+    WHERE a.date = p_date
+      AND (p_branch_id = -1 OR u.branch_id = p_branch_id)
+    GROUP BY b.name, a.date, a.status
+    ORDER BY b.name, a.status;
+END$$
+
+-- Report 2: Doctor-wise revenue report
+DROP PROCEDURE IF EXISTS report_doctor_revenue$$
+CREATE PROCEDURE report_doctor_revenue(
+    IN p_start_date DATE,
+    IN p_end_date DATE,
+    IN p_doctor_id INT
+)
+BEGIN
+    SELECT 
+        d.doctor_id,
+        d.name as doctor_name,
+        COUNT(DISTINCT a.appointment_id) as total_appointments,
+        SUM(bi.total_fee) as total_revenue,
+        SUM(bp.paid_amount) as total_collected,
+        SUM(bi.remaining_payment_amount) as total_outstanding
+    FROM doctor d
+    JOIN appointment a ON d.doctor_id = a.doctor_id
+    LEFT JOIN billing_invoice bi ON a.appointment_id = bi.appointment_id
+    LEFT JOIN billing_payment bp ON bi.appointment_id = bp.invoice_id
+    WHERE a.date BETWEEN p_start_date AND p_end_date
+      AND a.status = 'Completed'
+      AND (p_doctor_id = -1 OR d.doctor_id = p_doctor_id)
+    GROUP BY d.doctor_id, d.name
+    ORDER BY total_revenue DESC;
+END$$
+
+-- Report 3: List of patients with outstanding balances
+DROP PROCEDURE IF EXISTS report_patients_outstanding_balances$$
+CREATE PROCEDURE report_patients_outstanding_balances()
+BEGIN
+    SELECT 
+        p.patient_id,
+        p.name as patient_name,
+        p.emergency_contact_no,
+        b.name as branch_name,
+        SUM(bi.remaining_payment_amount) as total_outstanding,
+        COUNT(DISTINCT bi.appointment_id) as unpaid_invoices
+    FROM patient p
+    JOIN appointment a ON p.patient_id = a.patient_id
+    JOIN billing_invoice bi ON a.appointment_id = bi.appointment_id
+    JOIN user u ON p.patient_id = u.user_id
+    JOIN branch b ON u.branch_id = b.branch_id
+    WHERE bi.remaining_payment_amount > 0
+    GROUP BY p.patient_id, p.name, p.emergency_contact_no, b.name
+    ORDER BY total_outstanding DESC;
+END$$
+
+-- Report 4: Number of treatments per category over a given period
+DROP PROCEDURE IF EXISTS report_treatments_by_category$$
+CREATE PROCEDURE report_treatments_by_category(
+    IN p_start_date DATE,
+    IN p_end_date DATE
+)
+BEGIN
+    SELECT 
+        s.speciality_name as category,
+        tc.name as treatment_name,
+        COUNT(*) as treatment_count,
+        SUM(tc.fee) as total_revenue
+    FROM treatment t
+    JOIN appointment a ON t.appointment_id = a.appointment_id
+    JOIN treatment_catelogue tc ON t.service_code = tc.service_code
+    JOIN speciality s ON tc.speciality_id = s.speciality_id
+    WHERE a.date BETWEEN p_start_date AND p_end_date
+      AND a.status = 'Completed'
+    GROUP BY s.speciality_name, tc.name
+    ORDER BY s.speciality_name, treatment_count DESC;
+END$$
+
+-- Report 5: Insurance coverage vs. out-of-pocket payments
+DROP PROCEDURE IF EXISTS report_insurance_vs_outofpocket$$
+CREATE PROCEDURE report_insurance_vs_outofpocket(
+    IN p_start_date DATE,
+    IN p_end_date DATE
+)
+BEGIN
+    SELECT 
+        DATE_FORMAT(a.date, '%Y-%m') as month,
+        COUNT(DISTINCT a.appointment_id) as total_appointments,
+        SUM(bi.total_fee) as total_fees,
+        SUM(COALESCE(ic.claimed_amount, 0)) as insurance_covered,
+        SUM(bp.paid_amount) as out_of_pocket_payments,
+        ROUND(SUM(COALESCE(ic.claimed_amount, 0)) / SUM(bi.total_fee) * 100, 2) as insurance_coverage_percentage
+    FROM appointment a
+    JOIN billing_invoice bi ON a.appointment_id = bi.appointment_id
+    LEFT JOIN insurance_claim ic ON bi.claim_id = ic.claim_id
+    LEFT JOIN billing_payment bp ON bi.appointment_id = bp.invoice_id
+    WHERE a.date BETWEEN p_start_date AND p_end_date
+      AND a.status = 'Completed'
+    GROUP BY DATE_FORMAT(a.date, '%Y-%m')
+    ORDER BY month;
+END$$
+
+-- ============================================================================
+-- ADDITIONAL UTILITY PROCEDURES
+-- ============================================================================
+
+-- Get all appointments for a branch on a specific date
+DROP PROCEDURE IF EXISTS get_branch_appointments_by_date$$
+CREATE PROCEDURE get_branch_appointments_by_date(
+    IN p_branch_id INT,
+    IN p_date DATE
+)
+BEGIN
+    SELECT 
+        a.*,
+        p.name as patient_name,
+        d.name as doctor_name,
+        s.speciality_name
+    FROM appointment a
+    JOIN patient p ON a.patient_id = p.patient_id
+    JOIN doctor d ON a.doctor_id = d.doctor_id
+    JOIN user u ON d.doctor_id = u.user_id
+    LEFT JOIN doctor_speciality ds ON d.doctor_id = ds.doctor_id
+    LEFT JOIN speciality s ON ds.speciality_id = s.speciality_id
+    WHERE u.branch_id = p_branch_id
+      AND a.date = p_date
+    ORDER BY a.time_slot;
+END$$
+
+-- Get treatment catalogue with pagination
+DROP PROCEDURE IF EXISTS get_treatments_for_pagination$$
+CREATE PROCEDURE get_treatments_for_pagination(
+    IN p_count INT,
+    IN p_offset INT
+)
+BEGIN
+    SELECT 
+        tc.*,
+        s.speciality_name,
+        tc.created_at
+    FROM treatment_catelogue tc
+    LEFT JOIN speciality s ON tc.speciality_id = s.speciality_id
+    ORDER BY tc.service_code
+    LIMIT p_count OFFSET p_offset;
+END$$
+
+-- Get treatment count
+DROP PROCEDURE IF EXISTS get_treatments_count$$
+CREATE PROCEDURE get_treatments_count()
+BEGIN
+    SELECT COUNT(*) as treatment_count FROM treatment_catelogue;
+END$$
+
+-- Get all insurance policies
+DROP PROCEDURE IF EXISTS get_all_insurance$$
+CREATE PROCEDURE get_all_insurance()
+BEGIN
+    SELECT * FROM insurance ORDER BY created_at DESC;
+END$$
+
+-- Get total patients count (fixed version)
+DROP PROCEDURE IF EXISTS get_total_patients_count$$
+CREATE PROCEDURE get_total_patients_count()
+BEGIN
+    SELECT COUNT(*) as patient_count FROM patient;
+END$$
+
+-- Get total staff count (fixed version)
+DROP PROCEDURE IF EXISTS get_total_staffs_count$$
+CREATE PROCEDURE get_total_staffs_count()
+BEGIN
+    SELECT COUNT(*) as staff_count FROM staff;
+END$$
+
+-- Emergency walk-in appointment creation
+DROP PROCEDURE IF EXISTS create_walkin_appointment$$
+CREATE PROCEDURE create_walkin_appointment(
+    IN p_appointment_id INT,
+    IN p_patient_id INT,
+    IN p_doctor_id INT,
+    IN p_patient_note VARCHAR(255)
+)
+BEGIN
+    INSERT INTO appointment (
+        appointment_id, patient_id, doctor_id, patient_note,
+        date, time_slot, status, time_stamp
+    )
+    VALUES (
+        p_appointment_id, p_patient_id, p_doctor_id, p_patient_note,
+        CURDATE(), 'Walk-in', 'Scheduled', NOW()
+    );
+    
+    SELECT * FROM appointment WHERE appointment_id = p_appointment_id;
+END$$
+
+
 DELIMITER ;

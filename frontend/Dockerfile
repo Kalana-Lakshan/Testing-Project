@@ -13,6 +13,10 @@ RUN npm install --legacy-peer-deps && npm cache clean --force
 # Copy source code
 COPY . .
 
+# Build argument for backend URL
+ARG VITE_BACKEND_URL=http://localhost:8000
+ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
+
 # Build the application
 RUN npm run build
 

@@ -25,7 +25,7 @@ Thumbs.db
 *.swo
 
 # Docker
-*.sql
+# *.sql (temporarily disabled to add procedures)
 backup_*.sql.gz
 
 # Temporary files
