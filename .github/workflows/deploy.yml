@@ -30,7 +30,7 @@ jobs:
           script: |
             cd ~/Testing-Project
             git pull
-            docker compose up -d --build
+            docker-compose up -d --build
 
   build-and-deploy:
     if: startsWith(github.ref, 'refs/tags/')
@@ -98,4 +98,4 @@ jobs:
             cd ~/Testing-Project
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/medsync-frontend:${{ github.ref_name }}
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/medsync-backend:${{ github.ref_name }}
-            docker compose up -d
+            docker-compose up -d
