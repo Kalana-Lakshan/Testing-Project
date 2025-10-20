@@ -92,7 +92,7 @@ export const staffSignup = async (req: Request, res: Response) => {
         hashed_password,
         data.role,
         data.branch,
-        false
+        true // Automatically approved, no admin approval needed
     );
     if (!usr) {
         res.status(500).json({ error: "Internal Server Error" });
@@ -150,7 +150,7 @@ export const patientSignup = async (req: Request, res: Response) => {
         hashed_password,
         Role.PATIENT,
         data.branch,
-        true
+        true // Automatically approved, no admin approval needed
     );
     if (!usr) {
         res.status(500).json({ error: "Internal Server Error" });

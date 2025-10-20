@@ -51,39 +51,9 @@ function App() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  // Only validate token if you want to show protected pages
   useEffect(() => {
-    const path = window.location.pathname;
-    const isAuthPath =
-      path == "/staff/sign-in" || path == "/staff/sign-up" || path == "/sign-in" || path === "/sign-up";
-    
-    // If on auth page without token, just show the page
-    if (!token && isAuthPath) {
-      setLoading(false);
-      return;
-    }
-    
-    // If not on auth page and no token, redirect to sign-in
-    if (!token && !isAuthPath) {
-      setLoading(false);
-      navigate("/sign-in");
-      return;
-    }
-    
-    // If has token, validate it
-    validateToken().then(() => {
-      setLoading(false)
-    }).catch(() => {
-      localStorage.removeItem(LOCAL_STORAGE__TOKEN);
-      localStorage.removeItem(LOCAL_STORAGE__USER);
-      localStorage.removeItem(LOCAL_STORAGE__USERNAME);
-      localStorage.removeItem(LOCAL_STORAGE__ROLE);
-      localStorage.removeItem(LOCAL_STORAGE__USER_ID);
-
-      setLoading(false);
-      if (!isAuthPath) {
-        navigate("/sign-in");
-      }
-    });
+    setLoading(false);
   }, []);
 
   return loading ? (
