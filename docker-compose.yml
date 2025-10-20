@@ -1,0 +1,84 @@
+services:
+  # MySQL Database
+  database:
+    image: mysql:8.0
+    container_name: medsync-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DATABASE_NAME:-Project-MedSync}
+      MYSQL_USER: ${DATABASE_USER:-medsync}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD:-medsyncpassword}
+    ports:
+      - "3308:3306"  # Changed to 3308 to avoid conflicts
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/src/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./backend/src/db/table.sql:/docker-entrypoint-initdb.d/02-table.sql
+      - ./backend/src/db/procedures.sql:/docker-entrypoint-initdb.d/03-procedures.sql
+    networks:
+      - medsync-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DATABASE_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: medsync-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_HOST: database
+      DATABASE_USER: ${DATABASE_USER:-medsync}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-medsyncpassword}
+      DATABASE_NAME: ${DATABASE_NAME:-Project-MedSync}
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-24h}
+      PORT: 8000
+      NODE_ENV: production
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - medsync-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: medsync-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - medsync-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  medsync-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local

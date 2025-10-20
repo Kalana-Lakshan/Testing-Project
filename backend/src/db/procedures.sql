@@ -1,4 +1,4 @@
--- Active: 1755111596628@@127.0.0.1@3306@Project-MedSync
+-- Active: 1760701335833@@127.0.0.1@3306@project-medsync
 -- use `Project-MedSync`;
 -- User model functions
 DROP PROCEDURE IF EXISTS create_user;
@@ -1048,13 +1048,17 @@ BEGIN
 END$$
 
 -- get total patients count
-CREATE PROCEDURE get_total_patients_count()
+CREATE PROCEDURE get_total_patients_count(
+    OUT total_count INT
+)
 BEGIN
     SELECT COUNT(*) INTO total_count FROM patient;
 END$$
 
 -- get total staff count
-CREATE PROCEDURE get_total_staffs_count()
+CREATE PROCEDURE get_total_staffs_count(
+    OUT staffs_count INT
+)
 BEGIN
     SELECT COUNT(*) INTO staffs_count FROM staff;
 END$$

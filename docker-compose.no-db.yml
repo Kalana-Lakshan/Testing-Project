@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: medsync-backend
+    restart: unless-stopped
+    environment:
+      DATABASE_HOST: host.docker.internal  # Connect to host MySQL
+      DATABASE_USER: ${DATABASE_USER:-medsync}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-medsyncpassword}
+      DATABASE_NAME: ${DATABASE_NAME:-Project-MedSync}
+      JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-24h}
+      PORT: 8000
+      NODE_ENV: production
+    ports:
+      - "8000:8000"
+    networks:
+      - medsync-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: medsync-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - medsync-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  medsync-network:
+    driver: bridge

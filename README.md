@@ -101,7 +101,67 @@ Project-MedSync/
 - **Project Overview**: [Project 1 - Clinic Appointment and Treatment Management System.pdf](Project%201%20-%20Clinic%20Appointment%20and%20Treatment%20Management%20System.pdf)
 - **Database Design**: [DB_Project_Clinic_ERD.pdf](DB_Project_Clinic_ERD.pdf)
 
-## 🔧 Development
+## 🐳 Docker Deployment (Recommended)
+
+### Quick Start with Docker
+
+**Windows Users (Easiest):**
+```bash
+# Double-click or run:
+docker-start.bat
+```
+
+**Manual Setup:**
+```bash
+# Copy environment template
+cp .env.docker .env
+
+# Edit .env with your configuration
+# Then start all services
+docker-compose up -d
+```
+
+**Services will be available at:**
+- Frontend: http://localhost
+- Backend API: http://localhost:8000
+- MySQL Database: localhost:3306
+
+**Useful Scripts:**
+```bash
+docker-start.bat    # Start all services
+docker-stop.bat     # Stop all services
+docker-logs.bat     # View logs
+```
+
+**Manual Commands:**
+```bash
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Rebuild and restart
+docker-compose up -d --build
+```
+
+📖 **Quick Start Guide**: See [DOCKER_QUICKSTART.md](DOCKER_QUICKSTART.md)  
+📖 **Complete Docker guide**: See [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)
+
+### Alternative Deployment Scripts
+
+**Windows:**
+```bash
+deploy.bat
+```
+
+**Linux/Mac:**
+```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+## 🔧 Development (Without Docker)
 
 ### Running the Full Stack
 
@@ -123,7 +183,7 @@ Project-MedSync/
 
 - **Backend API**: RESTful API for clinic management operations
 - **Frontend Client**: React-based user interface
-- **Database**: PostgreSQL for data persistence
+- **Database**: MySQL for data persistence
 - **Documentation**: Comprehensive system specifications
 
 ## 🎯 Features (Planned/In Development)
@@ -137,12 +197,17 @@ Project-MedSync/
 
 ## 📊 Database
 
-The system uses PostgreSQL with a comprehensive schema designed for clinic management:
+The system uses MySQL 8.0 with a comprehensive schema designed for clinic management:
 - Patient records
 - Appointment scheduling
 - Treatment history
 - Healthcare provider information
 - Billing and payments
+
+Database initialization files are located in `backend/src/db/`:
+- `init.sql` - Initial database setup
+- `table.sql` - Table definitions
+- `procedures.sql` - Stored procedures
 
 Refer to the ERD document for detailed database design.
 

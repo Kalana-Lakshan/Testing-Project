@@ -1,0 +1,43 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+docs/
+*.pdf
+*.jpeg
+*.jpg
+*.png
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+node_modules
+dist
+build
+coverage
+
+# Logs
+*.log
+npm-debug.log*
+
+# Deployment scripts (not needed in container)
+deploy.sh
+deploy.bat
+docker-*.bat
